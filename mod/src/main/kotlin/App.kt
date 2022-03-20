@@ -15,11 +15,19 @@ lateinit var mod: App
 class App : KotlinMod() {
 
     lateinit var cube: V3
+    lateinit var coords: ArrayList<V3>
     var inited = false
 
     override fun onEnable() {
         mod = this
         UIEngine.initialize(this)
+
+        registerChannel("mobs:init"){
+            val times = readInt()
+            for (i in 0..times){
+                coords.add(V3(readDouble(), readDouble(), readDouble()))
+            }
+        }
 
         registerChannel("tower:init") {
             cube = V3(
@@ -40,6 +48,7 @@ class App : KotlinMod() {
                 last = System.currentTimeMillis()
             }
         }
+
 
         registerHandler<RenderPass> {
             if (inited) {
