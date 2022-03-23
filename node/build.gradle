@@ -18,6 +18,7 @@ compileKotlin {
 
 dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
+    implementation files('libs/simulator-api-1.0-SNAPSHOT.jar')
 
     compileOnly 'cristalix:bukkit-core:21.01.30'
     compileOnly 'cristalix:dark-paper:21.02.03'
@@ -36,8 +37,6 @@ dependencies {
 
     implementation 'me.func:animation-api:last-SNAPSHOT'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.0'
-
-    implementation files('libs/simulator-api-1.0-SNAPSHOT.jar')
 }
 
 afterEvaluate {

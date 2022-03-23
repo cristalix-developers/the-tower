@@ -33,6 +33,10 @@ afterEvaluate {
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
+dependencies {
+    implementation files('libs/simulator-api-1.0-SNAPSHOT.jar')
+}
+
 tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
     sourceCompatibility = "1.8"
