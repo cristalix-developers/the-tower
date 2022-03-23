@@ -1,4 +1,4 @@
-package me.func.tower
+package me.reidj.tower
 
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.bukkit.world.Label
@@ -41,7 +41,7 @@ class App : JavaPlugin(), Listener {
         x += 0.5
         z += 0.5
     }
-    val generators = map.getLabels("mob")
+    private val generators: MutableList<Label> = map.getLabels("mob")
 
     override fun onEnable() {
         app = this
@@ -80,9 +80,13 @@ class App : JavaPlugin(), Listener {
             ModTransfer(tower.x, tower.y, tower.z).send("tower:init", player)
 
             // Отправляем точки со спавнерами
-            val mobs = ModTransfer().integer(generators.size)
-            generators.forEach { mobs.double(it.x).double(it.y).double(it.z) }
-            mobs.send("mobs:init", player)
+            generators.forEach {
+                ModTransfer()
+                    .double(it.x)
+                    .double(it.y)
+                    .double(it.z)
+                    .send("mobs:init", player)
+            }
         }
     }
 }

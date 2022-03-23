@@ -1,7 +1,17 @@
+
+import dev.xdark.clientapi.entity.EntityLivingBase
+import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
+import java.util.*
 
-class Mob(wave: Wave, obj: Any, location: V3, destination: V3) {
-    val strength = wave.waveLevel
+class Mob(val location: V3, speed: Double) {
 
-    //TODO: Логика атаки, логика смерти, логика передвижения
+    fun create(): EntityLivingBase {
+        val mob = UIEngine.clientApi.entityProvider().newEntity(54, UIEngine.clientApi.minecraft().world) as EntityLivingBase
+        mob.entityId = (Math.random() * Int.MAX_VALUE).toInt()
+        mob.setUniqueId(UUID.randomUUID())
+        mob.teleport(location.x, location.y, location.z)
+        UIEngine.clientApi.minecraft().world.spawnEntity(mob)
+        return mob
+    }
 }

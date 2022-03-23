@@ -1,9 +1,10 @@
+
+import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.RenderPass
 import dev.xdark.clientapi.opengl.GlStateManager
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.GL_POLYGON
-import org.lwjgl.opengl.GL11.glCallList
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
@@ -11,22 +12,28 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 lateinit var mod: App
+lateinit var wave: Wave
 
 class App : KotlinMod() {
 
     lateinit var cube: V3
-    lateinit var coords: ArrayList<V3>
+    var coords: ArrayList<V3> = arrayListOf()
+    val mobs: MutableList<EntityLivingBase> = mutableListOf()
     var inited = false
 
     override fun onEnable() {
         mod = this
         UIEngine.initialize(this)
 
-        registerChannel("mobs:init"){
-            val times = readInt()
-            for (i in 0..times){
-                coords.add(V3(readDouble(), readDouble(), readDouble()))
-            }
+        registerChannel("mobs:init") {
+            coords.add(V3(readDouble(), readDouble(), readDouble()))
+        }
+
+        // Начинать 1 волну через 2 секунды после входа игрока
+        UIEngine.schedule(2) {
+            wave = Wave(System.currentTimeMillis(), 0, coords, cube)
+            wave.start()
+            MobManager()
         }
 
         registerChannel("tower:init") {
@@ -40,7 +47,6 @@ class App : KotlinMod() {
 
         var angle = 0.0
         var last = System.currentTimeMillis()
-
 
         registerHandler<GameLoop> {
             val computed = angle / 20.0
@@ -72,6 +78,7 @@ class App : KotlinMod() {
                 )
 
                 GlStateManager.translate(-player.x, -player.y, -player.z)
+                TowerManager.activeAmmo.forEach { it.draw() }
                 GlStateManager.translate(cube.x, cube.y, cube.z)
                 GlStateManager.rotate(
                     (angle / 23.0f).toFloat(),
