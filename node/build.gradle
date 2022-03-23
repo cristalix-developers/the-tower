@@ -24,8 +24,11 @@ dependencies {
     compileOnly 'dev.xdark:feder:1.0-SNAPSHOT'
 
     implementation 'dev.implario.bukkit:bukkit-tools:4.0.0'
-    implementation 'dev.implario.bukkit:kotlin-api:1.0.0'
+    implementation 'dev.implario.bukkit:kotlin-api:1.1.1'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
+
+    implementation 'clepto:clepto-bukkit:3.4.2'
+    implementation 'clepto:clepto-cristalix:3.0.2'
 
     implementation 'dev.implario.games5e:bukkit-worker-core:2.1.20'
     implementation 'dev.implario.bukkit:bukkit-tools:4.4.12'
@@ -33,6 +36,8 @@ dependencies {
 
     implementation 'me.func:animation-api:last-SNAPSHOT'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.0'
+
+    implementation files('libs/simulator-api-1.0-SNAPSHOT.jar')
 }
 
 afterEvaluate {
