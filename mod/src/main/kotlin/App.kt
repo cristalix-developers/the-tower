@@ -31,8 +31,8 @@ class App : KotlinMod() {
 
         // Начинать 1 волну через 2 секунды после входа игрока
         UIEngine.schedule(2) {
-            wave = Wave(System.currentTimeMillis(), 0, coords, cube)
-            wave.start()
+            //wave = Wave(System.currentTimeMillis(), 0, coords, cube)
+            //wave.start()
             MobManager()
         }
 

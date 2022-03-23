@@ -16,6 +16,7 @@ import me.reidj.tower.listener.JoinEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.user.Stat
 import me.reidj.tower.user.User
+import me.reidj.tower.wave.WaveManager
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.network.ISocketClient
@@ -84,5 +85,7 @@ class App : JavaPlugin() {
             UnusedEvent,
             InteractEvent
         )
+        
+        WaveManager().runTaskTimer(this@App, 0, 1)
     }
 }
