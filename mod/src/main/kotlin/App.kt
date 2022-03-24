@@ -1,23 +1,27 @@
 
 import dev.xdark.clientapi.entity.EntityLivingBase
-import dev.xdark.clientapi.event.lifecycle.GameLoop
+import dev.xdark.clientapi.event.render.ExpBarRender
+import dev.xdark.clientapi.event.render.HealthRender
+import dev.xdark.clientapi.event.render.HungerRender
 import dev.xdark.clientapi.event.render.RenderPass
 import dev.xdark.clientapi.opengl.GlStateManager
+import dev.xdark.feder.NetUtil
+import mob.Mob
+import mob.MobManager
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11.GL_POLYGON
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
+import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
 
 lateinit var mod: App
-lateinit var wave: Wave
 
 class App : KotlinMod() {
 
     lateinit var cube: V3
-    var coords: ArrayList<V3> = arrayListOf()
     val mobs: MutableList<EntityLivingBase> = mutableListOf()
     var inited = false
 
@@ -25,18 +29,26 @@ class App : KotlinMod() {
         mod = this
         UIEngine.initialize(this)
 
-        registerChannel("mobs:init") {
-            coords.add(V3(readDouble(), readDouble(), readDouble()))
-        }
+        MobManager
 
-        // Начинать 1 волну через 2 секунды после входа игрока
-        UIEngine.schedule(2) {
-            //wave = Wave(System.currentTimeMillis(), 0, coords, cube)
-            //wave.start()
-            MobManager()
+        registerHandler<ExpBarRender> { isCancelled = true }
+        registerHandler<HungerRender> { isCancelled = true }
+        registerHandler<HealthRender> { isCancelled = true }
+
+        registerChannel("tower:mobinit") {
+            mobs.add(
+                Mob(
+                    UUID.fromString(NetUtil.readUtf8(this)),
+                    readInt(),
+                    readDouble(),
+                    readDouble(),
+                    readDouble()
+                ).create()
+            )
         }
 
         registerChannel("tower:init") {
+            registerHandler<HealthRender> { isCancelled = false }
             cube = V3(
                 readDouble(),
                 readDouble() + 1,
@@ -46,15 +58,6 @@ class App : KotlinMod() {
         }
 
         var angle = 0.0
-        var last = System.currentTimeMillis()
-
-        registerHandler<GameLoop> {
-            val computed = angle / 20.0
-            if (System.currentTimeMillis() - last > 200) {
-                last = System.currentTimeMillis()
-            }
-        }
-
 
         registerHandler<RenderPass> {
             if (inited) {

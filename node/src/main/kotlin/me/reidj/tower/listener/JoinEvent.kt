@@ -4,6 +4,7 @@ import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import me.func.mod.conversation.ModLoader
 import me.reidj.tower.app
+import me.reidj.tower.user.User
 import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -38,6 +39,7 @@ object JoinEvent : Listener {
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
         teleport(app.spawn)
+        app.simulator.getUser<User>(uniqueId)?.player = player
         inventory.setItem(0, startItem)
         inventory.setItem(4, settingsItem)
         inventory.setItem(8, backItem)

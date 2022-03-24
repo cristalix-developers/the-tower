@@ -9,12 +9,11 @@ import org.bukkit.scheduler.BukkitRunnable
  * @project tower
  * @author Рейдж
  */
-class WaveManager : BukkitRunnable() {
+object WaveManager : BukkitRunnable() {
 
     override fun run() {
-        Bukkit.getOnlinePlayers().map { app.simulator.getUser<User>(it.uniqueId) }
-            .filter { it?.wave != null }
-            .filter { (System.currentTimeMillis() - it!!.wave!!.startTime) / 1000 == 40.toLong() }
-            .forEach { it?.wave!!.end() }
+        Bukkit.getOnlinePlayers().mapNotNull { app.simulator.getUser<User>(it.uniqueId)?.wave }
+            .filter { (System.currentTimeMillis() - it.startTime) / 1000 == 40.toLong() || it.aliveMobs.isEmpty() }
+            .forEach { it.end() }
     }
 }

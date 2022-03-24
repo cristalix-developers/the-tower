@@ -1,18 +1,19 @@
+package mob
+
 import dev.xdark.clientapi.event.lifecycle.GameLoop
+import mod
 
 /**
  * @project tower
  * @author Рейдж
  */
-class MobManager {
+object MobManager {
 
     private var lastTick = System.currentTimeMillis()
-    private val speed = .001
+    private var moveSpeed = 0.0
 
     init {
         mod.registerHandler<GameLoop> {
-            if ((System.currentTimeMillis() - wave.time) / 1000 == 40.toLong())
-                wave.end()
             val now = System.currentTimeMillis()
             if (now - lastTick > .01 * 1000) {
                 lastTick = now
@@ -21,12 +22,15 @@ class MobManager {
                     val dZ = mod.cube.z - entity.z
                     val rotation =
                         Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
-
                     entity.rotationYawHead = rotation
                     entity.setYaw(rotation)
-                    entity.teleport(entity.x + dX * speed, entity.y, entity.z + dZ * speed)
+                    entity.teleport(entity.x + dX * moveSpeed, entity.y, entity.z + dZ * moveSpeed)
                 }
             }
+        }
+
+        mod.registerChannel("tower:mobspeed") {
+            moveSpeed = readDouble()
         }
     }
 }

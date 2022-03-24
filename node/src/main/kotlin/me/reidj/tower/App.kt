@@ -8,15 +8,18 @@ import dev.implario.games5e.node.NoopGameNode
 import dev.implario.games5e.sdk.cristalix.MapLoader
 import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
+import io.netty.buffer.Unpooled
 import me.func.mod.Anime
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
+import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.JoinEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.user.Stat
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.WaveManager
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.network.ISocketClient
@@ -27,6 +30,7 @@ import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.transfer.ITransferService
 import ru.cristalix.core.transfer.TransferService
 import ru.kdev.simulatorapi.Simulator
+import java.util.*
 
 const val HUB = "HUB-2"
 
@@ -85,7 +89,23 @@ class App : JavaPlugin() {
             UnusedEvent,
             InteractEvent
         )
-        
-        WaveManager().runTaskTimer(this@App, 0, 1)
+
+        WaveManager.runTaskTimer(this@App, 0, 1)
+
+        Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
+            val user = simulator.getUser<User>(player.uniqueId)
+            user?.wave!!.aliveMobs.filter {
+                it.uuid == UUID.fromString(
+                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+                )
+            }.forEach {
+                if (it.hp > 0) {
+                    it.hp--
+                } else {
+                    user.wave!!.aliveMobs.remove(it)
+                    ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,4 @@
-package me.reidj.tower
+package me.reidj.tower.mob
 
 /**
  * @project tower

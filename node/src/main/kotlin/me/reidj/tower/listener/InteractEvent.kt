@@ -19,6 +19,10 @@ import ru.cristalix.core.realm.RealmId
  */
 object InteractEvent : Listener {
 
+    private const val MOVE_SPEED: Double = .001
+    private const val CONST_TICKS_BEFORE_STRIKE = 5
+    private const val TICKS_BEFORE_STRIKE = 40
+
     init {
         B.regCommand({ player, _ ->
             transfer(listOf(player.uniqueId), RealmId.of(HUB))
@@ -26,6 +30,8 @@ object InteractEvent : Listener {
         }, "leave")
         B.regCommand({ player, _ ->
             player.apply {
+                if (app.simulator.getUser<User>(player.uniqueId)?.inGame == true)
+                    return@apply
                 inventory.clear()
                 teleport(app.gamePosition)
 
@@ -41,9 +47,18 @@ object InteractEvent : Listener {
                         .send("mobs:init", player)
                 }
 
-                val wave = Wave(System.currentTimeMillis(), 0, mutableListOf(), player)
-                app.simulator.getUser<User>(player.uniqueId)?.wave = wave
-                B.postpone(3 * 20) { wave.start() }
+                // Отправляю скорость передвижения моба
+                ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", player)
+
+                ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", player)
+
+                val user = app.simulator.getUser<User>(player.uniqueId)
+                user?.inGame = true
+                B.postpone(3 * 20) {
+                    val wave = Wave(System.currentTimeMillis(), 0, mutableListOf(), player)
+                    user?.wave = wave
+                    wave.start()
+                }
             }
             null
         }, "play")

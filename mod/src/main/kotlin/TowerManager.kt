@@ -1,7 +1,11 @@
+
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
+import dev.xdark.feder.NetUtil
+import io.netty.buffer.Unpooled
 import org.lwjgl.opengl.GL11
 import ru.cristalix.clientapi.JavaMod
+import java.util.*
 import kotlin.math.pow
 
 /**
@@ -10,12 +14,11 @@ import kotlin.math.pow
  */
 object TowerManager {
 
-    const val TICKS_BEFORE_STRIKE = 5
     val activeAmmo = mutableListOf<Bullet>()
 
     private var lastTick = System.currentTimeMillis()
-    private val speed = 1
-    private var ticksBeforeStrike = 40
+    private var ticksBeforeStrike = 0
+    private var ticksStrike = 0
 
     data class Bullet(var x: Double, var y: Double, var z: Double, val target: EntityLivingBase) {
 
@@ -36,15 +39,17 @@ object TowerManager {
                 ticksBeforeStrike--
                 lastTick = now
                 if (ticksBeforeStrike < 0) {
-                    ticksBeforeStrike = TICKS_BEFORE_STRIKE
+                    ticksBeforeStrike = ticksStrike
                     mod.mobs.minByOrNull {
                         (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0)
                     }?.let { activeAmmo.add(Bullet(mod.cube.x, mod.cube.y, mod.cube.z, it)) }
                 }
                 activeAmmo.removeIf { !it.target.isEntityAlive }
                 activeAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1 }.forEach {
-                    mod.mobs.remove(it.target)
-                    JavaMod.clientApi.minecraft().world.removeEntity(it.target)
+                    JavaMod.clientApi.clientConnection().sendPayload(
+                        "tower:mobhit",
+                        Unpooled.copiedBuffer(it.target.uniqueID.toString(), Charsets.UTF_8)
+                    )
                 }
                 activeAmmo.forEach {
                     it.x += (it.target.x - it.x) * .1
@@ -52,6 +57,18 @@ object TowerManager {
                     it.z += (it.target.z - it.z) * .1
                 }
             }
+        }
+
+        mod.registerChannel("tower:mobkill") {
+            val uuid = NetUtil.readUtf8(this)
+            val mob = mod.mobs.filter { it.uniqueID == UUID.fromString(uuid) }[0]
+            mod.mobs.remove(mob)
+            JavaMod.clientApi.minecraft().world.removeEntity(mob)
+        }
+
+        mod.registerChannel("tower:strike") {
+            ticksBeforeStrike = readInt()
+            ticksStrike = readInt()
         }
     }
 }
