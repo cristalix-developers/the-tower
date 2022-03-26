@@ -1,4 +1,3 @@
-
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
@@ -52,9 +51,11 @@ object TowerManager {
                     )
                 }
                 activeAmmo.forEach {
-                    it.x += (it.target.x - it.x) * .1
-                    it.y += (it.target.y + 1.5 - it.y) * .1
-                    it.z += (it.target.z - it.z) * .1
+                    val vector = Vector(it.target.x - it.x, it.target.y + 1.5 - it.y, it.target.z - it.z).normalize()
+                        .multiply(0.35)
+                    it.x += vector.x
+                    it.y += vector.y
+                    it.z += vector.z
                 }
             }
         }
