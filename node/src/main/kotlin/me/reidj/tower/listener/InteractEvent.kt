@@ -21,7 +21,7 @@ import ru.kdev.simulatorapi.listener.SessionListener
  */
 object InteractEvent : Listener {
 
-    private const val MOVE_SPEED: Double = .001
+    private const val MOVE_SPEED: Double = .01
     private const val CONST_TICKS_BEFORE_STRIKE = 5
     private const val TICKS_BEFORE_STRIKE = 40
 

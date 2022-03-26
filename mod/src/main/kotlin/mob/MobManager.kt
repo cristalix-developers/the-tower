@@ -1,5 +1,6 @@
 package mob
 
+import Vector
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import mod
 
@@ -24,7 +25,8 @@ object MobManager {
                         Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
                     entity.rotationYawHead = rotation
                     entity.setYaw(rotation)
-                    entity.teleport(entity.x + dX * moveSpeed, entity.y, entity.z + dZ * moveSpeed)
+                    val vector = Vector(dX, 0.0, dZ).normalize().multiply(moveSpeed)
+                    entity.teleport(entity.x + vector.x, entity.y, entity.z + vector.z)
                 }
             }
         }
