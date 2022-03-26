@@ -16,4 +16,5 @@ class User(val stat: Stat) : SimulatorUser(stat.id) {
     var inGame: Boolean = false
     var pumpingTypes: MutableMap<String, PumpingType> =
         PumpingType.values().toSet().associateBy { it.name }.toMutableMap()
+    var health: Double = 5.0
 }

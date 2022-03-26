@@ -10,16 +10,21 @@ import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import io.netty.buffer.Unpooled
 import me.func.mod.Anime
+import me.func.mod.Glow
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
+import me.func.protocol.EndStatus
+import me.func.protocol.GlowColor
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.JoinEvent
 import me.reidj.tower.listener.UnusedEvent
+import me.reidj.tower.mob.Mob
 import me.reidj.tower.pumping.PumpingInventory
 import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.user.Stat
 import me.reidj.tower.user.User
+import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
@@ -106,11 +111,8 @@ class App : JavaPlugin() {
 
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
             val user = SessionListener.simulator.getUser<User>(player.uniqueId)
-            user?.wave!!.aliveMobs.filter {
-                it.uuid == UUID.fromString(
-                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
-                )
-            }.forEach {
+            // TODO И тут может ебануть
+            filterMobs(user!!, bytes).forEach {
                 if (it.hp > 0) {
                     it.hp -= user.pumpingTypes[PumpingType.DAMAGE.name]!!.upgradable.toInt()
                 } else {
@@ -119,5 +121,40 @@ class App : JavaPlugin() {
                 }
             }
         }
+        Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
+            val user = SessionListener.simulator.getUser<User>(player.uniqueId)
+            // TODO Тут может ебануть
+            filterMobs(user!!, bytes).forEach { mob ->
+                val wavePassed = user.wave
+                val waveLevel = wavePassed!!.level
+                user.apply {
+                    health -= mob.damage
+                    Glow.animate(player, .5, GlowColor.RED)
+                    if (health <= 0) {
+                        if (stat.maxWavePassed > waveLevel)
+                            stat.maxWavePassed = waveLevel
+                        LobbyItems.initialActionsWithPlayer(player)
+                        Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
+                        inGame = false
+                        wavePassed.aliveMobs.forEach { ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player) }
+                        wavePassed.aliveMobs.clear()
+                        wave = null
+                        // TODO Выдача монет бла бла бла
+                    }
+                }
+            }
+        }
+    }
+
+    private fun filterMobs(user: User, bytes: ByteArray): Set<Mob> {
+        if (user.wave == null)
+            return emptySet()
+        return user.wave?.let {
+            it.aliveMobs.filter { mob ->
+                mob.uuid == UUID.fromString(
+                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+                )
+            }
+        }!!.toSet()
     }
 }

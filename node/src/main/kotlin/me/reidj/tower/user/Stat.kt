@@ -10,6 +10,6 @@ import java.util.*
 data class Stat(
     val id: UUID,
 
-    val maxWavePassed: Int,
+    var maxWavePassed: Int,
     var pumpingTypes: MutableMap<String, PumpingType>
 )

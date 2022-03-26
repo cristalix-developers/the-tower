@@ -15,20 +15,20 @@ import kotlin.math.roundToInt
 class Wave(var isStarting: Boolean, var startTime: Long, var level: Int, val aliveMobs: MutableList<Mob>, private val player: Player) {
 
     fun start() {
-        level++
         isStarting = true
-        player.sendTitle("§eПриготовьтесь!", "Началась $level волна", 10, 15, 10)
+        player.sendTitle("§eПриготовьтесь!", "Началась ${level + 1} волна", 10, 15, 10)
         app.generators.forEach { drawMob(it.x, it.y, it.z, (level + level / 1.5).roundToInt()) }
     }
 
     private fun drawMob(x: Double, y: Double, z: Double, amount: Int) {
-        val mob = Mob(UUID.randomUUID(),2, x, y, z, 1.0, EntityType.ZOMBIE)
+        val mob = Mob(UUID.randomUUID(),1, x, y, z, 1.0, EntityType.ZOMBIE)
         aliveMobs.add(mob)
         mob.create(player)
     }
 
     fun end() {
         isStarting = false
+        level++
         player.sendTitle("§aПоздравляем!", "Волна завершена", 10, 15, 10)
         startTime = System.currentTimeMillis()
         B.postpone(3 * 20) { start() }
