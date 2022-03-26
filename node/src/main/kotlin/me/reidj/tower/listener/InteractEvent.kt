@@ -2,16 +2,18 @@ package me.reidj.tower.listener
 
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix.transfer
+import dev.implario.bukkit.item.item
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
 import me.reidj.tower.app
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
+import org.bukkit.Material
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 import ru.cristalix.core.realm.RealmId
+import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -23,6 +25,13 @@ object InteractEvent : Listener {
     private const val CONST_TICKS_BEFORE_STRIKE = 5
     private const val TICKS_BEFORE_STRIKE = 40
 
+    private val upgradeItem = item {
+        type = Material.CLAY_BALL
+        text("§bУлучшения")
+        nbt("other", "guild_members")
+        nbt("click", "settings")
+    }
+
     init {
         B.regCommand({ player, _ ->
             transfer(listOf(player.uniqueId), RealmId.of(HUB))
@@ -30,10 +39,11 @@ object InteractEvent : Listener {
         }, "leave")
         B.regCommand({ player, _ ->
             player.apply {
-                if (app.simulator.getUser<User>(player.uniqueId)?.inGame == true)
+                if (SessionListener.simulator.getUser<User>(player.uniqueId)?.inGame == true)
                     return@apply
                 inventory.clear()
                 teleport(app.gamePosition)
+                inventory.setItem(0, upgradeItem)
 
                 // Отправляем точку башни
                 ModTransfer(app.tower.x, app.tower.y, app.tower.z).send("tower:init", player)
@@ -52,10 +62,10 @@ object InteractEvent : Listener {
 
                 ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", player)
 
-                val user = app.simulator.getUser<User>(player.uniqueId)
+                val user = SessionListener.simulator.getUser<User>(player.uniqueId)
                 user?.inGame = true
                 B.postpone(3 * 20) {
-                    val wave = Wave(System.currentTimeMillis(), 0, mutableListOf(), player)
+                    val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), player)
                     user?.wave = wave
                     wave.start()
                 }
@@ -68,8 +78,7 @@ object InteractEvent : Listener {
     fun PlayerInteractEvent.handle() {
         if (item == null)
             return
-        val nmsItem = CraftItemStack.asNMSCopy(item)
-        if (nmsItem.hasTag() && nmsItem.tag.hasKeyOfType("click", 8))
-            player.performCommand(nmsItem.tag.getString("click"))
+        if (item.tag.hasKeyOfType("click", 8))
+            player.performCommand(item.tag.getString("click"))
     }
 }

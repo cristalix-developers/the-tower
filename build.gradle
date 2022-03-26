@@ -8,6 +8,9 @@ allprojects {
             url 'https://repo.implario.dev/public/'
         }
         maven {
+            url "https://papermc.io/repo/repository/maven-public/"
+        }
+        maven {
             url 'https://repo.implario.dev/cristalix/'
             credentials {
                 username = project.properties["IMPLARIO_REPO_USER"] ?: System.getenv("IMPLARIO_REPO_USER")

@@ -1,5 +1,6 @@
 package me.reidj.tower.wave
 
+import clepto.bukkit.B
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
 import org.bukkit.entity.EntityType
@@ -11,11 +12,12 @@ import kotlin.math.roundToInt
  * @project tower
  * @author Рейдж
  */
-class Wave(var startTime: Long, var level: Int, val aliveMobs: MutableList<Mob>, private val player: Player) {
+class Wave(var isStarting: Boolean, var startTime: Long, var level: Int, val aliveMobs: MutableList<Mob>, private val player: Player) {
 
     fun start() {
         level++
-        player.sendMessage("Началась $level волна")
+        isStarting = true
+        player.sendTitle("§eПриготовьтесь!", "Началась $level волна", 10, 15, 10)
         app.generators.forEach { drawMob(it.x, it.y, it.z, (level + level / 1.5).roundToInt()) }
     }
 
@@ -26,8 +28,9 @@ class Wave(var startTime: Long, var level: Int, val aliveMobs: MutableList<Mob>,
     }
 
     fun end() {
-        player.sendMessage("Волна окончена")
+        isStarting = false
+        player.sendTitle("§aПоздравляем!", "Волна завершена", 10, 15, 10)
         startTime = System.currentTimeMillis()
-        start()
+        B.postpone(3 * 20) { start() }
     }
 }

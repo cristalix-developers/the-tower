@@ -16,12 +16,16 @@ import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.JoinEvent
 import me.reidj.tower.listener.UnusedEvent
+import me.reidj.tower.pumping.PumpingInventory
+import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.user.Stat
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
+import ru.cristalix.core.inventory.IInventoryService
+import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
@@ -29,7 +33,8 @@ import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.transfer.ITransferService
 import ru.cristalix.core.transfer.TransferService
-import ru.kdev.simulatorapi.Simulator
+import ru.kdev.simulatorapi.createSimulator
+import ru.kdev.simulatorapi.listener.SessionListener
 import java.util.*
 
 const val HUB = "HUB-2"
@@ -37,8 +42,6 @@ const val HUB = "HUB-2"
 lateinit var app: App
 
 class App : JavaPlugin() {
-
-    lateinit var simulator: Simulator<App>
 
     val map = WorldMeta(MapLoader.load("func", "tower"))
     val client = CoordinatorClient(NoopGameNode())
@@ -55,18 +58,24 @@ class App : JavaPlugin() {
         B.plugin = this
         app = this
 
-        simulator = Simulator.createSimulator<App, User> {
+        createSimulator<App, User> {
             id = "tower"
             plugin = this@App
 
-            userCreator {
-                User(Stat(it, 0))
+            userCreator { uuid ->
+                User(Stat(uuid, 0, PumpingType.values().toSet().associateBy { it.name }.toMutableMap()))
             }
         }
+
+        B.regCommand({ player, args ->
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.money += args[0].toInt()
+            null
+        }, "money")
 
         CoreApi.get().apply {
             registerService(ITransferService::class.java, TransferService(this.socketClient))
             registerService(IPartyService::class.java, PartyService(ISocketClient.get()))
+            registerService(IInventoryService::class.java, InventoryService())
         }
 
         Platforms.set(PlatformDarkPaper())
@@ -83,6 +92,9 @@ class App : JavaPlugin() {
             servicedServers = arrayOf("SEC")
         }
 
+        // Создание контента
+        PumpingInventory
+
         // Регистрация обработчиков событий
         B.events(
             JoinEvent,
@@ -93,14 +105,14 @@ class App : JavaPlugin() {
         WaveManager.runTaskTimer(this@App, 0, 1)
 
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
-            val user = simulator.getUser<User>(player.uniqueId)
+            val user = SessionListener.simulator.getUser<User>(player.uniqueId)
             user?.wave!!.aliveMobs.filter {
                 it.uuid == UUID.fromString(
                     Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
                 )
             }.forEach {
                 if (it.hp > 0) {
-                    it.hp--
+                    it.hp -= user.pumpingTypes[PumpingType.DAMAGE.name]!!.upgradable.toInt()
                 } else {
                     user.wave!!.aliveMobs.remove(it)
                     ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)

@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
+import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -39,10 +40,12 @@ object JoinEvent : Listener {
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
         teleport(app.spawn)
-        app.simulator.getUser<User>(uniqueId)?.player = player
+        SessionListener.simulator.getUser<User>(uniqueId)?.player = player
         inventory.setItem(0, startItem)
         inventory.setItem(4, settingsItem)
         inventory.setItem(8, backItem)
+
+        println(SessionListener.simulator.getUser<User>(uniqueId)!!.money)
 
         // Отправляем наш мод
         B.postpone(5) { ModLoader.send("tower-mod-bundle.jar", player) }
