@@ -22,7 +22,7 @@ import ru.kdev.simulatorapi.listener.SessionListener
 object InteractEvent : Listener {
 
     private const val MOVE_SPEED: Double = .01
-    private const val CONST_TICKS_BEFORE_STRIKE = 5
+    private const val CONST_TICKS_BEFORE_STRIKE = 20
     private const val TICKS_BEFORE_STRIKE = 40
 
     private val upgradeItem = item {
@@ -60,7 +60,7 @@ object InteractEvent : Listener {
                 // Отправляю скорость передвижения моба
                 ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", player)
 
-                ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", player)
+                B.postpone(20) { ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", player) }
 
                 val user = SessionListener.simulator.getUser<User>(player.uniqueId)
                 user?.inGame = true

@@ -16,8 +16,8 @@ object TowerManager {
     val activeAmmo = mutableListOf<Bullet>()
 
     private var lastTick = System.currentTimeMillis()
-    private var ticksBeforeStrike = 0
-    private var ticksStrike = 0
+    private var ticksBeforeStrike = 30
+    private var ticksStrike = 30
 
     data class Bullet(var x: Double, var y: Double, var z: Double, val target: EntityLivingBase) {
 
