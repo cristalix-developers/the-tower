@@ -76,6 +76,7 @@ object InteractEvent : Listener {
                 user.giveTokens(80, true)
                 user.health = 5
                 user.maxHealth = 5
+                ModHelper.updateHeartBar(user.health, user.maxHealth, player)
                 B.postpone(3 * 20) {
                     val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), this)
                     user.wave = wave

@@ -8,6 +8,7 @@ import dev.implario.games5e.node.NoopGameNode
 import dev.implario.games5e.sdk.cristalix.MapLoader
 import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
+import implario.humanize.Humanize
 import io.netty.buffer.Unpooled
 import me.func.mod.Anime
 import me.func.mod.Glow
@@ -113,13 +114,12 @@ class App : JavaPlugin() {
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 filterMobs(this, bytes).forEach {
-                    if (it.hp > 0) {
-                        it.hp--
-                    } else {
+                    it.hp--
+                    if (it.hp <= 0) {
                         wave!!.aliveMobs.remove(it)
+                        ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                         giveTokens(1, false)
                         Anime.cursorMessage(player, "§b+1 §fжетон")
-                        ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                     }
                 }
             }
@@ -132,15 +132,13 @@ class App : JavaPlugin() {
                     val reward = formula(waveLevel)
                     health -= mob.damage
                     Glow.animate(player, .5, GlowColor.RED)
-                    ModTransfer().integer(health).integer(maxHealth).send("tower:loseheart", player)
+                    ModHelper.updateHeartBar(health, maxHealth, player)
                     if (health <= 0) {
                         if (stat.maxWavePassed > waveLevel)
                             stat.maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
                         ModHelper.updateBarVisible(player)
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        Anime.cursorMessage(player, "§e+$reward §fмонет")
-                        Anime.cursorMessage(player, "§b+$reward §fопыта")
                         wavePassed.aliveMobs.forEach {
                             ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                         }
@@ -148,6 +146,28 @@ class App : JavaPlugin() {
                         inGame = false
                         giveTokens(-tokens, true)
                         wave = null
+                        if (reward == 0)
+                            return@registerIncomingPluginChannel
+                        Anime.cursorMessage(
+                            player, "§e+$reward §f${
+                                Humanize.plurals(
+                                    "монета",
+                                    "монеты",
+                                    "монет",
+                                    reward
+                                )
+                            }"
+                        )
+                        Anime.cursorMessage(
+                            player, "§b+$reward §f${
+                                Humanize.plurals(
+                                    "опыт",
+                                    "опыта",
+                                    "опыта",
+                                    reward
+                                )
+                            }"
+                        )
                         giveExperience(reward)
                         giveMoney(reward)
                     }

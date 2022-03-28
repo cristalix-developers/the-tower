@@ -29,4 +29,7 @@ object ModHelper {
     }
 
     fun updateBarVisible(player: Player) = ModTransfer().send("tower:barvisible", player)
+
+    fun updateHeartBar(health: Int, maxHealth: Int, player: Player) =
+        ModTransfer().integer(health).integer(maxHealth).send("tower:loseheart", player)
 }

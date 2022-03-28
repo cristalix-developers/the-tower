@@ -1,3 +1,4 @@
+
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
@@ -50,6 +51,7 @@ object TowerManager {
                         "tower:mobhit",
                         Unpooled.copiedBuffer(it.target.uniqueID.toString(), Charsets.UTF_8)
                     )
+                    activeAmmo.remove(it)
                 }
                 activeAmmo.forEach {
                     val vector = Vector(it.target.x - it.x, it.target.y + 1.5 - it.y, it.target.z - it.z).normalize()

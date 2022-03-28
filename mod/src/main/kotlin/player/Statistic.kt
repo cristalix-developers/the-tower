@@ -1,4 +1,7 @@
+package player
+
 import implario.humanize.Humanize
+import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
 

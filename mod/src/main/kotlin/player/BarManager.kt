@@ -1,5 +1,9 @@
+package player
+
+import NAMESPACE
 import dev.xdark.clientapi.event.render.RenderTickPre
 import dev.xdark.clientapi.resource.ResourceLocation
+import mod
 import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
