@@ -15,7 +15,7 @@ data class Mob(
     val x: Double,
     val y: Double,
     val z: Double,
-    val damage: Double,
+    val damage: Int,
     val type: EntityType
 ) {
 

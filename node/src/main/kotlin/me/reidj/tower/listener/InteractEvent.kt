@@ -6,7 +6,7 @@ import dev.implario.bukkit.item.item
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
 import me.reidj.tower.app
-import me.reidj.tower.pumping.PumpingType
+import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
 import org.bukkit.Material
@@ -63,6 +63,8 @@ object InteractEvent : Listener {
                 // Отправляю скорость передвижения моба
                 ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", this)
 
+                ModHelper.updateBarVisible(player)
+
                 // Отправляю количество пуль
                 B.postpone(20) {
                     ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE)
@@ -72,7 +74,8 @@ object InteractEvent : Listener {
                 // Начинаю волну
                 user.inGame = true
                 user.giveTokens(80, true)
-                user.health = user.pumpingTypes[PumpingType.HEALTH.name]!!.upgradable
+                user.health = 5
+                user.maxHealth = 5
                 B.postpone(3 * 20) {
                     val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), this)
                     user.wave = wave

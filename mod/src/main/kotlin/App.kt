@@ -1,10 +1,7 @@
-
 import dev.xdark.clientapi.entity.EntityLivingBase
-import dev.xdark.clientapi.event.render.ExpBarRender
-import dev.xdark.clientapi.event.render.HealthRender
-import dev.xdark.clientapi.event.render.HungerRender
-import dev.xdark.clientapi.event.render.RenderPass
+import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.opengl.GlStateManager
+import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import mob.Mob
 import mob.MobManager
@@ -18,6 +15,8 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 lateinit var mod: App
+const val NAMESPACE = "tower"
+const val FILE_STORE = "http://storage.c7x.ru/reidj/"
 
 class App : KotlinMod() {
 
@@ -32,9 +31,20 @@ class App : KotlinMod() {
         MobManager
         Statistic
 
+        loadTextures(
+            load("health_bar.png", "35320C088F83D8890128127"),
+            load("energy.png", "35320C088F83D8890128111"),
+            load("xp_bar.png", "35320C094F83D8890128111")
+        ).thenRun {
+            BarManager
+        }
+
+        registerHandler<HealthRender> { isCancelled = true }
         registerHandler<ExpBarRender> { isCancelled = true }
         registerHandler<HungerRender> { isCancelled = true }
-        registerHandler<HealthRender> { isCancelled = true }
+        registerHandler<ArmorRender> { isCancelled = true }
+        registerHandler<AirBarRender> { isCancelled = true }
+        registerHandler<VehicleHealthRender> { isCancelled = true }
 
         registerChannel("tower:mobinit") {
             mobs.add(
@@ -49,7 +59,6 @@ class App : KotlinMod() {
         }
 
         registerChannel("tower:init") {
-            registerHandler<HealthRender> { isCancelled = false }
             cube = V3(
                 readDouble(),
                 readDouble() + 1,
@@ -136,5 +145,9 @@ class App : KotlinMod() {
                 GlStateManager.enableCull()
             }
         }
+    }
+
+    private fun load(path: String, hash: String): RemoteTexture {
+        return RemoteTexture(ResourceLocation.of(NAMESPACE, path), hash)
     }
 }

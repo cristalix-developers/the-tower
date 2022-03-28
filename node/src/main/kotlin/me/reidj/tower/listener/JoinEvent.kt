@@ -2,6 +2,7 @@ package me.reidj.tower.listener
 
 import clepto.bukkit.B
 import me.func.mod.conversation.ModLoader
+import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import org.bukkit.event.EventHandler
@@ -23,9 +24,11 @@ object JoinEvent : Listener {
         LobbyItems.initialActionsWithPlayer(this)
 
         // Отправляем наш мод
+        B.postpone(1) { ModLoader.send("tower-mod-bundle.jar", this) }
+
         B.postpone(5) {
-            ModLoader.send("tower-mod-bundle.jar", this)
-            user.giveMoney(user.money)
+            ModHelper.updateMoney(user)
+            ModHelper.updateLevelBar(user)
         }
     }
 }

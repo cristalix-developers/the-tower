@@ -1,6 +1,5 @@
 package me.reidj.tower.user
 
-import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.wave.Wave
@@ -13,21 +12,34 @@ import ru.kdev.simulatorapi.common.SimulatorUser
  */
 class User(val stat: Stat) : SimulatorUser(stat.id) {
 
+    @Transient
     var wave: Wave? = null
+    @Transient
     var player: Player? = null
+    @Transient
     var inGame: Boolean = false
+    @Transient
     var pumpingTypes: MutableMap<String, PumpingType> =
         PumpingType.values().toSet().associateBy { it.name }.toMutableMap()
-    var health: Double = 5.0
+    @Transient
+    var health: Int = 0
+    @Transient
+    var maxHealth: Int = 0
+    @Transient
     var tokens = 0
 
     fun giveTokens(tokens: Int, isVisible: Boolean) {
         this.tokens += tokens
-        ModTransfer().integer(this.tokens).boolean(isVisible).send("tower:tokens", player)
+        ModHelper.updateTokens(this, isVisible)
     }
 
     fun giveMoney(money: Int) {
         this.money += money
-        ModTransfer().integer(this.money).send("tower:money", player)
+        ModHelper.updateMoney(this)
+    }
+
+    infix fun giveExperience(exp: Int) {
+        this.exp += exp
+        ModHelper.updateLevelBar(this)
     }
 }

@@ -20,6 +20,7 @@ import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.JoinEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
+import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.pumping.PumpingInventory
 import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.user.Stat
@@ -41,6 +42,7 @@ import ru.cristalix.core.transfer.TransferService
 import ru.kdev.simulatorapi.createSimulator
 import ru.kdev.simulatorapi.listener.SessionListener
 import java.util.*
+import kotlin.math.sqrt
 
 const val HUB = "HUB-2"
 
@@ -67,15 +69,14 @@ class App : JavaPlugin() {
             id = "tower"
             plugin = this@App
 
+            levelFormula { ((sqrt(5.0) * sqrt((this * 80 + 5).toDouble()) + 5) / 20).toInt() }
+
+            expFormula { this * this - this / 2 }
+
             userCreator { uuid ->
                 User(Stat(uuid, 0, PumpingType.values().toSet().associateBy { it.name }.toMutableMap()))
             }
         }
-
-        B.regCommand({ player, args ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.money += args[0].toInt()
-            null
-        }, "money")
 
         CoreApi.get().apply {
             registerService(ITransferService::class.java, TransferService(this.socketClient))
@@ -113,7 +114,7 @@ class App : JavaPlugin() {
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 filterMobs(this, bytes).forEach {
                     if (it.hp > 0) {
-                        it.hp -= pumpingTypes[PumpingType.DAMAGE.name]!!.upgradable.toInt()
+                        it.hp++
                     } else {
                         wave!!.aliveMobs.remove(it)
                         giveTokens(1, false)
@@ -130,10 +131,12 @@ class App : JavaPlugin() {
                     val waveLevel = wavePassed!!.level
                     health -= mob.damage
                     Glow.animate(player, .5, GlowColor.RED)
+                    ModTransfer().integer(health).integer(maxHealth).send("tower:loseheart", player)
                     if (health <= 0) {
                         if (stat.maxWavePassed > waveLevel)
                             stat.maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
+                        ModHelper.updateBarVisible(player)
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
                         wavePassed.aliveMobs.forEach {
                             ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)

@@ -21,7 +21,7 @@ class Wave(var isStarting: Boolean, var startTime: Long, var level: Int, val ali
     }
 
     private fun drawMob(x: Double, y: Double, z: Double, amount: Int) {
-        val mob = Mob(UUID.randomUUID(),1, x, y, z, 1.0, EntityType.ZOMBIE)
+        val mob = Mob(UUID.randomUUID(),1, x, y, z, 1, EntityType.ZOMBIE)
         aliveMobs.add(mob)
         mob.create(player)
     }
