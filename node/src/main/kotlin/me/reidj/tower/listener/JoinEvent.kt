@@ -26,7 +26,7 @@ object JoinEvent : Listener {
         // Отправляем наш мод
         B.postpone(1) { ModLoader.send("tower-mod-bundle.jar", this) }
 
-        B.postpone(5) {
+        B.postpone(10) {
             ModHelper.updateMoney(user)
             ModHelper.updateLevelBar(user)
         }

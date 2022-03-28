@@ -21,7 +21,6 @@ object ModHelper {
         .send("tower:tokens", user.player)
 
     fun updateLevelBar(user: User) {
-        println(user.exp)
         ModTransfer()
             .integer(SessionListener.simulator.run { user.getLevel() })
             .integer(user.exp)
