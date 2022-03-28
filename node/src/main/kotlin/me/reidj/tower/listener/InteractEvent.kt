@@ -6,7 +6,7 @@ import dev.implario.bukkit.item.item
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
 import me.reidj.tower.app
-import me.reidj.tower.mod.ModHelper
+import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
 import org.bukkit.Material
@@ -41,11 +41,12 @@ object InteractEvent : Listener {
         }, "leave")
         B.regCommand({ player, _ ->
             player.apply {
-                if (SessionListener.simulator.getUser<User>(uniqueId)!!.inGame)
+                val user = SessionListener.simulator.getUser<User>(uniqueId)!!
+                if (user.inGame)
                     return@apply
                 inventory.clear()
                 teleport(app.gamePosition)
-                inventory.setItem(0, upgradeItem)
+                inventory.setItem(4, upgradeItem)
 
                 // Отправляем точку башни
                 ModTransfer(app.tower.x, app.tower.y, app.tower.z).send("tower:init", this)
@@ -63,13 +64,16 @@ object InteractEvent : Listener {
                 ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", this)
 
                 // Отправляю количество пуль
-                B.postpone(20) { ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", this) }
+                B.postpone(20) {
+                    ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE)
+                        .send("tower:strike", this)
+                }
 
                 // Начинаю волну
-                val user = SessionListener.simulator.getUser<User>(uniqueId)!!
                 user.inGame = true
+                user.giveTokens(80, true)
+                user.health = user.pumpingTypes[PumpingType.HEALTH.name]!!.upgradable
                 B.postpone(3 * 20) {
-                    ModHelper.sendTokens(user.tokens, this)
                     val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), this)
                     user.wave = wave
                     wave.start()
@@ -84,7 +88,8 @@ object InteractEvent : Listener {
         if (item == null)
             return
         val nmsItem = CraftItemStack.asNMSCopy(item)
-        if (nmsItem.hasTag() && nmsItem.tag.hasKeyOfType("click", 8))
-            player.performCommand(nmsItem.tag.getString("click"))
+        val tag = nmsItem.tag
+        if (nmsItem.hasTag() && tag.hasKeyOfType("click", 8))
+            player.performCommand(tag.getString("click"))
     }
 }

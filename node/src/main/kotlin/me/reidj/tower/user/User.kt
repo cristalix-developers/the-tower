@@ -1,5 +1,6 @@
 package me.reidj.tower.user
 
+import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.wave.Wave
@@ -18,15 +19,15 @@ class User(val stat: Stat) : SimulatorUser(stat.id) {
     var pumpingTypes: MutableMap<String, PumpingType> =
         PumpingType.values().toSet().associateBy { it.name }.toMutableMap()
     var health: Double = 5.0
-    var tokens = 80
+    var tokens = 0
 
-    fun giveTokens(tokens: Int) {
+    fun giveTokens(tokens: Int, isVisible: Boolean) {
         this.tokens += tokens
-        ModHelper.sendTokens(this.tokens, player!!)
+        ModTransfer().integer(this.tokens).boolean(isVisible).send("tower:tokens", player)
     }
 
     fun giveMoney(money: Int) {
         this.money += money
-        ModHelper.sendMoney(this.money, player!!)
+        ModTransfer().integer(this.money).send("tower:money", player)
     }
 }

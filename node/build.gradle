@@ -35,7 +35,7 @@ dependencies {
     implementation 'ru.cristalix:games5e-integration:1.3.23'
 
     implementation 'me.func:service-api:last-SNAPSHOT'
-    implementation 'ru.kdev.simulator-api:simulator-api:live-SNAPSHOT'
+    implementation 'ru.kdev.simulator-api:simulator-api:last-SNAPSHOT'
     implementation 'ru.kdev:common:last-SNAPSHOT'
     implementation 'me.func:animation-api:last-SNAPSHOT'
     implementation 'ru.cristalix:boards-bukkit-api:3.0.0'

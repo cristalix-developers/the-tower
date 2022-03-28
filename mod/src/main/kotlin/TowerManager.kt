@@ -15,7 +15,8 @@ object TowerManager {
 
     val activeAmmo = mutableListOf<Bullet>()
 
-    private var lastTick = System.currentTimeMillis()
+    private var lastTickMove = System.currentTimeMillis()
+    private var lastTickHit = System.currentTimeMillis()
     private var ticksBeforeStrike = 30
     private var ticksStrike = 30
 
@@ -34,9 +35,9 @@ object TowerManager {
     init {
         mod.registerHandler<GameLoop> {
             val now = System.currentTimeMillis()
-            if (now - lastTick > .05 * 1000) {
+            if (now - lastTickMove > .05 * 1000) {
                 ticksBeforeStrike--
-                lastTick = now
+                lastTickMove = now
                 if (ticksBeforeStrike < 0) {
                     ticksBeforeStrike = ticksStrike
                     mod.mobs.minByOrNull {
@@ -50,16 +51,19 @@ object TowerManager {
                         Unpooled.copiedBuffer(it.target.uniqueID.toString(), Charsets.UTF_8)
                     )
                 }
-                mod.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 8.0 }.forEach {
-                    JavaMod.clientApi.clientConnection()
-                        .sendPayload("tower:hittower", Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8))
-                }
                 activeAmmo.forEach {
                     val vector = Vector(it.target.x - it.x, it.target.y + 1.5 - it.y, it.target.z - it.z).normalize()
                         .multiply(0.35)
                     it.x += vector.x
                     it.y += vector.y
                     it.z += vector.z
+                }
+            }
+            if (now - lastTickHit > 1 * 1000) {
+                lastTickHit = now
+                mod.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 8.0 }.forEach {
+                    JavaMod.clientApi.clientConnection()
+                        .sendPayload("tower:hittower", Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8))
                 }
             }
         }

@@ -17,6 +17,7 @@ object Statistic {
         }
 
         val tokensBox = text {
+            enabled = false
             offset = V3(-3.0, -24.0)
             origin = BOTTOM_RIGHT
             shadow = true
@@ -36,20 +37,23 @@ object Statistic {
 
         mod.registerChannel("tower:money") {
             val money = readInt()
-            moneyBox.content = "${Humanize.plurals(
-                "Монета",
-                "Монеты",
-                "Монет",
-                money
-            )} §e$money"
+            moneyBox.content = "${
+                Humanize.plurals(
+                    "Монета",
+                    "Монеты",
+                    "Монет",
+                    money
+                )
+            } §e$money"
         }
-
-        mod.registerChannel("tower:hidetokens") { tokensBox.enabled = false }
-
-        mod.registerChannel("tower:showtokens") { tokensBox.enabled = true }
 
         mod.registerChannel("tower:tokens") {
             val tokens = readInt()
+            val toggleVisibility = readBoolean()
+
+            if (toggleVisibility)
+                tokensBox.enabled = !tokensBox.enabled
+
             Humanize.plurals(
                 "Жетон",
                 "Жетона",
@@ -62,7 +66,8 @@ object Statistic {
                     "Жетона",
                     "Жетонов",
                     tokens
-                )} §b$tokens"
+                )
+            } §b$tokens"
         }
     }
 }

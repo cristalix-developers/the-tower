@@ -116,7 +116,8 @@ class App : JavaPlugin() {
                         it.hp -= pumpingTypes[PumpingType.DAMAGE.name]!!.upgradable.toInt()
                     } else {
                         wave!!.aliveMobs.remove(it)
-                        giveTokens(1)
+                        giveTokens(1, false)
+                        Anime.cursorMessage(player, "§b+1 §fжетон")
                         ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                     }
                 }
@@ -134,12 +135,12 @@ class App : JavaPlugin() {
                             stat.maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        ModTransfer().send("tower:hidetokens", player)
-                        inGame = false
                         wavePassed.aliveMobs.forEach {
                             ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                         }
                         wavePassed.aliveMobs.clear()
+                        inGame = false
+                        giveTokens(-tokens, true)
                         wave = null
                         // TODO Выдача монет бла бла бла
                     }
