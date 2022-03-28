@@ -30,6 +30,7 @@ class App : KotlinMod() {
         UIEngine.initialize(this)
 
         MobManager
+        Statistic
 
         registerHandler<ExpBarRender> { isCancelled = true }
         registerHandler<HungerRender> { isCancelled = true }

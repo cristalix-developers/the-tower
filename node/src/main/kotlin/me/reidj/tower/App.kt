@@ -110,24 +110,23 @@ class App : JavaPlugin() {
         WaveManager.runTaskTimer(this@App, 0, 1)
 
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
-            val user = SessionListener.simulator.getUser<User>(player.uniqueId)
-            // TODO И тут может ебануть
-            filterMobs(user!!, bytes).forEach {
-                if (it.hp > 0) {
-                    it.hp -= user.pumpingTypes[PumpingType.DAMAGE.name]!!.upgradable.toInt()
-                } else {
-                    user.wave!!.aliveMobs.remove(it)
-                    ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+                filterMobs(this, bytes).forEach {
+                    if (it.hp > 0) {
+                        it.hp -= pumpingTypes[PumpingType.DAMAGE.name]!!.upgradable.toInt()
+                    } else {
+                        wave!!.aliveMobs.remove(it)
+                        giveTokens(1)
+                        ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
+                    }
                 }
             }
         }
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
-            val user = SessionListener.simulator.getUser<User>(player.uniqueId)
-            // TODO Тут может ебануть
-            filterMobs(user!!, bytes).forEach { mob ->
-                val wavePassed = user.wave
-                val waveLevel = wavePassed!!.level
-                user.apply {
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+                filterMobs(this, bytes).forEach { mob ->
+                    val wavePassed = wave
+                    val waveLevel = wavePassed!!.level
                     health -= mob.damage
                     Glow.animate(player, .5, GlowColor.RED)
                     if (health <= 0) {
@@ -135,8 +134,11 @@ class App : JavaPlugin() {
                             stat.maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
+                        ModTransfer().send("tower:hidetokens", player)
                         inGame = false
-                        wavePassed.aliveMobs.forEach { ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player) }
+                        wavePassed.aliveMobs.forEach {
+                            ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
+                        }
                         wavePassed.aliveMobs.clear()
                         wave = null
                         // TODO Выдача монет бла бла бла

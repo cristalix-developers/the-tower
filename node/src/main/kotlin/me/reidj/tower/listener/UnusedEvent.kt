@@ -29,8 +29,7 @@ object UnusedEvent : Listener {
 
     @EventHandler
     fun EntityDamageEvent.handle() {
-        if (entity is Player && (cause == EntityDamageEvent.DamageCause.FALL || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION)) {
+        if (entity is Player && (cause == EntityDamageEvent.DamageCause.FALL || cause == EntityDamageEvent.DamageCause.ENTITY_EXPLOSION))
             cancelled = true
-        }
     }
 }

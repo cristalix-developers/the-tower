@@ -6,6 +6,7 @@ import dev.implario.bukkit.item.item
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
 import me.reidj.tower.app
+import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
 import org.bukkit.Material
@@ -40,14 +41,14 @@ object InteractEvent : Listener {
         }, "leave")
         B.regCommand({ player, _ ->
             player.apply {
-                if (SessionListener.simulator.getUser<User>(player.uniqueId)?.inGame == true)
+                if (SessionListener.simulator.getUser<User>(uniqueId)!!.inGame)
                     return@apply
                 inventory.clear()
                 teleport(app.gamePosition)
                 inventory.setItem(0, upgradeItem)
 
                 // Отправляем точку башни
-                ModTransfer(app.tower.x, app.tower.y, app.tower.z).send("tower:init", player)
+                ModTransfer(app.tower.x, app.tower.y, app.tower.z).send("tower:init", this)
 
                 // Отправляем точки со спавнерами
                 app.generators.forEach {
@@ -55,19 +56,22 @@ object InteractEvent : Listener {
                         .double(it.x)
                         .double(it.y)
                         .double(it.z)
-                        .send("mobs:init", player)
+                        .send("mobs:init", this)
                 }
 
                 // Отправляю скорость передвижения моба
-                ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", player)
+                ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", this)
 
-                B.postpone(20) { ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", player) }
+                // Отправляю количество пуль
+                B.postpone(20) { ModTransfer().integer(TICKS_BEFORE_STRIKE).integer(CONST_TICKS_BEFORE_STRIKE).send("tower:strike", this) }
 
-                val user = SessionListener.simulator.getUser<User>(player.uniqueId)
-                user?.inGame = true
+                // Начинаю волну
+                val user = SessionListener.simulator.getUser<User>(uniqueId)!!
+                user.inGame = true
                 B.postpone(3 * 20) {
-                    val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), player)
-                    user?.wave = wave
+                    ModHelper.sendTokens(user.tokens, this)
+                    val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), this)
+                    user.wave = wave
                     wave.start()
                 }
             }
