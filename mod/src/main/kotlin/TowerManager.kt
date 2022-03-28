@@ -50,7 +50,7 @@ object TowerManager {
                         Unpooled.copiedBuffer(it.target.uniqueID.toString(), Charsets.UTF_8)
                     )
                 }
-                mod.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 2 }.forEach {
+                mod.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 8.0 }.forEach {
                     JavaMod.clientApi.clientConnection()
                         .sendPayload("tower:hittower", Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8))
                 }

@@ -19,8 +19,8 @@ object MobManager {
             if (now - lastTick > .01 * 1000) {
                 lastTick = now
                 mod.mobs.forEach { entity ->
-                    val dX = mod.cube.x - entity.x
-                    val dZ = mod.cube.z - entity.z
+                    val dX = mod.cube.x - entity.x - 1.5
+                    val dZ = mod.cube.z - entity.z - 1.5
                     val rotation =
                         Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
                     entity.rotationYawHead = rotation
