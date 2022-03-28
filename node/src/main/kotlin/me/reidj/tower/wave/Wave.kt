@@ -1,10 +1,13 @@
 package me.reidj.tower.wave
 
 import clepto.bukkit.B
+import me.func.mod.Anime
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
+import me.reidj.tower.user.User
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
+import ru.kdev.simulatorapi.listener.SessionListener
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -30,6 +33,10 @@ class Wave(var isStarting: Boolean, var startTime: Long, var level: Int, val ali
         isStarting = false
         level++
         player.sendTitle("§aПоздравляем!", "Волна завершена", 10, 15, 10)
+        if (level % 10 == 0) {
+            Anime.cursorMessage(player, "§e+10 §fмонет")
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(10)
+        }
         startTime = System.currentTimeMillis()
         B.postpone(3 * 20) { start() }
     }

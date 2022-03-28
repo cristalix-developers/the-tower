@@ -114,7 +114,7 @@ class App : JavaPlugin() {
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 filterMobs(this, bytes).forEach {
                     if (it.hp > 0) {
-                        it.hp++
+                        it.hp--
                     } else {
                         wave!!.aliveMobs.remove(it)
                         giveTokens(1, false)
@@ -129,6 +129,7 @@ class App : JavaPlugin() {
                 filterMobs(this, bytes).forEach { mob ->
                     val wavePassed = wave
                     val waveLevel = wavePassed!!.level
+                    val reward = formula(waveLevel)
                     health -= mob.damage
                     Glow.animate(player, .5, GlowColor.RED)
                     ModTransfer().integer(health).integer(maxHealth).send("tower:loseheart", player)
@@ -138,6 +139,8 @@ class App : JavaPlugin() {
                         LobbyItems.initialActionsWithPlayer(player)
                         ModHelper.updateBarVisible(player)
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
+                        Anime.cursorMessage(player, "§e+$reward §fмонет")
+                        Anime.cursorMessage(player, "§b+$reward §fопыта")
                         wavePassed.aliveMobs.forEach {
                             ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                         }
@@ -145,7 +148,8 @@ class App : JavaPlugin() {
                         inGame = false
                         giveTokens(-tokens, true)
                         wave = null
-                        // TODO Выдача монет бла бла бла
+                        giveExperience(reward)
+                        giveMoney(reward)
                     }
                 }
             }
@@ -162,5 +166,9 @@ class App : JavaPlugin() {
                 )
             }
         }!!.toSet()
+    }
+
+    private fun formula(number: Int): Int {
+        return (number * number - number) / 4
     }
 }
