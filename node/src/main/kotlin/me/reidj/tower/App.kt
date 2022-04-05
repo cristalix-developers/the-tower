@@ -17,14 +17,15 @@ import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
 import me.func.protocol.EndStatus
 import me.func.protocol.GlowColor
+import me.reidj.tower.content.MainGui
+import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
-import me.reidj.tower.listener.JoinEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
 import me.reidj.tower.mod.ModHelper
+import me.reidj.tower.pumping.Pumping
 import me.reidj.tower.pumping.PumpingInventory
-import me.reidj.tower.pumping.PumpingType
-import me.reidj.tower.user.Stat
+import me.reidj.tower.pumping.PumpingType.*
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
@@ -51,7 +52,7 @@ lateinit var app: App
 
 class App : JavaPlugin() {
 
-    val map = WorldMeta(MapLoader.load("func", "tower"))
+    private val map = WorldMeta(MapLoader.load("func", "tower"))
     val client = CoordinatorClient(NoopGameNode())
 
     val spawn: Label = map.getLabel("spawn").apply { yaw = -90f }
@@ -75,7 +76,11 @@ class App : JavaPlugin() {
             expFormula { this * this - this / 2 }
 
             userCreator { uuid ->
-                User(Stat(uuid, 0, PumpingType.values().toSet().associateBy { it.name }.toMutableMap()))
+                User(
+                    uuid,
+                    0,
+                    values().associateWith { Pumping(it, 1) }.toMutableMap()
+                )
             }
         }
 
@@ -101,25 +106,39 @@ class App : JavaPlugin() {
 
         // Создание контента
         PumpingInventory
+        MainGui
 
         // Регистрация обработчиков событий
         B.events(
-            JoinEvent,
+            ConnectionHandler,
             UnusedEvent,
             InteractEvent
         )
+
+        B.regCommand({ player, args ->
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
+            null
+        }, "money")
+
 
         WaveManager.runTaskTimer(this@App, 0, 1)
 
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                filterMobs(this, bytes).forEach {
-                    it.hp--
+                filterMobs(this, bytes).filter { wave!!.aliveMobs.contains(it) }.forEach {
+                    it.hp -= temporaryPumping[DAMAGE]!!.getValue().toInt()
                     if (it.hp <= 0) {
+                        val token = pumpingTypes[CASH_BONUS_KILL]!!.getValue().toInt()
                         wave!!.aliveMobs.remove(it)
                         ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
-                        giveTokens(1, false)
-                        Anime.cursorMessage(player, "§b+1 §fжетон")
+                        giveTokens(token, false)
+                        Anime.cursorMessage(player, "§b+$token §f${Humanize.plurals(
+                            "жетон",
+                            "жетона",
+                            "жетонов",
+                            token
+                        )}")
+                        return@apply
                     }
                 }
             }
@@ -130,12 +149,12 @@ class App : JavaPlugin() {
                     val wavePassed = wave
                     val waveLevel = wavePassed!!.level
                     val reward = formula(waveLevel)
-                    health -= mob.damage
+                    health -= (mob.damage - temporaryPumping[PROTECTION]!!.getValue())
                     Glow.animate(player, .5, GlowColor.RED)
-                    ModHelper.updateHeartBar(health, maxHealth, player)
+                    ModHelper.updateHeartBar(health, maxHealth, this)
                     if (health <= 0) {
-                        if (stat.maxWavePassed > waveLevel)
-                            stat.maxWavePassed = waveLevel
+                        if (maxWavePassed > waveLevel)
+                            maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
                         ModHelper.updateBarVisible(player)
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
@@ -158,22 +177,15 @@ class App : JavaPlugin() {
                                 )
                             }"
                         )
-                        Anime.cursorMessage(
-                            player, "§b+$reward §f${
-                                Humanize.plurals(
-                                    "опыт",
-                                    "опыта",
-                                    "опыта",
-                                    reward
-                                )
-                            }"
-                        )
-                        giveExperience(reward)
                         giveMoney(reward)
                     }
                 }
             }
         }
+    }
+
+    override fun onDisable() {
+        SessionListener.simulator.disable()
     }
 
     private fun filterMobs(user: User, bytes: ByteArray): Set<Mob> {

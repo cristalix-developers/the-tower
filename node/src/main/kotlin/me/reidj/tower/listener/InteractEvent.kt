@@ -2,14 +2,14 @@ package me.reidj.tower.listener
 
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix.transfer
-import dev.implario.bukkit.item.item
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
 import me.reidj.tower.app
 import me.reidj.tower.mod.ModHelper
+import me.reidj.tower.pumping.PumpingInventory
+import me.reidj.tower.pumping.PumpingType
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
-import org.bukkit.Material
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -27,13 +27,6 @@ object InteractEvent : Listener {
     private const val CONST_TICKS_BEFORE_STRIKE = 20
     private const val TICKS_BEFORE_STRIKE = 40
 
-    private val upgradeItem = item {
-        type = Material.CLAY_BALL
-        text("§bУлучшения")
-        nbt("other", "guild_members")
-        nbt("click", "settings")
-    }
-
     init {
         B.regCommand({ player, _ ->
             transfer(listOf(player.uniqueId), RealmId.of(HUB))
@@ -46,7 +39,7 @@ object InteractEvent : Listener {
                     return@apply
                 inventory.clear()
                 teleport(app.gamePosition)
-                inventory.setItem(4, upgradeItem)
+                inventory.setItem(4, PumpingInventory.workshop)
 
                 // Отправляем точку башни
                 ModTransfer(app.tower.x, app.tower.y, app.tower.z).send("tower:init", this)
@@ -71,14 +64,21 @@ object InteractEvent : Listener {
                         .send("tower:strike", this)
                 }
 
+
                 // Начинаю волну
                 user.inGame = true
+                user.temporaryPumping = user.pumpingTypes
+                user.temporaryPumping.forEach { (key, _) -> user.temporaryPumping.getValue(key).level = 1 }
                 user.giveTokens(80, true)
-                user.health = 5
-                user.maxHealth = 5
-                ModHelper.updateHeartBar(user.health, user.maxHealth, player)
+                val health = user.temporaryPumping[PumpingType.HEALTH]!!.getValue()
+                B.postpone(10) {
+                    ModHelper.updateHeartBar(health, health, user)
+                    ModHelper.updateProtectionBar(user)
+                    ModHelper.updateAttackSpeed(user)
+                    ModHelper.updateDamage(user)
+                }
                 B.postpone(3 * 20) {
-                    val wave = Wave(true, System.currentTimeMillis(), 0, mutableListOf(), this)
+                    val wave = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), this)
                     user.wave = wave
                     wave.start()
                 }

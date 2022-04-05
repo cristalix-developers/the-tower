@@ -3,6 +3,7 @@ package mob
 import Vector
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import mod
+import kotlin.math.pow
 
 /**
  * @project tower
@@ -18,9 +19,9 @@ object MobManager {
             val now = System.currentTimeMillis()
             if (now - lastTick > .01 * 1000) {
                 lastTick = now
-                mod.mobs.forEach { entity ->
-                    val dX = mod.cube.x - entity.x - 1.5
-                    val dZ = mod.cube.z - entity.z - 1.5
+                mod.mobs.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 6.5 }.forEach { entity ->
+                    val dX = mod.cube.x - entity.x
+                    val dZ = mod.cube.z - entity.z
                     val rotation =
                         Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
                     entity.rotationYawHead = rotation

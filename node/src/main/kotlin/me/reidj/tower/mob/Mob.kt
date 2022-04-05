@@ -11,11 +11,11 @@ import java.util.*
  */
 data class Mob(
     val uuid: UUID,
-    var hp: Int,
+    var hp: Double,
     val x: Double,
     val y: Double,
     val z: Double,
-    val damage: Int,
+    val damage: Double,
     val type: EntityType
 ) {
 
@@ -26,6 +26,7 @@ data class Mob(
             .double(x)
             .double(y)
             .double(z)
+            .double(hp)
             .send("tower:mobinit", player)
     }
 }

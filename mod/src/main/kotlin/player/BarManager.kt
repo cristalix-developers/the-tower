@@ -11,6 +11,7 @@ import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
+import java.text.DecimalFormat
 import kotlin.math.max
 import kotlin.math.min
 
@@ -25,39 +26,29 @@ object BarManager {
     private var lvlIndicator: LevelIndicator? = null
     private var airBar: RectangleElement? = null
 
-    private var health = 5
-    private var maxHealth = 5
-    private var protection = .1
+    private var health = 5.0
+    private var maxHealth = 5.0
+    private var protection = .0
     private var exp = 0
     private var level = 0
 
     private var airHide: Boolean = false
 
+    private val MONEY_FORMAT = DecimalFormat("##.#")
+
+    fun toHealthFormat(health: Double): String = MONEY_FORMAT.format(health)
+
     init {
         mod.registerChannel("tower:loseheart") {
-            health = readInt()
-            maxHealth = readInt()
+            health = readDouble()
+            maxHealth = readDouble()
         }
 
         mod.registerChannel("tower:protection") {
             val protect = readDouble()
-            protection = protect
-
             if (protect != protection) {
                 protection = protect
                 protectionIndicator?.updatePercentage(protect)
-            }
-        }
-
-        mod.registerChannel("tower:exp") {
-            val actualLevel = readInt()
-            val haveExp = readInt()
-            val needExp = readInt()
-
-            if (actualLevel != level || haveExp != exp) {
-                exp = haveExp
-                level = actualLevel
-                lvlIndicator?.updatePercentage(level, exp, needExp)
             }
         }
 
@@ -154,11 +145,11 @@ object BarManager {
             addChild(bar, text)
         }
 
-        fun updatePercentage(current: Int, max: Int) {
+        fun updatePercentage(current: Double, max: Double) {
             bar.animate(0.1, Easings.CUBIC_OUT) {
                 bar.size.x = maxX * min(1.0, current / max.toDouble())
             }
-            this.text.content = "§f$current/$max ❤"
+            this.text.content = "§f${toHealthFormat(current)}/${toHealthFormat(max)} ❤"
         }
     }
 
@@ -209,6 +200,7 @@ object BarManager {
         private val maxX: Double
 
         init {
+            enabled = false
             color = Color(0, 0, 0, 0.68)
             offset.y = -18.0
             align = Relative.CENTER

@@ -1,7 +1,9 @@
 import dev.xdark.clientapi.event.render.RenderPass
 import dev.xdark.clientapi.opengl.GlStateManager
+import dev.xdark.clientapi.resource.ResourceLocation
 import org.lwjgl.opengl.GL11
 import ru.cristalix.clientapi.JavaMod
+import ru.cristalix.clientapi.JavaMod.clientApi
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -35,8 +37,10 @@ object Cube {
                     0.6f
                 )
 
+                clientApi.renderEngine()
+                    .bindTexture(ResourceLocation.of("minecraft", "DIAMOND_BLOCK"))
+
                 GlStateManager.translate(-player.x, -player.y, -player.z)
-                TowerManager.activeAmmo.forEach { it.draw() }
                 GlStateManager.translate(mod.cube.x, mod.cube.y, mod.cube.z)
                 GlStateManager.rotate(
                     (angle / 23.0f).toFloat(),
@@ -47,38 +51,38 @@ object Cube {
 
                 GL11.glBegin(GL11.GL_POLYGON)
                 GL11.glColor3d(1.0, 1.0, 1.0)
-                GL11.glVertex3d(0.5, -0.5, 0.5)
-                GL11.glVertex3d(0.5, 0.5, 0.5)
-                GL11.glVertex3d(-0.5, 0.5, 0.5)
-                GL11.glVertex3d(-0.5, -0.5, 0.5)
+                GL11.glVertex3d(1.0, -1.0, 1.0)
+                GL11.glVertex3d(1.0, 1.0, 1.0)
+                GL11.glVertex3d(-1.0, 1.0, 1.0)
+                GL11.glVertex3d(-1.0, -1.0, 1.0)
                 GL11.glEnd()
                 GL11.glBegin(GL11.GL_POLYGON)
                 GL11.glColor3d(1.0, 0.0, 1.0)
-                GL11.glVertex3d(0.5, -0.5, -0.5)
-                GL11.glVertex3d(0.5, 0.5, -0.5)
-                GL11.glVertex3d(0.5, 0.5, 0.5)
-                GL11.glVertex3d(0.5, -0.5, 0.5)
+                GL11.glVertex3d(1.0, -1.0, -1.0)
+                GL11.glVertex3d(1.0, 1.0, -1.0)
+                GL11.glVertex3d(1.0, 1.0, 1.0)
+                GL11.glVertex3d(1.0, -1.0, 1.0)
                 GL11.glEnd()
                 GL11.glBegin(GL11.GL_POLYGON)
-                GL11.glColor3d(0.0, 1.0, 0.0)
-                GL11.glVertex3d(-0.5, -0.5, 0.5)
-                GL11.glVertex3d(-0.5, 0.5, 0.5)
-                GL11.glVertex3d(-0.5, 0.5, -0.5)
-                GL11.glVertex3d(-0.5, -0.5, -0.5)
+                GL11.glColor3d(1.0, 1.0, 0.0)
+                GL11.glVertex3d(-1.0, -1.0, 1.0)
+                GL11.glVertex3d(-1.0, 1.0, 1.0)
+                GL11.glVertex3d(-1.0, 1.0, -1.0)
+                GL11.glVertex3d(-1.0, -1.0, -1.0)
                 GL11.glEnd()
                 GL11.glBegin(GL11.GL_POLYGON)
                 GL11.glColor3d(0.0, 0.0, 1.0)
-                GL11.glVertex3d(0.5, 0.5, 0.5)
-                GL11.glVertex3d(0.5, 0.5, -0.5)
-                GL11.glVertex3d(-0.5, 0.5, -0.5)
-                GL11.glVertex3d(-0.5, 0.5, 0.5)
+                GL11.glVertex3d(1.0, 1.0, 1.0)
+                GL11.glVertex3d(1.0, 1.0, -1.0)
+                GL11.glVertex3d(-1.0, 1.0, -1.0)
+                GL11.glVertex3d(-1.0, 1.0, 1.0)
                 GL11.glEnd()
                 GL11.glBegin(GL11.GL_POLYGON)
                 GL11.glColor3d(1.0, 0.0, 0.0)
-                GL11.glVertex3d(0.5, -0.5, -0.5)
-                GL11.glVertex3d(0.5, -0.5, 0.5)
-                GL11.glVertex3d(-0.5, -0.5, 0.5)
-                GL11.glVertex3d(-0.5, -0.5, -0.5)
+                GL11.glVertex3d(1.0, -1.0, -1.0)
+                GL11.glVertex3d(1.0, -1.0, 1.0)
+                GL11.glVertex3d(-1.0, -1.0, 1.0)
+                GL11.glVertex3d(-1.0, -1.0, -1.0)
                 GL11.glEnd()
 
                 // GL конец

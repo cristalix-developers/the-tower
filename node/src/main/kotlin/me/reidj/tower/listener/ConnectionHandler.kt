@@ -14,7 +14,7 @@ import ru.kdev.simulatorapi.listener.SessionListener
  * @project tower
  * @author Рейдж
  */
-object JoinEvent : Listener {
+object ConnectionHandler : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
@@ -28,7 +28,7 @@ object JoinEvent : Listener {
 
         B.postpone(20) {
             ModHelper.updateMoney(user)
-            ModHelper.updateLevelBar(user)
+            //ModHelper.updateLevelBar(user)
         }
     }
 }
