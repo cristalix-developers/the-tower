@@ -1,17 +1,21 @@
 
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.render.*
+import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.render.Tessellator
 import dev.xdark.clientapi.resource.ResourceLocation
 import dev.xdark.feder.NetUtil
 import mob.Mob
 import mob.MobManager
+import org.lwjgl.opengl.GL11
 import player.BarManager
 import player.Statistic
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
 import java.util.*
+import kotlin.math.cos
+import kotlin.math.sin
 
 lateinit var mod: App
 const val NAMESPACE = "tower"
@@ -50,53 +54,34 @@ class App : KotlinMod() {
         val v2 = v1 + sz / sx
         val v3 = v2 + sy / sx
 
-        /*registerHandler<RenderPass> {
+        registerHandler<RenderPass> {
+            GlStateManager.disableLighting()
+            GlStateManager.disableCull()
+            GlStateManager.shadeModel(GL11.GL_SMOOTH)
+            GlStateManager.enableBlend()
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE)
             GlStateManager.enableTexture2D()
-            GlStateManager.enableAlpha()
+            GlStateManager.disableAlpha()
             clientApi.renderEngine()
-                .bindTexture(ResourceLocation.of())
-            render.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL)
+                    .bindTexture(ResourceLocation.of("minecraft", "mcpatcher/cit/marioparty/deathcube.png"))
+            GL11.glBegin(GL11.GL_POLYGON)
 
-            // Front
-            render.pos(0.0, sy, 0.0).tex(u2, v3).normal(0f, 0f, -1f).endVertex()
-            render.pos(sx, sy, 0.0).tex(u3, v3).normal(0f, 0f, -1f).endVertex()
-            render.pos(sx, 0.0, 0.0).tex(u3, v2).normal(0f, 0f, -1f).endVertex()
-            render.pos(0.0, 0.0, 0.0).tex(u2, v2).normal(0f, 0f, -1f).endVertex()
+            for (i in 0..360)
+                GL11.glVertex3d(sin(Math.toRadians(i.toDouble())), .01, cos(Math.toRadians(i.toDouble())))
 
-            /*render.pos(0.0, sy, 0.0).tex(u2, v3).normal(-1f, 0f, 0f).endVertex()
-            render.pos(0.0, 0.0, 0.0).tex(u2, v2).normal(-1f, 0f, 0f).endVertex()
-            render.pos(0.0, 0.0, sz).tex(u1, v2).normal(-1f, 0f, 0f).endVertex()
-            render.pos(0.0, sy, sz).tex(u1, v3).normal(-1f, 0f, 0f).endVertex()
-
-            render.pos(sx, sy, 0.0).tex(u3, v3).normal(1f, 0f, 0f).endVertex()
-            render.pos(sx, sy, sz).tex(u4, v3).normal(1f, 0f, 0f).endVertex()
-            render.pos(sx, 0.0, sz).tex(u4, v2).normal(1f, 0f, 0f).endVertex()
-            render.pos(sx, 0.0, 0.0).tex(u3, v2).normal(1f, 0f, 0f).endVertex()
-
-            render.pos(0.0, sy, sz).tex(u6, v3).normal(0f, 0f, 1f).endVertex()
-            render.pos(0.0, 0.0, sz).tex(u6, v2).normal(0f, 0f, 1f).endVertex()
-            render.pos(sx, 0.0, sz).tex(u4, v2).normal(0f, 0f, 1f).endVertex()
-            render.pos(sx, sy, sz).tex(u4, v3).normal(0f, 0f, 1f).endVertex()
-
-            render.pos(0.0, 0.0, 0.0).tex(u2, v2).normal(0f, -1f, 0f).endVertex()
-            render.pos(sx, 0.0, 0.0).tex(u3, v2).normal(0f, -1f, 0f).endVertex()
-            render.pos(sx, 0.0, sz).tex(u3, v1).normal(0f, -1f, 0f).endVertex()
-            render.pos(0.0, 0.0, sz).tex(u2, v1).normal(0f, -1f, 0f).endVertex()
-
-            render.pos(0.0, sy, sz).tex(u3, v1).normal(0f, 1f, 0f).endVertex()
-            render.pos(sx, sy, sz).tex(u5, v1).normal(0f, 1f, 0f).endVertex()
-            render.pos(sx, sy, 0.0).tex(u5, v2).normal(0f, 1f, 0f).endVertex()
-            render.pos(0.0, sy, 0.0).tex(u3, v2).normal(0f, 1f, 0f).endVertex()*/
-
-            tessellator.draw()
+            GL11.glEnd()
 
             GlStateManager.color(1f, 1f, 1f, 1f)
-        }*/
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_CONSTANT_COLOR)
+            GlStateManager.shadeModel(GL11.GL_FLAT)
+            GlStateManager.enableAlpha()
+            GlStateManager.enableCull()
+        }
 
         loadTextures(
-            load("health_bar.png", "35320C088F83D8890128127"),
-            load("energy.png", "35320C088F83D8890128111"),
-            load("xp_bar.png", "35320C094F83D8890128111")
+                load("health_bar.png", "35320C088F83D8890128127"),
+                load("energy.png", "35320C088F83D8890128111"),
+                load("xp_bar.png", "35320C094F83D8890128111")
         ).thenRun {
             BarManager
         }
@@ -110,23 +95,23 @@ class App : KotlinMod() {
 
         mod.registerChannel("tower:init") {
             mod.cube = V3(
-                readDouble(),
-                readDouble() + 1,
-                readDouble()
+                    readDouble(),
+                    readDouble() + 1,
+                    readDouble()
             )
             mod.inited = true
         }
 
         registerChannel("tower:mobinit") {
             mobs.add(
-                Mob(
-                    UUID.fromString(NetUtil.readUtf8(this)),
-                    readInt(),
-                    readDouble(),
-                    readDouble(),
-                    readDouble(),
-                    readDouble()
-                ).create()
+                    Mob(
+                            UUID.fromString(NetUtil.readUtf8(this)),
+                            readInt(),
+                            readDouble(),
+                            readDouble(),
+                            readDouble(),
+                            readDouble()
+                    ).create()
             )
         }
     }

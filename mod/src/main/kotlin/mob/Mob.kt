@@ -22,6 +22,7 @@ class Mob(
         mob.setUniqueId(uuid)
         mob.teleport(x, y, z)
         mob.health = hp.toFloat()
+        mob.alwaysRenderNameTag = true
         UIEngine.clientApi.minecraft().world.spawnEntity(mob)
         mob.updateNameHealth()
         return mob
