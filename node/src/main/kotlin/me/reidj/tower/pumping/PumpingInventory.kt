@@ -3,7 +3,6 @@ package me.reidj.tower.pumping
 import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import me.func.mod.Anime
-import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.user.User
 import me.reidj.tower.util.MoneyFormat
 import org.bukkit.Material.*
@@ -49,7 +48,7 @@ object PumpingInventory {
 
                 val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
 
-                icon(user, contents, if (!user.inGame) user.pumpingTypes else user.temporaryPumping)
+                icon(user, contents, if (!user.inGame) user.upgradeTypes else user.session.upgrade)
                 contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
                 contents.fillMask('X', ClickableItem.empty(item {
                     type = STAINED_GLASS_PANE
@@ -64,11 +63,11 @@ object PumpingInventory {
         B.regConsumerCommand({ player, _ -> menu.open(player) }, "workshop", "")
     }
 
-    fun icon(user: User, contents: InventoryContents, pumpingTypes: MutableMap<PumpingType, Pumping>) {
-        pumpingTypes.forEach { (pumpingType, pumping) ->
+    fun icon(user: User, contents: InventoryContents, upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
+        upgradeTypes.forEach { (pumpingType, pumping) ->
             val level = pumping.level
             val cost = pumpingType.startPrice + level
-            val has = !user.inGame
+            val notInGame = !user.inGame
             contents.add('O', ClickableItem.of(item {
                 type = CLAY_BALL
                 text(
@@ -85,20 +84,13 @@ object PumpingInventory {
                 val pair = pumpingType.nbt.split(":")
                 nbt(pair[0], pair[1])
             }) {
-                if (if (has) user.money >= cost else user.tokens >= cost) {
-                    if (has) user.giveMoney(-cost) else user.giveTokens(-cost, false)
+                if (if (notInGame) user.money >= cost else user.tokens >= cost) {
+                    if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
                     pumping.level++
                     user.player!!.performCommand("workshop")
-                    when (pumpingType) {
-                        PumpingType.HEALTH -> ModHelper.updateHeartBar(
-                            if (user.health < user.maxHealth) user.health else pumping.getValue(),
-                            pumping.getValue(),
-                            user
-                        )
-                        PumpingType.PROTECTION -> ModHelper.updateProtectionBar(user)
-                        PumpingType.ATTACK_SPEED -> ModHelper.updateAttackSpeed(user)
-                        PumpingType.DAMAGE -> ModHelper.updateDamage(user)
-                    }
+
+                    user.tower.updateHealth()
+                    if (notInGame) user.update(user, pumpingType) else user.tower.update(user, pumpingType)
                 } else {
                     user.player!!.closeInventory()
                     Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)

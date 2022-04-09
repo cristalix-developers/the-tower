@@ -5,7 +5,7 @@ import implario.humanize.Humanize
 import me.func.mod.Anime
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
-import me.reidj.tower.pumping.PumpingType
+import me.reidj.tower.pumping.UpgradeType
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
@@ -45,11 +45,11 @@ class Wave(
 
     fun end() {
         val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
-        val tokens = user.pumpingTypes[PumpingType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt()
+        val tokens = user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt()
         isStarting = false
         level++
         player.sendTitle("§aПоздравляем!", "Волна завершена", 10, 15, 10)
-        user.giveTokens(tokens, false)
+        user.giveTokens(tokens)
         Anime.cursorMessage(
             player, "§b+$tokens §f${
                 Humanize.plurals(

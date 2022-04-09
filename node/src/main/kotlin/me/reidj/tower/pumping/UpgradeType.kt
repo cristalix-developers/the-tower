@@ -4,7 +4,7 @@ package me.reidj.tower.pumping
  * @project tower
  * @author Рейдж
  */
-enum class PumpingType(
+enum class UpgradeType(
     val title: String,
     val lore: String,
     val nbt: String,
@@ -13,7 +13,7 @@ enum class PumpingType(
     val step: Double
 ) {
     DAMAGE("Урон", "Увеличивает максимально наносимый урон\n§7на 6 единиц", "other:custom_sword", 1.0, 10, 6.0),
-    ATTACK_SPEED(
+    BULLET_DELAY(
         "Скорость атаки",
         "Увеличивает максимальную скорость атаки\n§7на 0.01 единиц",
         "simulators:save_crystal",

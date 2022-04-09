@@ -22,10 +22,11 @@ import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
-import me.reidj.tower.mod.ModHelper
-import me.reidj.tower.pumping.Pumping
 import me.reidj.tower.pumping.PumpingInventory
-import me.reidj.tower.pumping.PumpingType.*
+import me.reidj.tower.pumping.Upgrade
+import me.reidj.tower.pumping.UpgradeType
+import me.reidj.tower.pumping.UpgradeType.*
+import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
@@ -79,7 +80,8 @@ class App : JavaPlugin() {
                 User(
                     uuid,
                     0,
-                    values().associateWith { Pumping(it, 1) }.toMutableMap()
+                    values().associateWith { Upgrade(it, 1) }.toMutableMap(),
+                    Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap())
                 )
             }
         }
@@ -126,18 +128,24 @@ class App : JavaPlugin() {
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 filterMobs(this, bytes).filter { wave!!.aliveMobs.contains(it) }.forEach {
-                    it.hp -= temporaryPumping[DAMAGE]!!.getValue().toInt()
+                    it.hp -= session.upgrade[DAMAGE]!!.getValue().toInt()
                     if (it.hp <= 0) {
-                        val token = pumpingTypes[CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
                         wave!!.aliveMobs.remove(it)
                         ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
-                        giveTokens(token, false)
-                        Anime.cursorMessage(player, "§b+$token §f${Humanize.plurals(
-                            "жетон",
-                            "жетона",
-                            "жетонов",
-                            token
-                        )}")
+
+                        giveTokens(token)
+
+                        Anime.cursorMessage(
+                            player, "§b+$token §f${
+                                Humanize.plurals(
+                                    "жетон",
+                                    "жетона",
+                                    "жетонов",
+                                    token
+                                )
+                            }"
+                        )
                         return@apply
                     }
                 }
@@ -145,25 +153,31 @@ class App : JavaPlugin() {
         }
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+
                 filterMobs(this, bytes).forEach { mob ->
                     val wavePassed = wave
                     val waveLevel = wavePassed!!.level
                     val reward = formula(waveLevel)
-                    health -= (mob.damage - temporaryPumping[PROTECTION]!!.getValue())
+                    tower.health -= (mob.damage - session.upgrade[PROTECTION]!!.getValue())
                     Glow.animate(player, .5, GlowColor.RED)
-                    ModHelper.updateHeartBar(health, maxHealth, this)
-                    if (health <= 0) {
+
+                    tower.updateHealth()
+
+                    if (tower.health <= 0) {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
-                        ModHelper.updateBarVisible(player)
+
+                        // Игра закончилась
+                        ModTransfer(false).send("tower:update-state", player)
+
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
                         wavePassed.aliveMobs.forEach {
                             ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
                         }
                         wavePassed.aliveMobs.clear()
                         inGame = false
-                        giveTokens(-tokens, true)
+                        giveTokens(-tokens)
                         wave = null
                         if (reward == 0)
                             return@registerIncomingPluginChannel

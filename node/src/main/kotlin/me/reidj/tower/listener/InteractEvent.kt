@@ -7,7 +7,7 @@ import me.reidj.tower.HUB
 import me.reidj.tower.app
 import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.pumping.PumpingInventory
-import me.reidj.tower.pumping.PumpingType
+import me.reidj.tower.pumping.UpgradeType
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
@@ -32,6 +32,7 @@ object InteractEvent : Listener {
             transfer(listOf(player.uniqueId), RealmId.of(HUB))
             null
         }, "leave")
+
         B.regCommand({ player, _ ->
             player.apply {
                 val user = SessionListener.simulator.getUser<User>(uniqueId)!!
@@ -56,7 +57,8 @@ object InteractEvent : Listener {
                 // Отправляю скорость передвижения моба
                 ModTransfer().double(MOVE_SPEED).send("tower:mobspeed", this)
 
-                ModHelper.updateBarVisible(player)
+                // Игра началась
+                ModTransfer(true).send("tower:update-state", this)
 
                 // Отправляю количество пуль
                 B.postpone(20) {
@@ -67,12 +69,12 @@ object InteractEvent : Listener {
 
                 // Начинаю волну
                 user.inGame = true
-                user.temporaryPumping = user.pumpingTypes
-                user.temporaryPumping.forEach { (key, _) -> user.temporaryPumping.getValue(key).level = 1 }
-                user.giveTokens(80, true)
-                val health = user.temporaryPumping[PumpingType.HEALTH]!!.getValue()
+                user.temporaryUpgrade = user.upgradeTypes
+                user.temporaryUpgrade.forEach { (key, _) -> user.temporaryUpgrade.getValue(key).level = 1 }
+                user.giveTokens(80)
+                val health = user.temporaryUpgrade[UpgradeType.HEALTH]!!.getValue()
                 B.postpone(10) {
-                    ModHelper.updateHeartBar(health, health, user)
+                    user.tower.updateHealth()
                     ModHelper.updateProtectionBar(user)
                     ModHelper.updateAttackSpeed(user)
                     ModHelper.updateDamage(user)

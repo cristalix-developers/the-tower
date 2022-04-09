@@ -2,7 +2,6 @@ package me.reidj.tower.listener
 
 import clepto.bukkit.B
 import me.func.mod.conversation.ModLoader
-import me.reidj.tower.mod.ModHelper
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import org.bukkit.event.EventHandler
@@ -27,7 +26,7 @@ object ConnectionHandler : Listener {
         B.postpone(1) { ModLoader.send("tower-mod-bundle.jar", this) }
 
         B.postpone(20) {
-            ModHelper.updateMoney(user)
+            user.giveMoney(-0)
             //ModHelper.updateLevelBar(user)
         }
     }

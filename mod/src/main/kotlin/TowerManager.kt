@@ -2,6 +2,7 @@ import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
 import io.netty.buffer.Unpooled
+import player.BarManager
 import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.Context3D
@@ -24,8 +25,11 @@ object TowerManager {
     private var lastTickHit = System.currentTimeMillis()
     private var ticksBeforeStrike = 30
     private var ticksStrike = 30
-    private var speedAttack = 0.0
+    private var speedAttack = 0.0 // BULLET_DELAY
     private var damage = 0.0
+    var health = 5.0
+    var maxHealth = 5.0
+    var protection = .0
 
     data class Bullet(
         var x: Double,
@@ -107,12 +111,25 @@ object TowerManager {
             ticksStrike = readInt()
         }
 
-        mod.registerChannel("tower:speedattack") {
+        mod.registerChannel("tower:bullet_delay") {
             speedAttack = readDouble()
         }
 
-        mod.registerChannel("tower:damgeupdate") {
+        mod.registerChannel("tower:damage") {
             damage = readDouble()
+        }
+
+        mod.registerChannel("tower:loseheart") {
+            health = readDouble()
+            maxHealth = readDouble()
+        }
+
+        mod.registerChannel("tower:protection") {
+            val protect = readDouble()
+            if (protect != protection) {
+                protection = protect
+                BarManager.protectionIndicator?.updatePercentage(protect)
+            }
         }
     }
 }

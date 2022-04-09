@@ -52,10 +52,8 @@ object Statistic {
 
         mod.registerChannel("tower:tokens") {
             val tokens = readInt()
-            val toggleVisibility = readBoolean()
 
-            if (toggleVisibility)
-                tokensBox.enabled = !tokensBox.enabled
+            tokensBox.enabled = mod.gameActive
 
             Humanize.plurals(
                 "Жетон",

@@ -1,6 +1,10 @@
 package player
 
 import NAMESPACE
+import TowerManager.health
+import TowerManager.maxHealth
+import TowerManager.protection
+import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.RenderTickPre
 import dev.xdark.clientapi.resource.ResourceLocation
 import mod
@@ -22,13 +26,10 @@ import kotlin.math.min
 object BarManager {
 
     private var healthIndicator: HealthIndicator? = null
-    private var protectionIndicator: ProtectionIndicator? = null
+    var protectionIndicator: ProtectionIndicator? = null
     private var lvlIndicator: LevelIndicator? = null
     private var airBar: RectangleElement? = null
 
-    private var health = 5.0
-    private var maxHealth = 5.0
-    private var protection = .0
     private var exp = 0
     private var level = 0
 
@@ -39,22 +40,9 @@ object BarManager {
     fun toHealthFormat(health: Double): String = MONEY_FORMAT.format(health)
 
     init {
-        mod.registerChannel("tower:loseheart") {
-            health = readDouble()
-            maxHealth = readDouble()
-        }
-
-        mod.registerChannel("tower:protection") {
-            val protect = readDouble()
-            if (protect != protection) {
-                protection = protect
-                protectionIndicator?.updatePercentage(protect)
-            }
-        }
-
-        mod.registerChannel("tower:barvisible") {
-            healthIndicator!!.enabled = !healthIndicator!!.enabled
-            protectionIndicator!!.enabled = !protectionIndicator!!.enabled
+        registerHandler<GameLoop> {
+            healthIndicator!!.enabled = mod.gameActive
+            protectionIndicator!!.enabled = mod.gameActive
         }
 
         registerHandler<RenderTickPre> {

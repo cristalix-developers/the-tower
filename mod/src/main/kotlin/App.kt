@@ -26,6 +26,7 @@ class App : KotlinMod() {
     lateinit var cube: V3
     val mobs: MutableList<EntityLivingBase> = mutableListOf()
     var inited = false
+    var gameActive = false
 
     override fun onEnable() {
         mod = this
@@ -100,6 +101,10 @@ class App : KotlinMod() {
                     readDouble()
             )
             mod.inited = true
+        }
+
+        mod.registerChannel("tower:update-state") {
+            gameActive = readBoolean()
         }
 
         registerChannel("tower:mobinit") {

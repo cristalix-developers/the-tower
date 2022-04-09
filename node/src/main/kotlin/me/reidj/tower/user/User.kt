@@ -1,54 +1,58 @@
 package me.reidj.tower.user
 
-import me.reidj.tower.mod.ModHelper
-import me.reidj.tower.pumping.Pumping
-import me.reidj.tower.pumping.PumpingType
+import me.func.mod.conversation.ModTransfer
+import me.reidj.tower.pumping.Upgrade
+import me.reidj.tower.pumping.UpgradeType
 import me.reidj.tower.wave.Wave
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.common.SimulatorUser
+import ru.kdev.simulatorapi.listener.SessionListener
 import java.util.*
 
 /**
  * @project tower
  * @author Рейдж
  */
-class User(val id: UUID, var maxWavePassed: Int, var pumpingTypes: MutableMap<PumpingType, Pumping>) : SimulatorUser() {
+class User(val id: UUID, var maxWavePassed: Int, var upgradeTypes: MutableMap<UpgradeType, Upgrade>, val tower: Tower) :
+    SimulatorUser(), Upgradable {
 
     @Transient
     var wave: Wave? = null
 
     @Transient
     var player: Player? = null
+        set(current) {
+            tower.owner = current
+            field = current
+        }
 
     @Transient
     var inGame: Boolean = false
 
     @Transient
-    lateinit var temporaryPumping: MutableMap<PumpingType, Pumping>
-
-    @Transient
-    var health: Double = 0.0
-
-    @Transient
-    var maxHealth: Double = 0.0
+    lateinit var session: Session
 
     @Transient
     var tokens = 0
 
-    fun giveTokens(tokens: Int, isVisible: Boolean) {
+    fun giveTokens(tokens: Int) {
         this.tokens += tokens
-        ModHelper.updateTokens(this, isVisible)
+        ModTransfer(tokens).send("tower:tokens", player)
     }
 
     fun giveMoney(money: Int) {
         this.money += money
-        ModHelper.updateMoney(this)
+        ModTransfer(money).send("tower:money", player)
     }
 
     fun giveExperience(exp: Int) {
         //val prevLevel = SessionListener.simulator.run { this@User.getLevel() }
         this.exp += exp
-        ModHelper.updateLevelBar(this)
+        ModTransfer()
+            .integer(SessionListener.simulator.run { getLevel() })
+            .integer(exp)
+            .integer(SessionListener.simulator.run { getNextLevelExp() })
+            .send("tower:exp", player)
         /*if (exp >= prevLevel) {
             Glow.animate(player!!, .5, GlowColor.GREEN)
             Anime.topMessage(
@@ -57,4 +61,8 @@ class User(val id: UUID, var maxWavePassed: Int, var pumpingTypes: MutableMap<Pu
             )
         }*/
     }
+
+    override fun update(user: User, vararg type: UpgradeType) =
+        type.forEach { ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", player) }
+
 }

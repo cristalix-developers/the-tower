@@ -1,7 +1,6 @@
 package me.reidj.tower.wave
 
-import me.reidj.tower.mod.ModHelper
-import me.reidj.tower.pumping.PumpingType
+import me.reidj.tower.pumping.UpgradeType
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable
@@ -23,15 +22,12 @@ object WaveManager : BukkitRunnable() {
                 if (it.wave!!.isStarting) {
                     if (((System.currentTimeMillis() - it.wave!!.startTime) / 1000 == 40.toLong() || it.wave!!.aliveMobs.isEmpty()))
                         it.wave!!.end()
-                    if (time % 20 == 0 && it.health < it.maxHealth) {
-                        ModHelper.updateHeartBar(
-                            it.maxHealth - maxOf(
-                                0.0,
-                                it.maxHealth - it.health - it.temporaryPumping[PumpingType.REGEN]!!.getValue()
-                            ),
-                            it.maxHealth,
-                            it
+                    if (time % 20 == 0 && it.tower.health < it.tower.maxHealth) {
+                        it.tower.health = it.tower.maxHealth - maxOf(
+                            0.0,
+                            it.tower.maxHealth - it.tower.health - it.session.upgrade[UpgradeType.REGEN]!!.getValue()
                         )
+                        it.tower.updateHealth()
                     }
                 }
             }
