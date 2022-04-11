@@ -1,9 +1,6 @@
-package player
+package tower
 
 import NAMESPACE
-import TowerManager.health
-import TowerManager.maxHealth
-import TowerManager.protection
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.RenderTickPre
 import dev.xdark.clientapi.resource.ResourceLocation
@@ -15,6 +12,9 @@ import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
+import tower.TowerManager.health
+import tower.TowerManager.maxHealth
+import tower.TowerManager.protection
 import java.text.DecimalFormat
 import kotlin.math.max
 import kotlin.math.min
@@ -25,7 +25,7 @@ import kotlin.math.min
  */
 object BarManager {
 
-    private var healthIndicator: HealthIndicator? = null
+    var healthIndicator: HealthIndicator? = null
     var protectionIndicator: ProtectionIndicator? = null
     private var lvlIndicator: LevelIndicator? = null
     private var airBar: RectangleElement? = null
@@ -135,7 +135,7 @@ object BarManager {
 
         fun updatePercentage(current: Double, max: Double) {
             bar.animate(0.1, Easings.CUBIC_OUT) {
-                bar.size.x = maxX * min(1.0, current / max.toDouble())
+                bar.size.x = maxX * min(1.0, current / max)
             }
             this.text.content = "§f${toHealthFormat(current)}/${toHealthFormat(max)} ❤"
         }
@@ -171,8 +171,8 @@ object BarManager {
             addChild(bar, text)
         }
 
-        fun updatePercentage(energy: Double) {
-            this.text.content = "§f$energy 㱈"
+        fun updatePercentage(protection: Double) {
+            this.text.content = "§f$protection 㱈"
         }
     }
 

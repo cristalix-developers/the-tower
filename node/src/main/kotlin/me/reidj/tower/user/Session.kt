@@ -1,8 +1,8 @@
 package me.reidj.tower.user
 
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.pumping.Upgrade
-import me.reidj.tower.pumping.UpgradeType
+import me.reidj.tower.upgrade.Upgrade
+import me.reidj.tower.upgrade.UpgradeType
 
 data class Session(var upgrade: MutableMap<UpgradeType, Upgrade>): Upgradable {
     override fun update(user: User, vararg type: UpgradeType) =

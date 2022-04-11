@@ -2,7 +2,7 @@ package me.reidj.tower.content
 
 import clepto.bukkit.B
 import dev.implario.bukkit.item.item
-import me.reidj.tower.pumping.PumpingInventory
+import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.user.User
 import org.bukkit.Material.CLAY_BALL
 import org.bukkit.Material.STAINED_GLASS_PANE
@@ -47,7 +47,7 @@ object MainGui {
 
                 val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
 
-                contents.add('U', ClickableItem.of(PumpingInventory.workshop) { player.performCommand("workshop") })
+                contents.add('U', ClickableItem.of(UpgradeInventory.workshop) { player.performCommand("workshop") })
                 contents.add('S', ClickableItem.empty(item {
                     type = CLAY_BALL
                     nbt("other", "quest_week")

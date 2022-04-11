@@ -1,4 +1,4 @@
-package me.reidj.tower.pumping
+package me.reidj.tower.upgrade
 
 /**
  * @project tower

@@ -22,15 +22,16 @@ import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
-import me.reidj.tower.pumping.PumpingInventory
-import me.reidj.tower.pumping.Upgrade
-import me.reidj.tower.pumping.UpgradeType
-import me.reidj.tower.pumping.UpgradeType.*
+import me.reidj.tower.upgrade.Upgrade
+import me.reidj.tower.upgrade.UpgradeInventory
+import me.reidj.tower.upgrade.UpgradeType
+import me.reidj.tower.upgrade.UpgradeType.*
 import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.inventory.IInventoryService
@@ -78,10 +79,10 @@ class App : JavaPlugin() {
 
             userCreator { uuid ->
                 User(
-                    uuid,
-                    0,
-                    values().associateWith { Upgrade(it, 1) }.toMutableMap(),
-                    Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap())
+                        uuid,
+                        0,
+                        values().associateWith { Upgrade(it, 1) }.toMutableMap(),
+                        Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap())
                 )
             }
         }
@@ -107,20 +108,25 @@ class App : JavaPlugin() {
         }
 
         // Создание контента
-        PumpingInventory
+        UpgradeInventory
         MainGui
 
         // Регистрация обработчиков событий
         B.events(
-            ConnectionHandler,
-            UnusedEvent,
-            InteractEvent
+                ConnectionHandler,
+                UnusedEvent,
+                InteractEvent
         )
 
         B.regCommand({ player, args ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
             null
         }, "money")
+
+        B.regCommand({ player, args ->
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
+            null
+        }, "tokens")
 
 
         WaveManager.runTaskTimer(this@App, 0, 1)
@@ -130,35 +136,26 @@ class App : JavaPlugin() {
                 filterMobs(this, bytes).filter { wave!!.aliveMobs.contains(it) }.forEach {
                     it.hp -= session.upgrade[DAMAGE]!!.getValue().toInt()
                     if (it.hp <= 0) {
-                        val token = upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = session.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
                         wave!!.aliveMobs.remove(it)
-                        ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
+
+                        ModTransfer(it.uuid.toString()).send("tower:mobkill", player)
 
                         giveTokens(token)
 
-                        Anime.cursorMessage(
-                            player, "§b+$token §f${
-                                Humanize.plurals(
-                                    "жетон",
-                                    "жетона",
-                                    "жетонов",
-                                    token
-                                )
-                            }"
-                        )
-                        return@apply
+                        Anime.cursorMessage(player, "§b+$token §f${Humanize.plurals("жетон", "жетона", "жетонов", token)}")
                     }
                 }
             }
         }
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-
                 filterMobs(this, bytes).forEach { mob ->
                     val wavePassed = wave
                     val waveLevel = wavePassed!!.level
                     val reward = formula(waveLevel)
-                    tower.health -= (mob.damage - session.upgrade[PROTECTION]!!.getValue())
+
+                    tower.health -= mob.damage - session.upgrade[PROTECTION]!!.getValue()
                     Glow.animate(player, .5, GlowColor.RED)
 
                     tower.updateHealth()
@@ -167,30 +164,20 @@ class App : JavaPlugin() {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
+                        app.setFlying(player)
 
                         // Игра закончилась
                         ModTransfer(false).send("tower:update-state", player)
 
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        wavePassed.aliveMobs.forEach {
-                            ModTransfer().string(it.uuid.toString()).send("tower:mobkill", player)
-                        }
+                        wavePassed.aliveMobs.forEach { ModTransfer(it.uuid.toString()).send("tower:mobkill", player) }
                         wavePassed.aliveMobs.clear()
                         inGame = false
                         giveTokens(-tokens)
                         wave = null
                         if (reward == 0)
                             return@registerIncomingPluginChannel
-                        Anime.cursorMessage(
-                            player, "§e+$reward §f${
-                                Humanize.plurals(
-                                    "монета",
-                                    "монеты",
-                                    "монет",
-                                    reward
-                                )
-                            }"
-                        )
+                        Anime.cursorMessage(player, "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}")
                         giveMoney(reward)
                     }
                 }
@@ -198,9 +185,7 @@ class App : JavaPlugin() {
         }
     }
 
-    override fun onDisable() {
-        SessionListener.simulator.disable()
-    }
+    override fun onDisable() = SessionListener.simulator.disable()
 
     private fun filterMobs(user: User, bytes: ByteArray): Set<Mob> {
         if (user.wave == null)
@@ -208,13 +193,13 @@ class App : JavaPlugin() {
         return user.wave?.let {
             it.aliveMobs.filter { mob ->
                 mob.uuid == UUID.fromString(
-                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+                        Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
                 )
             }
         }!!.toSet()
     }
 
-    private fun formula(number: Int): Int {
-        return (number * number - number) / 4
-    }
+    private fun formula(number: Int): Int = (number * number - number) / 4
+
+    fun setFlying(player: Player) = player.apply { allowFlight = !isFlying }
 }

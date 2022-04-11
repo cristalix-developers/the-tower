@@ -1,6 +1,6 @@
 package me.reidj.tower.wave
 
-import me.reidj.tower.pumping.UpgradeType
+import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.scheduler.BukkitRunnable

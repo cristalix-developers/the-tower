@@ -4,6 +4,7 @@ import clepto.bukkit.B
 import me.func.mod.conversation.ModLoader
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
+import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
@@ -20,6 +21,7 @@ object ConnectionHandler : Listener {
         val user = SessionListener.simulator.getUser<User>(uniqueId)!!
 
         user.player = this
+        gameMode = GameMode.ADVENTURE
         LobbyItems.initialActionsWithPlayer(this)
 
         // Отправляем наш мод

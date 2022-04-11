@@ -1,8 +1,8 @@
 package me.reidj.tower.user
 
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.pumping.Upgrade
-import me.reidj.tower.pumping.UpgradeType
+import me.reidj.tower.upgrade.Upgrade
+import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.wave.Wave
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.common.SimulatorUser
@@ -37,12 +37,12 @@ class User(val id: UUID, var maxWavePassed: Int, var upgradeTypes: MutableMap<Up
 
     fun giveTokens(tokens: Int) {
         this.tokens += tokens
-        ModTransfer(tokens).send("tower:tokens", player)
+        ModTransfer(this.tokens).send("tower:tokens", player)
     }
 
     fun giveMoney(money: Int) {
         this.money += money
-        ModTransfer(money).send("tower:money", player)
+        ModTransfer(this.money).send("tower:money", player)
     }
 
     fun giveExperience(exp: Int) {
@@ -64,5 +64,4 @@ class User(val id: UUID, var maxWavePassed: Int, var upgradeTypes: MutableMap<Up
 
     override fun update(user: User, vararg type: UpgradeType) =
         type.forEach { ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", player) }
-
 }

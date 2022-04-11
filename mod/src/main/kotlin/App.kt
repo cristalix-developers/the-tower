@@ -1,4 +1,3 @@
-
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.opengl.GlStateManager
@@ -8,11 +7,13 @@ import dev.xdark.feder.NetUtil
 import mob.Mob
 import mob.MobManager
 import org.lwjgl.opengl.GL11
-import player.BarManager
+import tower.BarManager
 import player.Statistic
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
+import tower.Cube
+import tower.TowerManager
 import java.util.*
 import kotlin.math.cos
 import kotlin.math.sin
@@ -94,17 +95,17 @@ class App : KotlinMod() {
         registerHandler<AirBarRender> { isCancelled = true }
         registerHandler<VehicleHealthRender> { isCancelled = true }
 
-        mod.registerChannel("tower:init") {
+        mod.registerChannel("tower:update-state") {
+            gameActive = readBoolean()
             mod.cube = V3(
                     readDouble(),
                     readDouble() + 1,
                     readDouble()
             )
+            MobManager.moveSpeed = readDouble()
+            TowerManager.ticksBeforeStrike = readInt()
+            TowerManager.ticksStrike = readInt()
             mod.inited = true
-        }
-
-        mod.registerChannel("tower:update-state") {
-            gameActive = readBoolean()
         }
 
         registerChannel("tower:mobinit") {

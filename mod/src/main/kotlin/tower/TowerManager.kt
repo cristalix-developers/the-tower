@@ -1,8 +1,11 @@
+package tower
+
+import Vector
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
 import io.netty.buffer.Unpooled
-import player.BarManager
+import mod
 import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.Context3D
@@ -10,6 +13,7 @@ import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.sphere
+import updateNameHealth
 import java.util.*
 import kotlin.math.pow
 
@@ -23,13 +27,13 @@ object TowerManager {
 
     private var lastTickMove = System.currentTimeMillis()
     private var lastTickHit = System.currentTimeMillis()
-    private var ticksBeforeStrike = 30
-    private var ticksStrike = 30
-    private var speedAttack = 0.0 // BULLET_DELAY
+    var ticksBeforeStrike = 30
+    var ticksStrike = 30
+    private var speedAttack = 0.05 // BULLET_DELAY
     private var damage = 0.0
     var health = 5.0
     var maxHealth = 5.0
-    var protection = .0
+    var protection = 0.0
 
     data class Bullet(
         var x: Double,
@@ -106,11 +110,6 @@ object TowerManager {
             mod.mobs.remove(mob)
         }
 
-        mod.registerChannel("tower:strike") {
-            ticksBeforeStrike = readInt()
-            ticksStrike = readInt()
-        }
-
         mod.registerChannel("tower:bullet_delay") {
             speedAttack = readDouble()
         }
@@ -120,16 +119,27 @@ object TowerManager {
         }
 
         mod.registerChannel("tower:loseheart") {
-            health = readDouble()
-            maxHealth = readDouble()
+            updateHealth(readDouble(), readDouble())
+        }
+
+        mod.registerChannel("tower:health") {
+            updateHealth(readDouble(), readDouble())
         }
 
         mod.registerChannel("tower:protection") {
             val protect = readDouble()
             if (protect != protection) {
                 protection = protect
-                BarManager.protectionIndicator?.updatePercentage(protect)
+                BarManager.protectionIndicator?.updatePercentage(protection)
             }
+        }
+    }
+
+    private fun updateHealth(healthUpdate: Double, maxHealthUpdate: Double) {
+        if (healthUpdate != health) {
+            health = healthUpdate
+            maxHealth = maxHealthUpdate
+            BarManager.healthIndicator?.updatePercentage(health, maxHealth)
         }
     }
 }

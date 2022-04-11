@@ -1,4 +1,4 @@
-package me.reidj.tower.pumping
+package me.reidj.tower.upgrade
 
 import clepto.bukkit.B
 import dev.implario.bukkit.item.item
@@ -18,7 +18,7 @@ import ru.kdev.simulatorapi.listener.SessionListener
  * @project tower
  * @author Рейдж
  */
-object PumpingInventory {
+object UpgradeInventory {
 
     private val backItem = item {
         type = CLAY_BALL
@@ -66,7 +66,7 @@ object PumpingInventory {
     fun icon(user: User, contents: InventoryContents, upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
         upgradeTypes.forEach { (pumpingType, pumping) ->
             val level = pumping.level
-            val cost = pumpingType.startPrice + level
+            val cost = pumpingType.price + level
             val notInGame = !user.inGame
             contents.add('O', ClickableItem.of(item {
                 type = CLAY_BALL
@@ -86,11 +86,10 @@ object PumpingInventory {
             }) {
                 if (if (notInGame) user.money >= cost else user.tokens >= cost) {
                     if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
+                    if (notInGame) user.update(user, pumpingType) else user.tower.update(user, pumpingType)
                     pumping.level++
                     user.player!!.performCommand("workshop")
-
                     user.tower.updateHealth()
-                    if (notInGame) user.update(user, pumpingType) else user.tower.update(user, pumpingType)
                 } else {
                     user.player!!.closeInventory()
                     Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)

@@ -1,6 +1,6 @@
 package me.reidj.tower.user
 
-import me.reidj.tower.pumping.UpgradeType
+import me.reidj.tower.upgrade.UpgradeType
 
 @FunctionalInterface
 interface Upgradable {

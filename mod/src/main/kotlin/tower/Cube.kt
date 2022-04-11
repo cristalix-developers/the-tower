@@ -1,8 +1,10 @@
+package tower
+
 import dev.xdark.clientapi.event.render.RenderPass
 import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
+import mod
 import org.lwjgl.opengl.GL11
-import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.clientapi.JavaMod.clientApi
 import kotlin.math.cos
 import kotlin.math.sin
@@ -20,7 +22,7 @@ object Cube {
             if (mod.inited) {
                 angle = if (angle > 7200) 0.0 else angle + 1
 
-                val player = JavaMod.clientApi.minecraft().player
+                val player = clientApi.minecraft().player
 
                 // GL начало
                 GlStateManager.disableLighting()

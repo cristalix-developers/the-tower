@@ -12,7 +12,7 @@ import kotlin.math.pow
 object MobManager {
 
     private var lastTick = System.currentTimeMillis()
-    private var moveSpeed = 0.0
+    var moveSpeed = 0.0
 
     init {
         mod.registerHandler<GameLoop> {
@@ -30,10 +30,6 @@ object MobManager {
                     entity.teleport(entity.x + vector.x, entity.y, entity.z + vector.z)
                 }
             }
-        }
-
-        mod.registerChannel("tower:mobspeed") {
-            moveSpeed = readDouble()
         }
     }
 }

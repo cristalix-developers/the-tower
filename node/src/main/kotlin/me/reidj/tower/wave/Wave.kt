@@ -5,7 +5,7 @@ import implario.humanize.Humanize
 import me.func.mod.Anime
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
-import me.reidj.tower.pumping.UpgradeType
+import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.entity.EntityType
