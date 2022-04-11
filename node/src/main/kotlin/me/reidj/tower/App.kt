@@ -95,7 +95,7 @@ class App : JavaPlugin() {
 
         Platforms.set(PlatformDarkPaper())
 
-        Anime.include(Kit.STANDARD, Kit.EXPERIMENTAL, Kit.DIALOG, Kit.NPC)
+        Anime.include(Kit.STANDARD, Kit.NPC)
         ModLoader.loadAll("mods")
 
         // Конфигурация реалма
@@ -139,11 +139,16 @@ class App : JavaPlugin() {
                         val token = session.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
                         wave!!.aliveMobs.remove(it)
 
-                        ModTransfer(it.uuid.toString()).send("tower:mobkill", player)
-
                         giveTokens(token)
 
-                        Anime.cursorMessage(player, "§b+$token §f${Humanize.plurals("жетон", "жетона", "жетонов", token)}")
+                        ModTransfer(it.uuid.toString(), "§b+$token §f${
+                            Humanize.plurals(
+                                "жетон",
+                                "жетона",
+                                "жетонов",
+                                token
+                            )
+                        }").send("tower:mobkill", player)
                     }
                 }
             }

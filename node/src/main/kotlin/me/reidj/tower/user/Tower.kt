@@ -6,6 +6,7 @@ import me.reidj.tower.upgrade.UpgradeType
 import org.bukkit.entity.Player
 
 data class Tower(
+    @Transient
     var owner: Player? = null,
     var health: Double,
     var maxHealth: Double,

@@ -1,7 +1,6 @@
 package me.reidj.tower.wave
 
 import clepto.bukkit.B
-import implario.humanize.Humanize
 import me.func.mod.Anime
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
@@ -50,16 +49,6 @@ class Wave(
         level++
         player.sendTitle("§aПоздравляем!", "Волна завершена", 10, 15, 10)
         user.giveTokens(tokens)
-        Anime.cursorMessage(
-            player, "§b+$tokens §f${
-                Humanize.plurals(
-                    "жетон",
-                    "жетона",
-                    "жетонов",
-                    tokens
-                )
-            }"
-        )
         if (level % 10 == 0) {
             Anime.cursorMessage(player, "§e+10 §fмонет")
             user.giveMoney(10)

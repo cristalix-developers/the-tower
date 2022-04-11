@@ -55,12 +55,6 @@ object Statistic {
 
             tokensBox.enabled = mod.gameActive
 
-            Humanize.plurals(
-                "Жетон",
-                "Жетона",
-                "Жетонов",
-                tokens
-            )
             tokensBox.content = "${
                 Humanize.plurals(
                     "Жетон",

@@ -1,5 +1,6 @@
 package tower
 
+import Banners
 import Vector
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
@@ -104,9 +105,12 @@ object TowerManager {
         }
 
         mod.registerChannel("tower:mobkill") {
-            val uuid = NetUtil.readUtf8(this)
-            val mob = mod.mobs.filter { it.uniqueID == UUID.fromString(uuid) }[0]
+            val uuid = UUID.fromString(NetUtil.readUtf8(this))
+            val text = NetUtil.readUtf8(this)
+            val mob = mod.mobs.filter { it.uniqueID == uuid }[0]
+            Banners.create(uuid, mob.x, mob.y + 2, mob.z, text)
             JavaMod.clientApi.minecraft().world.removeEntity(mob)
+            UIEngine.schedule(2) { Banners.remove(uuid) }
             mod.mobs.remove(mob)
         }
 
