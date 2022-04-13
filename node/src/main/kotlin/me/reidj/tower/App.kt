@@ -79,10 +79,10 @@ class App : JavaPlugin() {
 
             userCreator { uuid ->
                 User(
-                        uuid,
-                        0,
-                        values().associateWith { Upgrade(it, 1) }.toMutableMap(),
-                        Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap())
+                    uuid,
+                    0,
+                    values().associateWith { Upgrade(it, 1) }.toMutableMap(),
+                    Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap())
                 )
             }
         }
@@ -113,9 +113,9 @@ class App : JavaPlugin() {
 
         // Регистрация обработчиков событий
         B.events(
-                ConnectionHandler,
-                UnusedEvent,
-                InteractEvent
+            ConnectionHandler,
+            UnusedEvent,
+            InteractEvent
         )
 
         B.regCommand({ player, args ->
@@ -137,18 +137,21 @@ class App : JavaPlugin() {
                     it.hp -= session.upgrade[DAMAGE]!!.getValue().toInt()
                     if (it.hp <= 0) {
                         val token = session.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
-                        wave!!.aliveMobs.remove(it)
 
                         giveTokens(token)
 
-                        ModTransfer(it.uuid.toString(), "§b+$token §f${
-                            Humanize.plurals(
-                                "жетон",
-                                "жетона",
-                                "жетонов",
-                                token
-                            )
-                        }").send("tower:mobkill", player)
+                        ModTransfer(
+                            it.uuid.toString(), "§b+$token §f${
+                                Humanize.plurals(
+                                    "жетон",
+                                    "жетона",
+                                    "жетонов",
+                                    token
+                                )
+                            }"
+                        ).send("tower:mobkill", player)
+
+                        wave!!.aliveMobs.remove(it)
                     }
                 }
             }
@@ -169,7 +172,7 @@ class App : JavaPlugin() {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
-                        app.setFlying(player)
+                        setFlying(player)
 
                         // Игра закончилась
                         ModTransfer(false).send("tower:update-state", player)
@@ -182,7 +185,10 @@ class App : JavaPlugin() {
                         wave = null
                         if (reward == 0)
                             return@registerIncomingPluginChannel
-                        Anime.cursorMessage(player, "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}")
+                        Anime.cursorMessage(
+                            player,
+                            "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
+                        )
                         giveMoney(reward)
                     }
                 }
@@ -198,7 +204,7 @@ class App : JavaPlugin() {
         return user.wave?.let {
             it.aliveMobs.filter { mob ->
                 mob.uuid == UUID.fromString(
-                        Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
                 )
             }
         }!!.toSet()
