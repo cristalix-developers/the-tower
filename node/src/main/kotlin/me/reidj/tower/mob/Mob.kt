@@ -27,6 +27,6 @@ data class Mob(
             .double(y)
             .double(z)
             .double(hp)
-            .send("tower:mobinit", player)
+            .send("mob:init", player)
     }
 }

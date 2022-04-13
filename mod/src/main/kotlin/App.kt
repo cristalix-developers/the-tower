@@ -1,22 +1,14 @@
-import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.render.*
-import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.render.Tessellator
 import dev.xdark.clientapi.resource.ResourceLocation
-import dev.xdark.feder.NetUtil
-import mob.Mob
 import mob.MobManager
-import org.lwjgl.opengl.GL11
-import tower.BarManager
 import player.Statistic
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
+import tower.BarManager
 import tower.Cube
 import tower.TowerManager
-import java.util.*
-import kotlin.math.cos
-import kotlin.math.sin
 
 lateinit var mod: App
 const val NAMESPACE = "tower"
@@ -25,7 +17,6 @@ const val FILE_STORE = "http://storage.c7x.ru/reidj/"
 class App : KotlinMod() {
 
     lateinit var cube: V3
-    val mobs: MutableList<EntityLivingBase> = mutableListOf()
     var inited = false
     var gameActive = false
 
@@ -33,10 +24,7 @@ class App : KotlinMod() {
         mod = this
         UIEngine.initialize(this)
 
-        Cube
-        MobManager
         Statistic
-        TowerManager
 
         val player = clientApi.minecraft().player
         val tessellator: Tessellator = clientApi.tessellator()
@@ -56,36 +44,14 @@ class App : KotlinMod() {
         val v2 = v1 + sz / sx
         val v3 = v2 + sy / sx
 
-        registerHandler<RenderPass> {
-            GlStateManager.disableLighting()
-            GlStateManager.disableCull()
-            GlStateManager.shadeModel(GL11.GL_SMOOTH)
-            GlStateManager.enableBlend()
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE)
-            GlStateManager.enableTexture2D()
-            GlStateManager.disableAlpha()
-            clientApi.renderEngine()
-                    .bindTexture(ResourceLocation.of("minecraft", "mcpatcher/cit/marioparty/deathcube.png"))
-            GL11.glBegin(GL11.GL_POLYGON)
-
-            for (i in 0..360)
-                GL11.glVertex3d(sin(Math.toRadians(i.toDouble())), .01, cos(Math.toRadians(i.toDouble())))
-
-            GL11.glEnd()
-
-            GlStateManager.color(1f, 1f, 1f, 1f)
-            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_CONSTANT_COLOR)
-            GlStateManager.shadeModel(GL11.GL_FLAT)
-            GlStateManager.enableAlpha()
-            GlStateManager.enableCull()
-        }
-
         loadTextures(
                 load("health_bar.png", "35320C088F83D8890128127"),
                 load("energy.png", "35320C088F83D8890128111"),
                 load("xp_bar.png", "35320C094F83D8890128111")
         ).thenRun {
             BarManager
+            TowerManager
+            Cube
         }
 
         registerHandler<HealthRender> { isCancelled = true }
@@ -97,28 +63,21 @@ class App : KotlinMod() {
 
         mod.registerChannel("tower:update-state") {
             gameActive = readBoolean()
-            mod.cube = V3(
+            if (gameActive) {
+                mod.cube = V3(
                     readDouble(),
                     readDouble() + 1,
                     readDouble()
-            )
-            MobManager.moveSpeed = readDouble()
-            TowerManager.ticksBeforeStrike = readInt()
-            TowerManager.ticksStrike = readInt()
-            mod.inited = true
-        }
+                )
+                MobManager.moveSpeed = readDouble()
+                TowerManager.ticksBeforeStrike = readInt()
+                TowerManager.ticksStrike = readInt()
+                mod.inited = true
 
-        registerChannel("tower:mobinit") {
-            mobs.add(
-                    Mob(
-                            UUID.fromString(NetUtil.readUtf8(this)),
-                            readInt(),
-                            readDouble(),
-                            readDouble(),
-                            readDouble(),
-                            readDouble()
-                    ).create()
-            )
+                MobManager
+            } else {
+                MobManager.clear()
+            }
         }
     }
 

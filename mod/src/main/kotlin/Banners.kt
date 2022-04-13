@@ -61,7 +61,7 @@ object Banners {
         }
     }
 
-    fun create(uuid: UUID, x: Double, y: Double, z: Double, text: String) {
+    fun create(uuid: UUID, x: Double, y: Double, z: Double, text: String): Context3D {
         val banner = Banner(
             uuid,
             true,
@@ -110,6 +110,7 @@ object Banners {
             }
         })
         UIEngine.worldContexts.add(context)
+        return context
     }
 
     fun remove(uuid: UUID) {

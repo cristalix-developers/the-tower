@@ -1,6 +1,7 @@
 package me.reidj.tower
 
 import clepto.bukkit.B
+import com.mojang.brigadier.arguments.UuidArgumentType.uuid
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.bukkit.world.Label
 import dev.implario.games5e.node.CoordinatorClient
@@ -30,6 +31,7 @@ import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
+import net.minecraft.server.v1_12_R1.SoundEffects.hp
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -54,16 +56,10 @@ lateinit var app: App
 
 class App : JavaPlugin() {
 
-    private val map = WorldMeta(MapLoader.load("func", "tower"))
+    val map = WorldMeta(MapLoader.load("func", "tower"))
     val client = CoordinatorClient(NoopGameNode())
 
     val spawn: Label = map.getLabel("spawn").apply { yaw = -90f }
-    val gamePosition: Label = map.getLabel("start").apply { yaw = -90f }
-    val tower = map.getLabel("tower").apply {
-        x += 0.5
-        z += 0.5
-    }
-    val generators: MutableList<Label> = map.getLabels("mob")
 
     override fun onEnable() {
         B.plugin = this
@@ -131,17 +127,17 @@ class App : JavaPlugin() {
 
         WaveManager.runTaskTimer(this@App, 0, 1)
 
-        Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:mobhit") { _, player, bytes ->
+        Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                filterMobs(this, bytes).filter { wave!!.aliveMobs.contains(it) }.forEach {
-                    it.hp -= session.upgrade[DAMAGE]!!.getValue().toInt()
-                    if (it.hp <= 0) {
+                findMob(this, bytes)?.let { mob ->
+                    mob.hp -= session.upgrade[DAMAGE]!!.getValue().toInt()
+                    if (mob.hp <= 0) {
                         val token = session.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
 
                         giveTokens(token)
 
                         ModTransfer(
-                            it.uuid.toString(), "§b+$token §f${
+                            mob.uuid.toString(), "§b+$token §f${
                                 Humanize.plurals(
                                     "жетон",
                                     "жетона",
@@ -149,16 +145,16 @@ class App : JavaPlugin() {
                                     token
                                 )
                             }"
-                        ).send("tower:mobkill", player)
+                        ).send("mob:kill", player)
 
-                        wave!!.aliveMobs.remove(it)
+                        wave!!.aliveMobs.remove(mob)
                     }
                 }
             }
         }
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                filterMobs(this, bytes).forEach { mob ->
+                findMob(this, bytes)?.let { mob ->
                     val wavePassed = wave
                     val waveLevel = wavePassed!!.level
                     val reward = formula(waveLevel)
@@ -172,13 +168,12 @@ class App : JavaPlugin() {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
-                        setFlying(player)
+                        player.setFlying()
 
                         // Игра закончилась
                         ModTransfer(false).send("tower:update-state", player)
 
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        wavePassed.aliveMobs.forEach { ModTransfer(it.uuid.toString()).send("tower:mobkill", player) }
                         wavePassed.aliveMobs.clear()
                         inGame = false
                         giveTokens(-tokens)
@@ -198,19 +193,17 @@ class App : JavaPlugin() {
 
     override fun onDisable() = SessionListener.simulator.disable()
 
-    private fun filterMobs(user: User, bytes: ByteArray): Set<Mob> {
+    private fun findMob(user: User, bytes: ByteArray): Mob? {
         if (user.wave == null)
-            return emptySet()
+            return null
         return user.wave?.let {
-            it.aliveMobs.filter { mob ->
+            it.aliveMobs.find { mob ->
                 mob.uuid == UUID.fromString(
                     Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
                 )
             }
-        }!!.toSet()
+        }
     }
 
     private fun formula(number: Int): Int = (number * number - number) / 4
-
-    fun setFlying(player: Player) = player.apply { allowFlight = !isFlying }
 }

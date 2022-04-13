@@ -4,7 +4,7 @@ import clepto.bukkit.B
 import clepto.cristalix.Cristalix.transfer
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
-import me.reidj.tower.app
+import me.reidj.tower.setFlying
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
@@ -37,22 +37,45 @@ object InteractEvent : Listener {
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 if (inGame)
                     return@apply
-                player.inventory.clear()
-                player.teleport(app.gamePosition)
-                player.inventory.setItem(4, UpgradeInventory.workshop)
-                app.setFlying(player)
-
-                tower.health = tower.maxHealth
-                tower.updateHealth()
-
                 session = Session(tower.upgrades)
                 session.upgrade.values.forEach { it.level = 1 }
 
+                player.apply {
+                    inventory.clear()
+                    teleport(session.arenaSpawn)
+                    inventory.setItem(4, UpgradeInventory.workshop)
+                    setFlying()
+                }
+
+                tower.health = tower.maxHealth
+                tower.updateHealth()
+                tower.update(
+                    this,
+                    UpgradeType.BULLET_DELAY,
+                    UpgradeType.DAMAGE,
+                    UpgradeType.HEALTH,
+                    UpgradeType.PROTECTION,
+                    UpgradeType.REGEN
+                )
+                update(
+                    this,
+                    UpgradeType.CASH_BONUS_KILL,
+                    UpgradeType.CASH_BONUS_WAVE_PASS,
+                )
+
                 // Отправляем точки со спавнерами
-                app.generators.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
+                session.generators.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
 
                 // Игра началась
-                ModTransfer(true, app.tower.x, app.tower.y, app.tower.z, MOVE_SPEED, TICKS_BEFORE_STRIKE, CONST_TICKS_BEFORE_STRIKE).send("tower:update-state", player)
+                ModTransfer(
+                    true,
+                    session.cubeLocation.x,
+                    session.cubeLocation.y,
+                    session.cubeLocation.z,
+                    MOVE_SPEED,
+                    TICKS_BEFORE_STRIKE,
+                    CONST_TICKS_BEFORE_STRIKE
+                ).send("tower:update-state", player)
 
                 // Начинаю волну
                 inGame = true

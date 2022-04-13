@@ -28,11 +28,13 @@ class Wave(
         isStarting = true
         player.sendTitle("§eПриготовьтесь!", "Началась $level волна", 10, 15, 10)
         Anime.timer(player, "$level волна", 40)
-        repeat(7 + level * 2) {
+        repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
-                val v3 = app.generators.random()
-                drawMob(v3.x + Math.random() * 4 - 2, v3.y, v3.z + Math.random() * 4 - 2)
-            }, it.toLong() * 4)
+                SessionListener.simulator.getUser<User>(player.uniqueId)?.apply {
+                    val v3 = session.generators.random()
+                    drawMob(v3.x + Math.random() * 4 - 2, v3.y, v3.z + Math.random() * 4 - 2)
+                }
+            }, minOf(it.toLong() * 12, 400))
         }
     }
 

@@ -1,8 +1,14 @@
 package mob
 
 import Vector
+import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
+import dev.xdark.feder.NetUtil
 import mod
+import ru.cristalix.clientapi.JavaMod
+import ru.cristalix.uiengine.UIEngine
+import sun.security.jgss.GSSToken.readInt
+import java.util.*
 import kotlin.math.pow
 
 /**
@@ -10,6 +16,8 @@ import kotlin.math.pow
  * @author Рейдж
  */
 object MobManager {
+
+    val mobs: MutableList<EntityLivingBase> = mutableListOf()
 
     private var lastTick = System.currentTimeMillis()
     var moveSpeed = 0.0
@@ -19,7 +27,7 @@ object MobManager {
             val now = System.currentTimeMillis()
             if (now - lastTick > .01 * 1000) {
                 lastTick = now
-                mod.mobs.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 6.5 }.forEach { entity ->
+                mobs.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 6.5 }.forEach { entity ->
                     val dX = mod.cube.x - entity.x
                     val dZ = mod.cube.z - entity.z
                     val rotation =
@@ -31,5 +39,34 @@ object MobManager {
                 }
             }
         }
+
+        mod.registerChannel("mob:init") {
+            mobs.add(
+                Mob(
+                    UUID.fromString(NetUtil.readUtf8(this)),
+                    readInt(),
+                    readDouble(),
+                    readDouble(),
+                    readDouble(),
+                    readDouble()
+                ).create()
+            )
+        }
+
+        mod.registerChannel("mob:kill") {
+            val uuid = UUID.fromString(NetUtil.readUtf8(this))
+            val text = NetUtil.readUtf8(this)
+            val mob = mobs.filter { it.uniqueID == uuid }[0]
+
+            Banners.create(uuid, mob.x, mob.y + 2, mob.z, text)
+
+            JavaMod.clientApi.minecraft().world.removeEntity(mob)
+
+            UIEngine.schedule(2) { Banners.remove(uuid) }
+
+            mobs.remove(mob)
+        }
     }
+
+    fun clear() = mobs.onEach { it.world.removeEntity(it) }.clear()
 }
