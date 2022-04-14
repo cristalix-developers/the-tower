@@ -1,5 +1,6 @@
 package tower
 
+import Banner
 import Banners
 import Vector
 import dev.xdark.clientapi.entity.EntityLivingBase
@@ -16,6 +17,7 @@ import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.sphere
 import updateNameHealth
+import java.awt.SystemColor.text
 import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
@@ -38,6 +40,8 @@ object TowerManager {
     var maxHealth = 5.0
     var protection = 0.0
     var radius = 10.0
+
+    var healthBanner: Banner? = null
 
     data class Bullet(
         var x: Double,
@@ -133,11 +137,13 @@ object TowerManager {
         }
     }
 
-    private fun updateHealth(healthUpdate: Double, maxHealthUpdate: Double) {
+    fun updateHealth(healthUpdate: Double = health, maxHealthUpdate: Double = maxHealth) {
         if (healthUpdate != health) {
             health = healthUpdate
             maxHealth = maxHealthUpdate
             BarManager.healthIndicator?.updatePercentage(health, maxHealth)
         }
+
+        Banners.text("§4${health.toInt()} ❤", healthBanner!!, Banners.banners[healthBanner!!.uuid]!!.second)
     }
 }

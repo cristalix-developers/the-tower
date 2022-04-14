@@ -11,7 +11,7 @@ data class Session(var upgrade: MutableMap<UpgradeType, Upgrade>): Upgradable {
         type.forEach { ModTransfer(upgrade[it]!!.getValue()).send("user:${it.name.lowercase()}", user.player) }
 
     val arenaSpawn: Label = app.map.getLabel("start").apply { yaw = -90f }
-    val cubeLocation = app.map.getLabel("tower").apply {
+    val cubeLocation = app.map.getLabel("tower").clone().apply {
         x += 0.5
         z += 0.5
     }

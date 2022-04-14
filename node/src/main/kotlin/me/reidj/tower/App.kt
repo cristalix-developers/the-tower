@@ -48,6 +48,7 @@ import ru.cristalix.core.transfer.TransferService
 import ru.kdev.simulatorapi.createSimulator
 import ru.kdev.simulatorapi.listener.SessionListener
 import java.util.*
+import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
 const val HUB = "HUB-2"
@@ -130,9 +131,9 @@ class App : JavaPlugin() {
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 findMob(this, bytes)?.let { mob ->
-                    mob.hp -= session.upgrade[DAMAGE]!!.getValue().toInt()
+                    mob.hp -= session!!.upgrade[DAMAGE]!!.getValue().toInt()
                     if (mob.hp <= 0) {
-                        val token = session.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = session!!.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
 
                         giveTokens(token)
 
@@ -159,7 +160,7 @@ class App : JavaPlugin() {
                     val waveLevel = wavePassed!!.level
                     val reward = formula(waveLevel)
 
-                    tower.health -= mob.damage - session.upgrade[PROTECTION]!!.getValue()
+                    tower.health -= mob.damage - session!!.upgrade[PROTECTION]!!.getValue()
                     Glow.animate(player, .5, GlowColor.RED)
 
                     tower.updateHealth()
@@ -189,6 +190,10 @@ class App : JavaPlugin() {
                 }
             }
         }
+
+        Runtime.getRuntime().addShutdownHook(Thread {
+            SessionListener.simulator.disable()
+        })
     }
 
     override fun onDisable() = SessionListener.simulator.disable()

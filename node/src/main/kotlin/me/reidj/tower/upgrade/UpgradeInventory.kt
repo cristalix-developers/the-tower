@@ -48,7 +48,7 @@ object UpgradeInventory {
 
                 val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
 
-                icon(user, contents, if (!user.inGame) user.upgradeTypes else user.session.upgrade)
+                icon(user, contents, if (!user.inGame) user.upgradeTypes else user.session!!.upgrade)
                 contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
                 contents.fillMask('X', ClickableItem.empty(item {
                     type = STAINED_GLASS_PANE

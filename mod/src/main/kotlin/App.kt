@@ -1,14 +1,19 @@
+import com.sun.media.jfxmedia.events.PlayerEvent
+import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.render.Tessellator
 import dev.xdark.clientapi.resource.ResourceLocation
+import io.netty.buffer.Unpooled
 import mob.MobManager
 import player.Statistic
+import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
 import tower.BarManager
 import tower.Cube
 import tower.TowerManager
+import java.util.*
 
 lateinit var mod: App
 const val NAMESPACE = "tower"
@@ -61,7 +66,7 @@ class App : KotlinMod() {
         registerHandler<AirBarRender> { isCancelled = true }
         registerHandler<VehicleHealthRender> { isCancelled = true }
 
-        mod.registerChannel("tower:update-state") {
+        registerChannel("tower:update-state") {
             gameActive = readBoolean()
             if (gameActive) {
                 mod.cube = V3(
@@ -72,12 +77,31 @@ class App : KotlinMod() {
                 MobManager.moveSpeed = readDouble()
                 TowerManager.ticksBeforeStrike = readInt()
                 TowerManager.ticksStrike = readInt()
+                TowerManager.healthBanner = Banners.create(
+                    UUID.randomUUID(),
+                    mod.cube.x,
+                    mod.cube.y - 1.25,
+                    mod.cube.z,
+                    "",
+                    2.0,
+                    true
+                )
                 mod.inited = true
 
                 MobManager
+
+                UIEngine.schedule(1.0) { TowerManager.updateHealth() }
             } else {
+                Banners.remove(TowerManager.healthBanner!!.uuid)
                 MobManager.clear()
             }
+        }
+
+        registerHandler<EntityLeftClick> {
+            clientApi.clientConnection().sendPayload(
+                "mob:hit",
+                Unpooled.copiedBuffer(entity.uniqueID.toString(), Charsets.UTF_8)
+            )
         }
     }
 

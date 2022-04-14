@@ -30,7 +30,7 @@ class User(val id: UUID, var maxWavePassed: Int, var upgradeTypes: MutableMap<Up
     var inGame: Boolean = false
 
     @Transient
-    lateinit var session: Session
+    var session: Session? = null
 
     @Transient
     var tokens = 0

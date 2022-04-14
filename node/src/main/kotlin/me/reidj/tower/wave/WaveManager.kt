@@ -17,7 +17,7 @@ object WaveManager : BukkitRunnable() {
     override fun run() {
         time++
         Bukkit.getOnlinePlayers().mapNotNull { SessionListener.simulator.getUser<User>(it.uniqueId) }
-            .filter { it.wave != null }
+            .filter { it.wave != null && it.session != null }
             .forEach {
                 if (it.wave!!.isStarting) {
                     if (((System.currentTimeMillis() - it.wave!!.startTime) / 1000 == 40.toLong() || it.wave!!.aliveMobs.isEmpty()))
@@ -25,7 +25,7 @@ object WaveManager : BukkitRunnable() {
                     if (time % 20 == 0 && it.tower.health < it.tower.maxHealth) {
                         it.tower.health = it.tower.maxHealth - maxOf(
                             0.0,
-                            it.tower.maxHealth - it.tower.health - it.session.upgrade[UpgradeType.REGEN]!!.getValue()
+                            it.tower.maxHealth - it.tower.health - it.session!!.upgrade[UpgradeType.REGEN]!!.getValue()
                         )
                         it.tower.updateHealth()
                     }

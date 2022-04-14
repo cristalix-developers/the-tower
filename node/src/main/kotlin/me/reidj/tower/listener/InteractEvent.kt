@@ -38,11 +38,11 @@ object InteractEvent : Listener {
                 if (inGame)
                     return@apply
                 session = Session(tower.upgrades)
-                session.upgrade.values.forEach { it.level = 1 }
+                session?.upgrade?.values?.forEach { it.level = 1 }
 
                 player.apply {
                     inventory.clear()
-                    teleport(session.arenaSpawn)
+                    teleport(session?.arenaSpawn)
                     inventory.setItem(4, UpgradeInventory.workshop)
                     setFlying()
                 }
@@ -64,14 +64,14 @@ object InteractEvent : Listener {
                 )
 
                 // Отправляем точки со спавнерами
-                session.generators.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
+                session?.generators?.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
 
                 // Игра началась
                 ModTransfer(
                     true,
-                    session.cubeLocation.x,
-                    session.cubeLocation.y,
-                    session.cubeLocation.z,
+                    session!!.cubeLocation.x,
+                    session!!.cubeLocation.y,
+                    session!!.cubeLocation.z,
                     MOVE_SPEED,
                     TICKS_BEFORE_STRIKE,
                     CONST_TICKS_BEFORE_STRIKE

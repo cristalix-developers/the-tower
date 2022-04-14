@@ -3,11 +3,13 @@ package tower
 import dev.xdark.clientapi.event.render.RenderPass
 import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
-import mob.MobManager
 import mod
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11.*
 import ru.cristalix.clientapi.JavaMod.clientApi
-import tower.TowerManager.radius
+import java.nio.ByteBuffer
+import java.nio.DoubleBuffer
+import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -41,16 +43,11 @@ object Cube {
 
                 // GL начало
                 GlStateManager.disableLighting()
-                GlStateManager.disableTexture2D()
                 GlStateManager.disableAlpha()
                 GlStateManager.disableCull()
-                GlStateManager.shadeModel(GL11.GL_SMOOTH)
+                GlStateManager.shadeModel(GL_SMOOTH)
                 GlStateManager.enableBlend()
-                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-
-                clientApi.renderEngine()
-                    .bindTexture(ResourceLocation.of("minecraft", "textures/blocks/diamond_block.png"))
-
+                GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
                 GlStateManager.translate(
                     -(entity.x - prevX) * pt - prevX,
                     -(entity.y - prevY) * pt - prevY,
@@ -58,32 +55,35 @@ object Cube {
                 )
                 GlStateManager.translate(mod.cube.x, mod.cube.y - distanceBetweenTowerAndGround, mod.cube.z)
 
+                clientApi.renderEngine()
+                    .bindTexture(ResourceLocation.of("minecraft", "textures/blocks/diamond_block.png"))
+
                 // Рисуем выделение зоны
                 GlStateManager.color(0.066666f, 0.52941f, 1f, 0.21f)
-                GL11.glBegin(GL11.GL_POLYGON)
-                val angles = 40.0
+                glBegin(GL_POLYGON)
+                val angles = 60.0
                 val radius = TowerManager.radius
                 repeat(angles.toInt()) {
-                    GL11.glVertex3d(
+                    glVertex3d(
                         radius * sin(Math.toRadians(it / angles * 360.0)),
                         0.01,
                         radius * cos(Math.toRadians(it / angles * 360.0))
                     )
                 }
-                GL11.glEnd()
+                glEnd()
 
                 // Рисуем выделение зоны
                 GlStateManager.color(0.066666f, 0.52941f, 1f, 1f)
                 GlStateManager.glLineWidth(5f)
-                GL11.glBegin(GL11.GL_LINE_LOOP)
+                glBegin(GL_LINE_LOOP)
                 repeat(angles.toInt()) {
-                    GL11.glVertex3d(
+                    glVertex3d(
                         radius * sin(Math.toRadians(it / angles * 360.0)),
                         0.01,
                         radius * cos(Math.toRadians(it / angles * 360.0))
                     )
                 }
-                GL11.glEnd()
+                glEnd()
 
                 GlStateManager.translate(0.0, distanceBetweenTowerAndGround, 0.0)
 
@@ -91,7 +91,7 @@ object Cube {
                     1.0f,
                     1.0f,
                     1.0f,
-                    0.6f
+                    1.0f
                 )
 
                 GlStateManager.rotate(
@@ -101,50 +101,72 @@ object Cube {
                     sin(angle / 51.0).toFloat()
                 )
 
-                GL11.glBegin(GL11.GL_POLYGON)
-                GL11.glColor3d(1.0, 1.0, 1.0)
-                GL11.glVertex3d(1.0, -1.0, 1.0)
-                GL11.glTexCoord2d(0.0, 0.0)
-                GL11.glVertex3d(1.0, 1.0, 1.0)
-                GL11.glTexCoord2d(0.0, 1.0)
-                GL11.glVertex3d(-1.0, 1.0, 1.0)
-                GL11.glTexCoord2d(1.0, 1.0)
-                GL11.glVertex3d(-1.0, -1.0, 1.0)
-                GL11.glTexCoord2d(1.0, 0.0)
-                GL11.glEnd()
-                GL11.glBegin(GL11.GL_POLYGON)
-                GL11.glColor3d(1.0, 0.0, 1.0)
-                GL11.glVertex3d(1.0, -1.0, -1.0)
-                GL11.glVertex3d(1.0, 1.0, -1.0)
-                GL11.glVertex3d(1.0, 1.0, 1.0)
-                GL11.glVertex3d(1.0, -1.0, 1.0)
-                GL11.glEnd()
-                GL11.glBegin(GL11.GL_POLYGON)
-                GL11.glColor3d(1.0, 1.0, 0.0)
-                GL11.glVertex3d(-1.0, -1.0, 1.0)
-                GL11.glVertex3d(-1.0, 1.0, 1.0)
-                GL11.glVertex3d(-1.0, 1.0, -1.0)
-                GL11.glVertex3d(-1.0, -1.0, -1.0)
-                GL11.glEnd()
-                GL11.glBegin(GL11.GL_POLYGON)
-                GL11.glColor3d(0.0, 0.0, 1.0)
-                GL11.glVertex3d(1.0, 1.0, 1.0)
-                GL11.glVertex3d(1.0, 1.0, -1.0)
-                GL11.glVertex3d(-1.0, 1.0, -1.0)
-                GL11.glVertex3d(-1.0, 1.0, 1.0)
-                GL11.glEnd()
-                GL11.glBegin(GL11.GL_POLYGON)
-                GL11.glColor3d(1.0, 0.0, 0.0)
-                GL11.glVertex3d(1.0, -1.0, -1.0)
-                GL11.glVertex3d(1.0, -1.0, 1.0)
-                GL11.glVertex3d(-1.0, -1.0, 1.0)
-                GL11.glVertex3d(-1.0, -1.0, -1.0)
-                GL11.glEnd()
+                glScalef(0.8f, 0.8f, 0.8f)
+
+                glBegin(GL_POLYGON)
+                glVertex3d(1.0, -1.0, -1.0)
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(1.0, 1.0, -1.0)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(1.0, 1.0, 1.0)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(1.0, -1.0, 1.0)
+                glTexCoord2d(1.0, 0.0)
+                glEnd()
+                glBegin(GL_POLYGON)
+                glVertex3d(-1.0, -1.0, 1.0)
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(-1.0, 1.0, 1.0)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(-1.0, 1.0, -1.0)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(-1.0, -1.0, -1.0)
+                glTexCoord2d(1.0, 0.0)
+                glEnd()
+                glBegin(GL_POLYGON)
+                glVertex3d(1.0, 1.0, 1.0)
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(1.0, 1.0, -1.0)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(-1.0, 1.0, -1.0)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(-1.0, 1.0, 1.0)
+                glTexCoord2d(1.0, 0.0)
+                glEnd()
+                glBegin(GL_POLYGON)
+                glVertex3d(1.0, -1.0, -1.0)
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(1.0, -1.0, 1.0)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(-1.0, -1.0, 1.0)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(-1.0, -1.0, -1.0)
+                glTexCoord2d(1.0, 0.0)
+                glEnd()
+                glBegin(GL_POLYGON)
+                glVertex3d(-1.0, -1.0, -1.0)
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(-1.0, 1.0, -1.0)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(1.0, 1.0, -1.0)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(1.0, -1.0, -1.0)
+                glTexCoord2d(1.0, 0.0)
+                glEnd()
+                glBegin(GL_POLYGON)
+                glVertex3d(1.0, -1.0, 1.0)
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(1.0, 1.0, 1.0)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(-1.0, 1.0, 1.0)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(-1.0, -1.0, 1.0)
+                glTexCoord2d(1.0, 0.0)
+                glEnd()
 
                 // GL конец
                 GlStateManager.color(1f, 1f, 1f, 1f)
-                GlStateManager.shadeModel(GL11.GL_FLAT)
-                GlStateManager.enableTexture2D()
+                GlStateManager.shadeModel(GL_FLAT)
                 GlStateManager.enableAlpha()
                 GlStateManager.enableCull()
             }
