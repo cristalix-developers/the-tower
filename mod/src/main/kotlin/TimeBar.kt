@@ -1,6 +1,5 @@
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
-import ru.cristalix.clientapi.mod
 import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
@@ -47,9 +46,10 @@ object TimeBar {
                 content.content = content.content.dropLast(7) + (time / 60).toString()
                     .padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0') + " ⏳"
             }
+            cooldown.enabled = mod.gameActive
         }
 
-        App::class.java.mod.registerChannel("func:bar") {
+        mod.registerChannel("func:bar") {
             val text = NetUtil.readUtf8(this) + " XX:XX ⏳"
             time = this.readInt()
 
@@ -61,8 +61,9 @@ object TimeBar {
                 return@registerChannel
             }
 
-            cooldown.enabled = true
             content.content = text
+            line.size.x = 180.0
+
             line.animate(time - 0.1) {
                 size.x = 0.0
             }
@@ -99,7 +100,7 @@ object TimeBar {
             }
         }
 
-        App::class.java.mod.registerChannel("func:attention") {
+        mod.registerChannel("func:attention") {
             val secondsTotal = 3
 
             dropNumber(3.toString(), 5.0, Color(255, 255, 85))

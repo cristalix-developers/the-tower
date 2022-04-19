@@ -2,9 +2,10 @@ package me.reidj.tower.listener
 
 import clepto.bukkit.B
 import clepto.cristalix.Cristalix.transfer
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.HUB
-import me.reidj.tower.setFlying
+import me.reidj.tower.flying
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
@@ -45,7 +46,7 @@ object InteractEvent : Listener {
                     inventory.clear()
                     teleport(session?.arenaSpawn)
                     inventory.setItem(4, UpgradeInventory.workshop)
-                    setFlying()
+                    flying()
                 }
 
                 tower.health = tower.maxHealth
@@ -67,16 +68,7 @@ object InteractEvent : Listener {
                 // Отправляем точки со спавнерами
                 session?.generators?.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
 
-                // Игра началась
-                ModTransfer(
-                    true,
-                    session!!.cubeLocation.x,
-                    session!!.cubeLocation.y,
-                    session!!.cubeLocation.z,
-                    MOVE_SPEED,
-                    TICKS_BEFORE_STRIKE,
-                    CONST_TICKS_BEFORE_STRIKE
-                ).send("tower:update-state", player)
+                Anime.counting321(player)
 
                 // Начинаю волну
                 inGame = true
@@ -85,6 +77,17 @@ object InteractEvent : Listener {
                     val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                     wave = current
                     current.start()
+
+                    // Игра началась
+                    ModTransfer(
+                        true,
+                        session!!.cubeLocation.x,
+                        session!!.cubeLocation.y,
+                        session!!.cubeLocation.z,
+                        MOVE_SPEED,
+                        TICKS_BEFORE_STRIKE,
+                        CONST_TICKS_BEFORE_STRIKE
+                    ).send("tower:update-state", player)
                 }
             }
             null

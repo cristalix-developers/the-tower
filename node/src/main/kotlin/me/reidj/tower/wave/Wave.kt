@@ -58,6 +58,7 @@ class Wave(
             user.giveMoney(10)
         }
         startTime = System.currentTimeMillis()
+        Anime.counting321(player)
         B.postpone(3 * 20) { start() }
     }
 }

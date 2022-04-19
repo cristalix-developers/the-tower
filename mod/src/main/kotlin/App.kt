@@ -1,6 +1,6 @@
+
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.*
-import dev.xdark.clientapi.render.Tessellator
 import dev.xdark.clientapi.resource.ResourceLocation
 import io.netty.buffer.Unpooled
 import mob.MobManager
@@ -30,24 +30,8 @@ class App : KotlinMod() {
         Statistic
         TimeBar
         Ending
-
-        val player = clientApi.minecraft().player
-        val tessellator: Tessellator = clientApi.tessellator()
-        val render = tessellator.bufferBuilder
-        val sx = 16.0
-        val sy = 16.0
-        val sz = 16.0
-        val uSize = sx
-        val u1 = sx / uSize
-        val u2 = u1 + sz / uSize
-        val u3 = u2 + sx / uSize
-        val u4 = u3 + sz / uSize
-        val u5 = u3 + sx / uSize
-        val u6 = u4 + sx / uSize
-
-        val v1 = sy / sx
-        val v2 = v1 + sz / sx
-        val v3 = v2 + sy / sx
+        GlowEffect
+        ItemTitle
 
         loadTextures(
             load("health_bar.png", "35320C088F83D8890128127"),
