@@ -27,9 +27,6 @@ object ConnectionHandler : Listener {
         // Отправляем наш мод
         B.postpone(1) { ModLoader.send("tower-mod-bundle.jar", this) }
 
-        B.postpone(20) {
-            user.giveMoney(-0)
-            //ModHelper.updateLevelBar(user)
-        }
+        B.postpone(20) { user.giveMoney(-0) }
     }
 }

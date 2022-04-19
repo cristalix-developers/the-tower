@@ -13,7 +13,10 @@ data class Tower(
     var upgrades: MutableMap<UpgradeType, Upgrade>
 ) : Upgradable {
 
-    fun updateHealth() = ModTransfer(health, maxHealth).send("tower:loseheart", owner)
+    fun updateHealth() {
+        maxHealth = upgrades[UpgradeType.HEALTH]!!.getValue()
+        ModTransfer(health, maxHealth).send("tower:loseheart", owner)
+    }
 
     override fun update(user: User, vararg type: UpgradeType) =
         type.forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }

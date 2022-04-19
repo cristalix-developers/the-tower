@@ -5,7 +5,6 @@ import Banners
 import Vector
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
-import dev.xdark.feder.NetUtil
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import mod
@@ -17,8 +16,6 @@ import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.sphere
 import updateNameHealth
-import java.awt.SystemColor.text
-import java.util.*
 import kotlin.math.max
 import kotlin.math.pow
 
@@ -138,12 +135,11 @@ object TowerManager {
     }
 
     fun updateHealth(healthUpdate: Double = health, maxHealthUpdate: Double = maxHealth) {
-        if (healthUpdate != health) {
-            health = healthUpdate
-            maxHealth = maxHealthUpdate
-            BarManager.healthIndicator?.updatePercentage(health, maxHealth)
-        }
+        health = healthUpdate
+        maxHealth = maxHealthUpdate
+        BarManager.healthIndicator?.updatePercentage(health, maxHealth)
 
-        Banners.text("§4${health.toInt()} ❤", healthBanner!!, Banners.banners[healthBanner!!.uuid]!!.second)
+        if (mod.gameActive)
+            Banners.text("§4${health.toInt()} ❤", healthBanner!!, Banners.banners[healthBanner!!.uuid]!!.second)
     }
 }

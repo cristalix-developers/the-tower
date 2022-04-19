@@ -26,7 +26,6 @@ class Wave(
 
     fun start() {
         isStarting = true
-        player.sendTitle("§eПриготовьтесь!", "Началась $level волна", 10, 15, 10)
         Anime.timer(player, "$level волна", 40)
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
@@ -53,7 +52,6 @@ class Wave(
         val tokens = user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt()
         isStarting = false
         level++
-        player.sendTitle("§aПоздравляем!", "Волна завершена", 10, 15, 10)
         user.giveTokens(tokens)
         if (level % 10 == 0) {
             Anime.cursorMessage(player, "§e+10 §fмонет")

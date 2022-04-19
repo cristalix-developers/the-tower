@@ -1,7 +1,6 @@
 package me.reidj.tower
 
 import clepto.bukkit.B
-import com.mojang.brigadier.arguments.UuidArgumentType.uuid
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.bukkit.world.Label
 import dev.implario.games5e.node.CoordinatorClient
@@ -31,9 +30,7 @@ import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
-import net.minecraft.server.v1_12_R1.SoundEffects.hp
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.inventory.IInventoryService
@@ -48,7 +45,6 @@ import ru.cristalix.core.transfer.TransferService
 import ru.kdev.simulatorapi.createSimulator
 import ru.kdev.simulatorapi.listener.SessionListener
 import java.util.*
-import kotlin.concurrent.thread
 import kotlin.math.sqrt
 
 const val HUB = "HUB-2"
@@ -92,7 +88,7 @@ class App : JavaPlugin() {
 
         Platforms.set(PlatformDarkPaper())
 
-        Anime.include(Kit.STANDARD, Kit.NPC)
+        Anime.include(Kit.NPC)
         ModLoader.loadAll("mods")
 
         // Конфигурация реалма

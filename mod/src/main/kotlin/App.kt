@@ -1,4 +1,3 @@
-import com.sun.media.jfxmedia.events.PlayerEvent
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.render.Tessellator
@@ -6,7 +5,6 @@ import dev.xdark.clientapi.resource.ResourceLocation
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import player.Statistic
-import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
@@ -30,6 +28,8 @@ class App : KotlinMod() {
         UIEngine.initialize(this)
 
         Statistic
+        TimeBar
+        Ending
 
         val player = clientApi.minecraft().player
         val tessellator: Tessellator = clientApi.tessellator()
@@ -50,9 +50,9 @@ class App : KotlinMod() {
         val v3 = v2 + sy / sx
 
         loadTextures(
-                load("health_bar.png", "35320C088F83D8890128127"),
-                load("energy.png", "35320C088F83D8890128111"),
-                load("xp_bar.png", "35320C094F83D8890128111")
+            load("health_bar.png", "35320C088F83D8890128127"),
+            load("energy.png", "35320C088F83D8890128111"),
+            load("xp_bar.png", "35320C094F83D8890128111"),
         ).thenRun {
             BarManager
             TowerManager

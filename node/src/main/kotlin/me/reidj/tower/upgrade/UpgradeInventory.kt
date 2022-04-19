@@ -48,7 +48,15 @@ object UpgradeInventory {
 
                 val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
 
-                icon(user, contents, if (!user.inGame) user.upgradeTypes else user.session!!.upgrade)
+                icon(
+                    user, contents, if (!user.inGame) {
+                        user.upgradeTypes
+                        user.tower.upgrades
+                    } else {
+                        user.session!!.upgrade
+                    }
+                )
+
                 contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
                 contents.fillMask('X', ClickableItem.empty(item {
                     type = STAINED_GLASS_PANE
@@ -63,38 +71,40 @@ object UpgradeInventory {
         B.regConsumerCommand({ player, _ -> menu.open(player) }, "workshop", "")
     }
 
-    fun icon(user: User, contents: InventoryContents, upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
-        upgradeTypes.forEach { (pumpingType, pumping) ->
-            val level = pumping.level
-            val cost = pumpingType.price + level
-            val notInGame = !user.inGame
-            contents.add('O', ClickableItem.of(item {
-                type = CLAY_BALL
-                text(
-                    """§b${pumpingType.title}
+    fun icon(user: User, contents: InventoryContents, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
+        upgradeTypes.forEach {
+            it.forEach { (upgradeType, upgrade) ->
+                val level = upgrade.level
+                val cost = upgradeType.price + level
+                val notInGame = !user.inGame
+                contents.add('O', ClickableItem.of(item {
+                    type = CLAY_BALL
+                    text(
+                        """§b${upgradeType.title}
                 §7Цена ${MoneyFormat.toMoneyFormat(cost)}
                         
                 §b$level §f➠ §b${level + 1} уровень §a▲▲▲
         
-                §7${pumpingType.lore}
+                §7${upgradeType.lore}
         
                 §aНажмите чтобы улучшить
                 """.trimIndent()
-                )
-                val pair = pumpingType.nbt.split(":")
-                nbt(pair[0], pair[1])
-            }) {
-                if (if (notInGame) user.money >= cost else user.tokens >= cost) {
-                    if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
-                    if (notInGame) user.update(user, pumpingType) else user.tower.update(user, pumpingType)
-                    pumping.level++
-                    user.player!!.performCommand("workshop")
-                    user.tower.updateHealth()
-                } else {
-                    user.player!!.closeInventory()
-                    Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)
-                }
-            })
+                    )
+                    val pair = upgradeType.nbt.split(":")
+                    nbt(pair[0], pair[1])
+                }) {
+                    if (if (notInGame) user.money >= cost else user.tokens >= cost) {
+                        if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
+                        if (notInGame) user.update(user) else user.tower.update(user)
+                        upgrade.level++
+                        user.player!!.performCommand("workshop")
+                        user.tower.updateHealth()
+                    } else {
+                        user.player!!.closeInventory()
+                        Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)
+                    }
+                })
+            }
         }
     }
 }
