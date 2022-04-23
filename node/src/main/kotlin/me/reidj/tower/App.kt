@@ -1,6 +1,5 @@
 package me.reidj.tower
 
-import clepto.bukkit.B
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.bukkit.world.Label
 import dev.implario.games5e.node.CoordinatorClient
@@ -31,6 +30,7 @@ import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.Bukkit
+import org.bukkit.command.CommandExecutor
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.inventory.IInventoryService
@@ -59,7 +59,6 @@ class App : JavaPlugin() {
     val spawn: Label = map.getLabel("spawn").apply { yaw = -90f }
 
     override fun onEnable() {
-        B.plugin = this
         app = this
 
         createSimulator<App, User> {
@@ -105,21 +104,19 @@ class App : JavaPlugin() {
         MainGui
 
         // Регистрация обработчиков событий
-        B.events(
-            ConnectionHandler,
-            UnusedEvent,
-            InteractEvent
-        )
+        Bukkit.getPluginManager().registerEvents(ConnectionHandler, this)
+        Bukkit.getPluginManager().registerEvents(UnusedEvent, this)
+        Bukkit.getPluginManager().registerEvents(InteractEvent, this)
 
-        B.regCommand({ player, args ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
-            null
-        }, "money")
+        //CommandExecutor..regCommand({ player, args ->
+        //    SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
+        //    null
+        //}, "money")
 
-        B.regCommand({ player, args ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
-            null
-        }, "tokens")
+        //B.regCommand({ player, args ->
+        //    SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
+        //    null
+        //}, "tokens")
 
 
         WaveManager.runTaskTimer(this@App, 0, 1)

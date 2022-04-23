@@ -1,8 +1,8 @@
 package me.reidj.tower.upgrade
 
-import clepto.bukkit.B
 import dev.implario.bukkit.item.item
 import me.func.mod.Anime
+import me.func.mod.util.addNbt
 import me.reidj.tower.user.User
 import me.reidj.tower.util.MoneyFormat
 import org.bukkit.Material.*
@@ -13,6 +13,7 @@ import ru.cristalix.core.inventory.ControlledInventory
 import ru.cristalix.core.inventory.InventoryContents
 import ru.cristalix.core.inventory.InventoryProvider
 import ru.kdev.simulatorapi.listener.SessionListener
+import java.awt.SystemColor.text
 
 /**
  * @project tower
@@ -20,17 +21,15 @@ import ru.kdev.simulatorapi.listener.SessionListener
  */
 object UpgradeInventory {
 
-    private val backItem = item {
-        type = CLAY_BALL
-        text("§cНазад")
-        nbt("other", "cancel")
+    private val backItem = ItemStack(CLAY_BALL).apply {
+        displayName = "§cНазад"
+        addNbt("other", "cancel")
     }
 
-    val workshop = item {
-        type = CLAY_BALL
-        text("§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!")
-        nbt("other", "friend_add")
-        nbt("click", "workshop")
+    val workshop = ItemStack(CLAY_BALL).apply {
+        displayName = "§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!"
+        addNbt("other", "friend_add")
+        addNbt("click", "workshop")
     }
 
     private val menu = ControlledInventory.builder()
