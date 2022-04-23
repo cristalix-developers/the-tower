@@ -1,10 +1,10 @@
 package me.reidj.tower.util
 
-import dev.implario.bukkit.item.item
 import me.reidj.tower.app
-import org.bukkit.Material
+import me.reidj.tower.item
+import me.reidj.tower.nbt
+import me.reidj.tower.text
 import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
 
 /**
  * @project tower
@@ -13,19 +13,16 @@ import org.bukkit.inventory.ItemStack
 object LobbyItems {
 
     private val startItem = item {
-        type = Material.CLAY_BALL
         text("§bИграть")
         nbt("other", "guild_members")
         nbt("click", "play")
     }
     private var backItem = item {
-        type = Material.CLAY_BALL
         text("§cВыйти")
         nbt("other", "cancel")
         nbt("click", "leave")
     }
-    private var settingsItem: ItemStack = item {
-        type = Material.CLAY_BALL
+    private var settingsItem = item {
         text("§aПерсонаж")
         nbt("other", "clothes")
         nbt("click", "menu")

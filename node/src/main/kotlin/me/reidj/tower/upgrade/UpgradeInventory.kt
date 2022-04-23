@@ -1,19 +1,20 @@
 package me.reidj.tower.upgrade
 
-import dev.implario.bukkit.item.item
 import me.func.mod.Anime
 import me.func.mod.util.addNbt
+import me.reidj.tower.*
+import me.reidj.tower.content.MainGui.backItem
 import me.reidj.tower.user.User
 import me.reidj.tower.util.MoneyFormat
 import org.bukkit.Material.*
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import org.bukkit.material.MaterialData
 import ru.cristalix.core.inventory.ClickableItem
 import ru.cristalix.core.inventory.ControlledInventory
 import ru.cristalix.core.inventory.InventoryContents
 import ru.cristalix.core.inventory.InventoryProvider
 import ru.kdev.simulatorapi.listener.SessionListener
-import java.awt.SystemColor.text
 
 /**
  * @project tower
@@ -21,15 +22,10 @@ import java.awt.SystemColor.text
  */
 object UpgradeInventory {
 
-    private val backItem = ItemStack(CLAY_BALL).apply {
-        displayName = "§cНазад"
-        addNbt("other", "cancel")
-    }
-
-    val workshop = ItemStack(CLAY_BALL).apply {
-        displayName = "§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!"
-        addNbt("other", "friend_add")
-        addNbt("click", "workshop")
+    val workshop = item {
+        text("§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!")
+        nbt("other", "friend_add")
+        nbt("click", "workshop")
     }
 
     private val menu = ControlledInventory.builder()
@@ -57,9 +53,8 @@ object UpgradeInventory {
                 )
 
                 contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
-                contents.fillMask('X', ClickableItem.empty(item {
-                    type = STAINED_GLASS_PANE
-                    data = 7
+                contents.fillMask('X', ClickableItem.empty(item(STAINED_GLASS_PANE) {
+                    data(7)
                     text("&f")
                 }))
             }
@@ -67,7 +62,7 @@ object UpgradeInventory {
 
     init {
         // Команда для открытия меню
-        B.regConsumerCommand({ player, _ -> menu.open(player) }, "workshop", "")
+        app.command("workshop") { player, _ -> menu.open(player) }
     }
 
     fun icon(user: User, contents: InventoryContents, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
@@ -77,7 +72,6 @@ object UpgradeInventory {
                 val cost = upgradeType.price + level
                 val notInGame = !user.inGame
                 contents.add('O', ClickableItem.of(item {
-                    type = CLAY_BALL
                     text(
                         """§b${upgradeType.title}
                 §7Цена ${MoneyFormat.toMoneyFormat(cost)}

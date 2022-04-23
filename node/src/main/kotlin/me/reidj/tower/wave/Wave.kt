@@ -1,7 +1,7 @@
 package me.reidj.tower.wave
 
-import clepto.bukkit.B
 import me.func.mod.Anime
+import me.reidj.tower.after
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
 import me.reidj.tower.upgrade.UpgradeType
@@ -59,6 +59,6 @@ class Wave(
         }
         startTime = System.currentTimeMillis()
         Anime.counting321(player)
-        B.postpone(3 * 20) { start() }
+        me.reidj.tower.app.after(3 * 20) { start() }
     }
 }

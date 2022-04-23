@@ -7,6 +7,7 @@ import dev.implario.games5e.node.NoopGameNode
 import dev.implario.games5e.sdk.cristalix.MapLoader
 import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
+import dev.xdark.paper.MaterialRegistry
 import implario.humanize.Humanize
 import io.netty.buffer.Unpooled
 import me.func.mod.Anime
@@ -29,8 +30,11 @@ import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
+import net.minecraft.server.v1_12_R1.BlockStone
+import net.minecraft.server.v1_12_R1.Blocks
+import net.minecraft.server.v1_12_R1.SoundEffectType
 import org.bukkit.Bukkit
-import org.bukkit.command.CommandExecutor
+import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.inventory.IInventoryService
@@ -85,6 +89,17 @@ class App : JavaPlugin() {
             registerService(IInventoryService::class.java, InventoryService())
         }
 
+        MaterialRegistry.register(Material("new", 274, 794))
+        println(MaterialRegistry.getMaterial(274))
+        Blocks.setupBlock(274,
+            Blocks.a(
+                274,
+                "new",
+                BlockStone().setDurability(10.0f).a(SoundEffectType.d).setName("new")
+            ))
+        println(Blocks.REGISTRY.getId(274))
+        println(Blocks.REGISTRY.getId(274).stateList.getValidStates())
+
         Platforms.set(PlatformDarkPaper())
 
         Anime.include(Kit.NPC)
@@ -104,9 +119,7 @@ class App : JavaPlugin() {
         MainGui
 
         // Регистрация обработчиков событий
-        Bukkit.getPluginManager().registerEvents(ConnectionHandler, this)
-        Bukkit.getPluginManager().registerEvents(UnusedEvent, this)
-        Bukkit.getPluginManager().registerEvents(InteractEvent, this)
+        app.listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
         //CommandExecutor..regCommand({ player, args ->
         //    SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())

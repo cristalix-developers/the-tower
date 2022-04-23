@@ -1,11 +1,8 @@
 package me.reidj.tower.listener
 
-import clepto.bukkit.B
-import clepto.cristalix.Cristalix.transfer
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.HUB
-import me.reidj.tower.flying
+import me.reidj.tower.*
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
@@ -14,7 +11,6 @@ import me.reidj.tower.wave.Wave
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
-import ru.cristalix.core.realm.RealmId
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -28,12 +24,12 @@ object InteractEvent : Listener {
     private const val TICKS_BEFORE_STRIKE = 40
 
     init {
-        B.regCommand({ player, _ ->
-            transfer(listOf(player.uniqueId), RealmId.of(HUB))
-            null
-        }, "leave")
+        //B.regCommand({ player, _ ->
+        //    transfer(listOf(player.uniqueId), RealmId.of(HUB))
+        //    null
+        //}, "leave")
 
-        B.regCommand({ player, _ ->
+        app.command("play") { player, _ ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 if (inGame)
                     return@apply
@@ -72,7 +68,7 @@ object InteractEvent : Listener {
                 // Начинаю волну
                 inGame = true
                 giveTokens(80)
-                B.postpone(3 * 20) {
+                app.after(3 * 20) {
                     val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                     wave = current
                     current.start()
@@ -89,8 +85,7 @@ object InteractEvent : Listener {
                     ).send("tower:update-state", player)
                 }
             }
-            null
-        }, "play")
+        }
     }
 
     @EventHandler

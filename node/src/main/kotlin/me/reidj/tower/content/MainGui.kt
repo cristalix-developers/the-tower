@@ -1,12 +1,12 @@
 package me.reidj.tower.content
 
-import clepto.bukkit.B
-import dev.implario.bukkit.item.item
+import me.reidj.tower.*
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.user.User
 import org.bukkit.Material.CLAY_BALL
 import org.bukkit.Material.STAINED_GLASS_PANE
 import org.bukkit.entity.Player
+import org.bukkit.material.MaterialData
 import ru.cristalix.core.inventory.ClickableItem
 import ru.cristalix.core.inventory.ControlledInventory
 import ru.cristalix.core.inventory.InventoryContents
@@ -20,14 +20,12 @@ import ru.kdev.simulatorapi.listener.SessionListener
 object MainGui {
 
     val backItem = item {
-        type = CLAY_BALL
         text("§cНазад")
         nbt("other", "cancel")
     }
 
-    val glass = item {
-        type = STAINED_GLASS_PANE
-        data = 7
+    val glass = item(STAINED_GLASS_PANE) {
+        data(7)
         text("&f")
     }
 
@@ -49,7 +47,6 @@ object MainGui {
 
                 contents.add('U', ClickableItem.of(UpgradeInventory.workshop) { player.performCommand("workshop") })
                 contents.add('S', ClickableItem.empty(item {
-                    type = CLAY_BALL
                     nbt("other", "quest_week")
                     text(
                         "§f§l > §bСтатистика\n" +
@@ -63,6 +60,6 @@ object MainGui {
         }).build()
 
     init {
-        B.regConsumerCommand({ player, _ -> menu.open(player) }, "menu")
+        app.command("menu") { player, _ -> menu.open(player) }
     }
 }
