@@ -1,15 +1,14 @@
 package me.reidj.tower.upgrade
 
 import me.func.mod.Anime
-import me.func.mod.util.addNbt
 import me.reidj.tower.*
 import me.reidj.tower.content.MainGui.backItem
 import me.reidj.tower.user.User
 import me.reidj.tower.util.MoneyFormat
-import org.bukkit.Material.*
+import org.bukkit.Material.BARRIER
+import org.bukkit.Material.STAINED_GLASS_PANE
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.material.MaterialData
 import ru.cristalix.core.inventory.ClickableItem
 import ru.cristalix.core.inventory.ControlledInventory
 import ru.cristalix.core.inventory.InventoryContents
@@ -62,7 +61,7 @@ object UpgradeInventory {
 
     init {
         // Команда для открытия меню
-        app.command("workshop") { player, _ -> menu.open(player) }
+        command("workshop") { player, _ -> menu.open(player) }
     }
 
     fun icon(user: User, contents: InventoryContents, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
@@ -88,10 +87,20 @@ object UpgradeInventory {
                 }) {
                     if (if (notInGame) user.money >= cost else user.tokens >= cost) {
                         if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
-                        if (notInGame) user.update(user) else user.tower.update(user)
                         upgrade.level++
                         user.player!!.performCommand("workshop")
                         user.tower.updateHealth()
+                        if (notInGame)
+                            user.update(user)
+                        else
+                            user.session!!.update(
+                                user,
+                                UpgradeType.BULLET_DELAY,
+                                UpgradeType.DAMAGE,
+                                UpgradeType.HEALTH,
+                                UpgradeType.PROTECTION,
+                                UpgradeType.REGEN
+                            )
                     } else {
                         user.player!!.closeInventory()
                         Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)

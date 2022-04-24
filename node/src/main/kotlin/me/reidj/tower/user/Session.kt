@@ -8,7 +8,7 @@ import me.reidj.tower.upgrade.UpgradeType
 
 data class Session(var upgrade: MutableMap<UpgradeType, Upgrade>): Upgradable {
     override fun update(user: User, vararg type: UpgradeType) =
-        type.forEach { ModTransfer(upgrade[it]!!.getValue()).send("user:${it.name.lowercase()}", user.player) }
+        type.forEach { ModTransfer(upgrade[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }
 
     val arenaSpawn: Label = app.map.getLabel("start").apply { yaw = -90f }
     val cubeLocation = app.map.getLabel("tower").clone().apply {

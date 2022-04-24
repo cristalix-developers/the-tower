@@ -11,6 +11,8 @@ import me.reidj.tower.wave.Wave
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
+import ru.cristalix.core.realm.RealmId
+import ru.cristalix.core.transfer.ITransferService
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -24,16 +26,13 @@ object InteractEvent : Listener {
     private const val TICKS_BEFORE_STRIKE = 40
 
     init {
-        //B.regCommand({ player, _ ->
-        //    transfer(listOf(player.uniqueId), RealmId.of(HUB))
-        //    null
-        //}, "leave")
+        command("leave") { player, _ -> ITransferService.get().transfer(player.uniqueId, RealmId.of(HUB)) }
 
-        app.command("play") { player, _ ->
+        command("play") { player, _ ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 if (inGame)
                     return@apply
-                session = Session(upgradeTypes)
+                session = Session(tower.upgrades)
 
                 session?.upgrade?.values?.forEach { it.level = 1 }
 
@@ -90,8 +89,7 @@ object InteractEvent : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
-        if (item == null)
-            return
+        //player.location.block.setTypeAndDataFast(274,0)
         if (item.tag != null && item.tag.hasKeyOfType("click", 8))
             player.performCommand(item.tag.getString("click"))
     }

@@ -122,7 +122,7 @@ object TowerManager {
         }
 
         mod.registerChannel("tower:health") {
-            updateHealth(readDouble(), readDouble())
+            updateHealth(health, readDouble())
         }
 
         mod.registerChannel("tower:protection") {
@@ -134,7 +134,7 @@ object TowerManager {
         }
     }
 
-    fun updateHealth(healthUpdate: Double = health, maxHealthUpdate: Double = maxHealth) {
+    fun updateHealth(healthUpdate: Double, maxHealthUpdate: Double) {
         health = healthUpdate
         maxHealth = maxHealthUpdate
         BarManager.healthIndicator?.updatePercentage(health, maxHealth)

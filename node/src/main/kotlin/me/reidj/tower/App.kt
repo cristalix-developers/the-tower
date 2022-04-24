@@ -32,7 +32,8 @@ import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import net.minecraft.server.v1_12_R1.BlockStone
 import net.minecraft.server.v1_12_R1.Blocks
-import net.minecraft.server.v1_12_R1.SoundEffectType
+import net.minecraft.server.v1_12_R1.IBlockData
+import net.minecraft.server.v1_12_R1.Item
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
@@ -65,6 +66,37 @@ class App : JavaPlugin() {
     override fun onEnable() {
         app = this
 
+        val material = Material("block", 274, 834)
+        val block = object : BlockStone() {
+            override fun isFullBlock(blockData: IBlockData): Boolean {
+                return true
+            }
+
+            override fun isTranslucent(iblockdata: IBlockData?): Boolean {
+                return false
+            }
+
+            override fun isFullCube(iblockdata: IBlockData?): Boolean {
+                return true
+            }
+
+            override fun isOpaqueCube(iblockdata: IBlockData): Boolean {
+                return true
+            }
+
+            override fun isTopSolid(blockData: IBlockData): Boolean {
+                return true
+            }
+        }
+        block.setHardness(1.5F)
+        MaterialRegistry.register(material)
+        Item.register(block)
+        Blocks.a(
+            274,
+            "block",
+            block
+        )
+
         createSimulator<App, User> {
             id = "tower"
             plugin = this@App
@@ -89,17 +121,6 @@ class App : JavaPlugin() {
             registerService(IInventoryService::class.java, InventoryService())
         }
 
-        MaterialRegistry.register(Material("new", 274, 794))
-        println(MaterialRegistry.getMaterial(274))
-        Blocks.setupBlock(274,
-            Blocks.a(
-                274,
-                "new",
-                BlockStone().setDurability(10.0f).a(SoundEffectType.d).setName("new")
-            ))
-        println(Blocks.REGISTRY.getId(274))
-        println(Blocks.REGISTRY.getId(274).stateList.getValidStates())
-
         Platforms.set(PlatformDarkPaper())
 
         Anime.include(Kit.NPC)
@@ -121,15 +142,13 @@ class App : JavaPlugin() {
         // Регистрация обработчиков событий
         app.listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
-        //CommandExecutor..regCommand({ player, args ->
-        //    SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
-        //    null
-        //}, "money")
+        command("money") { player, args ->
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
+        }
 
-        //B.regCommand({ player, args ->
-        //    SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
-        //    null
-        //}, "tokens")
+        command("tokens") { player, args ->
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
+        }
 
 
         WaveManager.runTaskTimer(this@App, 0, 1)

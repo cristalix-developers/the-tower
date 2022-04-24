@@ -7,14 +7,14 @@ import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
-import org.bukkit.material.MaterialData
+import org.bukkit.scheduler.BukkitTask
 
 fun Player.flying(state: Boolean = true) = apply {
     allowFlight = state
     isFlying = state
 }
 
-fun App.command(name: String, consumer: (Player, Array<out String>) -> Unit) =
+fun command(name: String, consumer: (Player, Array<out String>) -> Unit) =
     Bukkit.getCommandMap().register("tower", object : Command(name) {
         override fun execute(sender: CommandSender, var2: String, agrs: Array<out String>): Boolean {
             if (sender is Player)
@@ -24,7 +24,7 @@ fun App.command(name: String, consumer: (Player, Array<out String>) -> Unit) =
 
     })
 
-fun App.after(ticks: Long, runnable: () -> Unit) =
+fun App.after(ticks: Long, runnable: () -> Unit): BukkitTask =
     Bukkit.getScheduler().runTaskLater(this, { runnable.invoke() }, ticks)
 
 fun App.listener(vararg listener: Listener) = listener.forEach { Bukkit.getPluginManager().registerEvents(it, this) }

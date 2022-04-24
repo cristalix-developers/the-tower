@@ -14,10 +14,14 @@ data class Tower(
 ) : Upgradable {
 
     fun updateHealth() {
-        maxHealth = upgrades[UpgradeType.HEALTH]!!.getValue()
+        val upgrade = upgrades[UpgradeType.HEALTH]!!.getValue()
+        if (health == maxHealth)
+            health = upgrade
+        maxHealth = upgrade
         ModTransfer(health, maxHealth).send("tower:loseheart", owner)
     }
 
-    override fun update(user: User, vararg type: UpgradeType) =
+    override fun update(user: User, vararg type: UpgradeType) {
         type.forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }
+    }
 }

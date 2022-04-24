@@ -37,11 +37,44 @@ class App : KotlinMod() {
             load("health_bar.png", "35320C088F83D8890128127"),
             load("energy.png", "35320C088F83D8890128111"),
             load("xp_bar.png", "35320C094F83D8890128111"),
+            load("block.png", "35320C023F83D8890128111")
         ).thenRun {
             BarManager
             TowerManager
             Cube
         }
+
+        /*val item = Block.Builder.builder()
+            .material(
+                Material.Builder.builder()
+                    .liquid(false)
+                    .blocksLight(false)
+                    .blocksMovement(true)
+                    .translucent(false)
+                    .solid(true)
+                    .pushReaction(PushReaction.IGNORE)
+                    .build()
+            )
+            .translationKey("block")
+            .blockHardnessHandler { _, _, _, _, _ -> 1.5F }
+            .baseHardness(1.5F)
+            .slipperiness(0.98F)
+            .creativeTab(CreativeTab.COMBAT)
+            .blockRenderLayer(BlockRenderLayer.SOLID)
+            .solidTopHandler { true }
+            .fullBlockHandler { true }
+            .opaqueCubeHandler { true }
+            .fullCubeHandler { true }
+            .soundType(SoundType.SAND)
+            .build()
+
+        clientApi.blockRegistry().register(
+            274,
+            ResourceLocation.of("minecraft", "block"),
+            item
+        )
+
+        clientApi.renderItem().registerBlock(item, "minecraft/textures/blocks/block")*/
 
         registerHandler<HealthRender> { isCancelled = true }
         registerHandler<ExpBarRender> { isCancelled = true }
@@ -74,7 +107,7 @@ class App : KotlinMod() {
 
                 MobManager
 
-                UIEngine.schedule(1.0) { TowerManager.updateHealth() }
+                UIEngine.schedule(1.0) { TowerManager.updateHealth(TowerManager.health, TowerManager.maxHealth) }
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 MobManager.clear()

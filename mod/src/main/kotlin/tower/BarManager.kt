@@ -37,7 +37,7 @@ object BarManager {
 
     private val MONEY_FORMAT = DecimalFormat("##.#")
 
-    fun toHealthFormat(health: Double): String = MONEY_FORMAT.format(health)
+    fun toMoneyFormat(health: Double): String = MONEY_FORMAT.format(health)
 
     init {
         registerHandler<GameLoop> {
@@ -137,7 +137,7 @@ object BarManager {
             bar.animate(0.1, Easings.CUBIC_OUT) {
                 bar.size.x = maxX * min(1.0, current / max)
             }
-            this.text.content = "§f${toHealthFormat(current)}/${toHealthFormat(max)} ❤"
+            this.text.content = "§f${toMoneyFormat(current)}/${toMoneyFormat(max)} ❤"
         }
     }
 
@@ -172,7 +172,7 @@ object BarManager {
         }
 
         fun updatePercentage(protection: Double) {
-            this.text.content = "§f$protection 㱈"
+            this.text.content = "§f${toMoneyFormat(protection)} 㱈"
         }
     }
 

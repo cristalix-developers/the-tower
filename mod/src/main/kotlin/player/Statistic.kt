@@ -1,7 +1,9 @@
 package player
 
+import dev.xdark.clientapi.event.lifecycle.GameLoop
 import implario.humanize.Humanize
 import mod
+import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
 
@@ -34,6 +36,10 @@ object Statistic {
             addChild(moneyBox, tokensBox)
         }
 
+        registerHandler<GameLoop> {
+            tokensBox.enabled = mod.gameActive
+        }
+
         UIEngine.overlayContext + box
 
         repeat(2) { box.children.add(rectangle { color = TRANSPARENT }) }
@@ -52,8 +58,6 @@ object Statistic {
 
         mod.registerChannel("tower:tokens") {
             val tokens = readInt()
-
-            tokensBox.enabled = mod.gameActive
 
             tokensBox.content = "${
                 Humanize.plurals(

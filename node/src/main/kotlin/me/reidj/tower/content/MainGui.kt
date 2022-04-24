@@ -3,10 +3,8 @@ package me.reidj.tower.content
 import me.reidj.tower.*
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.user.User
-import org.bukkit.Material.CLAY_BALL
 import org.bukkit.Material.STAINED_GLASS_PANE
 import org.bukkit.entity.Player
-import org.bukkit.material.MaterialData
 import ru.cristalix.core.inventory.ClickableItem
 import ru.cristalix.core.inventory.ControlledInventory
 import ru.cristalix.core.inventory.InventoryContents
@@ -47,12 +45,12 @@ object MainGui {
 
                 contents.add('U', ClickableItem.of(UpgradeInventory.workshop) { player.performCommand("workshop") })
                 contents.add('S', ClickableItem.empty(item {
-                    nbt("other", "quest_week")
                     text(
                         "§f§l > §bСтатистика\n" +
                                 "§7    Монет: §e${user.money}\n" +
                                 "§7    Волн пройдено: §b${user.maxWavePassed}\n"
                     )
+                    nbt("other", "quest_week")
                 }))
                 contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
                 contents.fillMask('X', ClickableItem.empty(glass))
@@ -60,6 +58,6 @@ object MainGui {
         }).build()
 
     init {
-        app.command("menu") { player, _ -> menu.open(player) }
+        command("menu") { player, _ -> menu.open(player) }
     }
 }
