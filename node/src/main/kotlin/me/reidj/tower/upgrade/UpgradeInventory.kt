@@ -99,7 +99,8 @@ object UpgradeInventory {
                                 UpgradeType.DAMAGE,
                                 UpgradeType.HEALTH,
                                 UpgradeType.PROTECTION,
-                                UpgradeType.REGEN
+                                UpgradeType.REGEN,
+                                UpgradeType.RADIUS
                             )
                     } else {
                         user.player!!.closeInventory()

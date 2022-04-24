@@ -36,7 +36,7 @@ object TowerManager {
     var health = 5.0
     var maxHealth = 5.0
     var protection = 0.0
-    var radius = 10.0
+    var radius = 0.0
 
     var healthBanner: Banner? = null
 
@@ -131,6 +131,10 @@ object TowerManager {
                 protection = protect
                 BarManager.protectionIndicator?.updatePercentage(protection)
             }
+        }
+
+        mod.registerChannel("tower:radius") {
+            radius = readDouble()
         }
     }
 

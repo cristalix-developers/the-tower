@@ -1,5 +1,7 @@
+
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
+import mob.MobManager
 import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
@@ -46,7 +48,7 @@ object TimeBar {
                 content.content = content.content.dropLast(7) + (time / 60).toString()
                     .padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0') + " ⏳"
             }
-            cooldown.enabled = mod.gameActive
+            if (MobManager.mobs.isEmpty()) cooldown.enabled = false else cooldown.enabled = mod.gameActive
         }
 
         mod.registerChannel("func:bar") {

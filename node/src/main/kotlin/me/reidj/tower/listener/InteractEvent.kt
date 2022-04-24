@@ -51,7 +51,8 @@ object InteractEvent : Listener {
                     UpgradeType.DAMAGE,
                     UpgradeType.HEALTH,
                     UpgradeType.PROTECTION,
-                    UpgradeType.REGEN
+                    UpgradeType.REGEN,
+                    UpgradeType.RADIUS
                 )
                 update(
                     this,
@@ -90,6 +91,8 @@ object InteractEvent : Listener {
     @EventHandler
     fun PlayerInteractEvent.handle() {
         //player.location.block.setTypeAndDataFast(274,0)
+        if (item == null)
+            return
         if (item.tag != null && item.tag.hasKeyOfType("click", 8))
             player.performCommand(item.tag.getString("click"))
     }
