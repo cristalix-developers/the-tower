@@ -1,4 +1,4 @@
-import dev.xdark.clientapi.entity.EntityLivingBase
+import dev.xdark.clientapi.entity.EntityLiving
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.opengl.GlStateManager
@@ -27,8 +27,8 @@ class App : KotlinMod() {
     var inited = false
     var gameActive = false
 
-    val players: MutableMap<UUID, String> = mutableMapOf()
-    val location: MutableMap<UUID, V3> = mutableMapOf()
+    val playerBuffTextures: MutableMap<UUID, ResourceLocation> = mutableMapOf()
+    val activeEntities = mutableListOf<EntityLiving>()
 
     override fun onEnable() {
         mod = this
@@ -54,15 +54,18 @@ class App : KotlinMod() {
             TowerManager
             Cube
 
-            players[UUID.fromString("307264a1-2c69-11e8-b5ea-1cb72caa35fd")] = "2.png"
+            playerBuffTextures[UUID.fromString("307264a1-2c69-11e8-b5ea-1cb72caa35fd")] =
+                ResourceLocation.of(NAMESPACE, "2.png")
 
             registerHandler<NameTemplateRender> a@{
-                if (entity !is EntityLivingBase) return@a
-                val entity = entity as EntityLivingBase
-                if (!location.containsKey(entity.uniqueID))
-                    location[entity.uniqueID] = V3(entity.x, entity.y, entity.z)
-                else
-                    location.replace(entity.uniqueID, V3(entity.x, entity.y, entity.z))
+                if (entity !is EntityLiving) return@a
+                val entity = entity as EntityLiving
+
+                if (!activeEntities.contains(entity) && playerBuffTextures.containsKey(entity.uniqueID)) {
+                    if (activeEntities.size > 30)
+                        activeEntities.clear()
+                    activeEntities.add(entity)
+                }
             }
 
             val scale = 1.5
@@ -76,35 +79,31 @@ class App : KotlinMod() {
                 GlStateManager.enableBlend()
                 GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
-                players.filter { send -> location.any { it.key == send.key } }
-                    .values.forEach {
-                        clientApi.renderEngine()
-                            .bindTexture(ResourceLocation.of(NAMESPACE, "tower/$it"))
-                    }
+                activeEntities.forEach {
+                    clientApi.renderEngine().bindTexture(playerBuffTextures[it.uniqueID])
 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
 
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
 
-                GlStateManager.translate(-player.x, -player.y, -player.z)
+                    GlStateManager.translate(-player.x, -player.y, -player.z)
+                    GlStateManager.translate(it.x, it.y, it.z)
 
-                location.filter { loc -> players.any { it.key == loc.key } }
-                    .values.forEach { GlStateManager.translate(it.x, it.y, it.z) }
+                    glBegin(GL_QUADS)
 
-                glBegin(GL_QUADS)
+                    glTexCoord2d(0.0, 0.0)
+                    glVertex3d(-0.5 * scale, 0.01, -0.5 * scale)
+                    glTexCoord2d(1.0, 0.0)
+                    glVertex3d(0.5 * scale, 0.01, -0.5 * scale)
+                    glTexCoord2d(1.0, 1.0)
+                    glVertex3d(0.5 * scale, 0.01, 0.5 * scale)
+                    glTexCoord2d(0.0, 1.0)
+                    glVertex3d(-0.5 * scale, 0.01, 0.5 * scale)
 
-                glTexCoord2d(0.0, 0.0)
-                glVertex3d(-0.5 * scale, 0.01, -0.5 * scale)
-                glTexCoord2d(1.0, 0.0)
-                glVertex3d(0.5 * scale, 0.01, -0.5 * scale)
-                glTexCoord2d(1.0, 1.0)
-                glVertex3d(0.5 * scale, 0.01, 0.5 * scale)
-                glTexCoord2d(0.0, 1.0)
-                glVertex3d(-0.5 * scale, 0.01, 0.5 * scale)
-
-                glEnd()
+                    glEnd()
+                }
 
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 GlStateManager.shadeModel(GL_FLAT)
