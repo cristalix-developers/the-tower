@@ -2,8 +2,6 @@ package me.reidj.tower
 
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.bukkit.world.Label
-import dev.implario.games5e.node.CoordinatorClient
-import dev.implario.games5e.node.NoopGameNode
 import dev.implario.games5e.sdk.cristalix.MapLoader
 import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
@@ -59,8 +57,6 @@ lateinit var app: App
 class App : JavaPlugin() {
 
     val map = WorldMeta(MapLoader.load("func", "tower"))
-    val client = CoordinatorClient(NoopGameNode())
-
     val spawn: Label = map.getLabel("spawn").apply { yaw = -90f }
 
     override fun onEnable() {

@@ -1,6 +1,7 @@
 package me.reidj.tower.upgrade
 
 import me.func.mod.Anime
+import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.*
 import me.reidj.tower.content.MainGui.backItem
 import me.reidj.tower.user.User
@@ -60,27 +61,45 @@ object UpgradeInventory {
         }).build()
 
     init {
+
         // Команда для открытия меню
-        command("workshop") { player, _ -> menu.open(player) }
+        command("workshop") { player, _ ->
+            menu.open(player)
+            /*SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+                icon(
+                    this, if (!inGame) {
+                        upgradeTypes
+                        tower.upgrades
+                    } else {
+                        session!!.upgrade
+                    }
+                )
+            }*/
+
+        }
     }
 
     fun icon(user: User, contents: InventoryContents, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
-        upgradeTypes.forEach {
-            it.forEach { (upgradeType, upgrade) ->
+        upgradeTypes.forEachIndexed { index, mutableMap ->
+            mutableMap.forEach { (upgradeType, upgrade) ->
                 val level = upgrade.level
                 val cost = upgradeType.price + level
                 val notInGame = !user.inGame
+                ModTransfer(index + 2, upgradeType.title, cost, level, upgradeType.lore).send(
+                    "upgradegui:init",
+                    user.player
+                )
                 contents.add('O', ClickableItem.of(item {
                     text(
                         """§b${upgradeType.title}
-                §7Цена ${MoneyFormat.toMoneyFormat(cost)}
-                        
-                §b$level §f➠ §b${level + 1} уровень §a▲▲▲
-        
-                §7${upgradeType.lore}
-        
-                §aНажмите чтобы улучшить
-                """.trimIndent()
+            §7Цена ${MoneyFormat.toMoneyFormat(cost)}
+
+            §b$level §f➠ §b${level + 1} уровень §a▲▲▲
+
+            §7${upgradeType.lore}
+
+            §aНажмите чтобы улучшить
+            """.trimIndent()
                     )
                     val pair = upgradeType.nbt.split(":")
                     nbt(pair[0], pair[1])

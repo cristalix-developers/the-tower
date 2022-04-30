@@ -7,10 +7,8 @@ import me.reidj.tower.mob.Mob
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.listener.SessionListener
-import java.util.*
 
 /**
  * @project tower
@@ -42,9 +40,13 @@ class Wave(
     }
 
     private fun drawMob(x: Double, y: Double, z: Double) {
-        val mob = Mob(UUID.randomUUID(), 1.0 + level * 0.3, x, y, z, 0.5 + level * 0.05, EntityType.ZOMBIE)
-        aliveMobs.add(mob)
-        mob.create(player)
+        aliveMobs.add(Mob {
+            hp = 1.0 + level * 0.3
+            this.x = x
+            this.y = y
+            this.z = z
+            damage = 0.5 + level * 0.05
+        }.create(player))
     }
 
     fun end() {
@@ -59,6 +61,6 @@ class Wave(
         }
         startTime = System.currentTimeMillis()
         Anime.counting321(player)
-        me.reidj.tower.app.after(3 * 20) { start() }
+        app.after(3 * 20) { start() }
     }
 }

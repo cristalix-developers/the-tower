@@ -10,16 +10,20 @@ import java.util.*
  * @author Рейдж
  */
 data class Mob(
-    val uuid: UUID,
-    var hp: Double,
-    val x: Double,
-    val y: Double,
-    val z: Double,
-    val damage: Double,
-    val type: EntityType
+    val uuid: UUID = UUID.randomUUID(),
+    var hp: Double = 5.0,
+    var x: Double = 0.0,
+    var y: Double = 0.0,
+    var z: Double = 0.0,
+    var damage: Double = 1.0,
+    var type: EntityType = EntityType.ZOMBIE
 ) {
 
-    fun create(player: Player) {
+    constructor(init: Mob.() -> Unit) : this() {
+        this.init()
+    }
+
+    fun create(player: Player): Mob {
         ModTransfer()
             .string(uuid.toString())
             .integer(type.typeId.toInt())
@@ -28,5 +32,6 @@ data class Mob(
             .double(z)
             .double(hp)
             .send("mob:init", player)
+        return this
     }
 }

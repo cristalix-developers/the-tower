@@ -1,9 +1,12 @@
-
+import dev.xdark.clientapi.entity.EntityPlayer
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.*
+import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
+import gui.UpgradeGui
 import io.netty.buffer.Unpooled
 import mob.MobManager
+import org.lwjgl.opengl.GL11.*
 import player.Statistic
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
@@ -12,6 +15,7 @@ import tower.BarManager
 import tower.Cube
 import tower.TowerManager
 import java.util.*
+
 
 lateinit var mod: App
 const val NAMESPACE = "tower"
@@ -23,6 +27,8 @@ class App : KotlinMod() {
     var inited = false
     var gameActive = false
 
+    val players: MutableSet<EntityPlayer> = mutableSetOf()
+
     override fun onEnable() {
         mod = this
         UIEngine.initialize(this)
@@ -32,49 +38,111 @@ class App : KotlinMod() {
         Ending
         GlowEffect
         ItemTitle
+        UpgradeGui
 
         loadTextures(
             load("health_bar.png", "35320C088F83D8890128127"),
             load("energy.png", "35320C088F83D8890128111"),
             load("xp_bar.png", "35320C094F83D8890128111"),
-            load("block.png", "35320C023F83D8890128111")
+            load("block.png", "35320C023F83D8890128111"),
+            load("tower/krug.png", "94420C323F83D8890128111"),
+            load("tower/krug5.png", "92520C323F95D8890128111"),
+            load("tower/2.png", "92520C323F95D8890127811")
         ).thenRun {
             BarManager
             TowerManager
             Cube
+
+            registerChannel("") {
+                players.add()
+            }
+
+            registerHandler<RenderPass> {
+                GlStateManager.disableLighting()
+                GlStateManager.disableAlpha()
+                GlStateManager.disableCull()
+                GlStateManager.shadeModel(GL_SMOOTH)
+                GlStateManager.enableBlend()
+                GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+
+                val player = clientApi.minecraft().player
+
+                clientApi.renderEngine()
+                    .bindTexture(ResourceLocation.of(NAMESPACE, "tower/2.png"))
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+
+                GlStateManager.translate(-player.x, -player.y, -player.z)
+                GlStateManager.translate(player.x, player.y, player.z)
+
+                glBegin(GL_QUADS)
+                val scale = 1.5
+
+                glTexCoord2d(0.0, 0.0)
+                glVertex3d(-0.5 * scale, 0.01, -0.5 * scale)
+                glTexCoord2d(1.0, 0.0)
+                glVertex3d(0.5  * scale, 0.01, -0.5 * scale)
+                glTexCoord2d(1.0, 1.0)
+                glVertex3d(0.5 * scale, 0.01, 0.5 * scale)
+                glTexCoord2d(0.0, 1.0)
+                glVertex3d(-0.5 * scale, 0.01, 0.5 * scale)
+
+                glEnd()
+
+/*glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+
+glBegin(GL_POLYGON)
+
+for (i in 0..360) {
+    glVertex3d(sin(Math.toRadians(i.toDouble())), .01, cos(Math.toRadians(i.toDouble())))
+    glTexCoord2d(sin(Math.toRadians(i.toDouble())), cos(Math.toRadians(i.toDouble())))
+}
+
+glEnd()*/
+
+                GlStateManager.color(1f, 1f, 1f, 1f)
+                GlStateManager.shadeModel(GL_FLAT)
+                GlStateManager.enableAlpha()
+                GlStateManager.enableCull()
+            }
         }
 
-        /*val item = Block.Builder.builder()
-            .material(
-                Material.Builder.builder()
-                    .liquid(false)
-                    .blocksLight(false)
-                    .blocksMovement(true)
-                    .translucent(false)
-                    .solid(true)
-                    .pushReaction(PushReaction.IGNORE)
-                    .build()
-            )
-            .translationKey("block")
-            .blockHardnessHandler { _, _, _, _, _ -> 1.5F }
-            .baseHardness(1.5F)
-            .slipperiness(0.98F)
-            .creativeTab(CreativeTab.COMBAT)
-            .blockRenderLayer(BlockRenderLayer.SOLID)
-            .solidTopHandler { true }
-            .fullBlockHandler { true }
-            .opaqueCubeHandler { true }
-            .fullCubeHandler { true }
-            .soundType(SoundType.SAND)
-            .build()
+/*val item = Block.Builder.builder()
+.material(
+Material.Builder.builder()
+.liquid(false)
+.blocksLight(false)
+.blocksMovement(true)
+.translucent(false)
+.solid(true)
+.pushReaction(PushReaction.IGNORE)
+.build()
+)
+.translationKey("block")
+.blockHardnessHandler { _, _, _, _, _ -> 1.5F }
+.baseHardness(1.5F)
+.slipperiness(0.98F)
+.creativeTab(CreativeTab.COMBAT)
+.blockRenderLayer(BlockRenderLayer.SOLID)
+.solidTopHandler { true }
+.fullBlockHandler { true }
+.opaqueCubeHandler { true }
+.fullCubeHandler { true }
+.soundType(SoundType.SAND)
+.build()
 
-        clientApi.blockRegistry().register(
-            274,
-            ResourceLocation.of("minecraft", "block"),
-            item
-        )
+clientApi.blockRegistry().register(
+274,
+ResourceLocation.of("minecraft", "block"),
+item
+)
 
-        clientApi.renderItem().registerBlock(item, "minecraft/textures/blocks/block")*/
+clientApi.renderItem().registerBlock(item, "minecraft/textures/blocks/block")*/
 
         registerHandler<HealthRender> { isCancelled = true }
         registerHandler<ExpBarRender> { isCancelled = true }
