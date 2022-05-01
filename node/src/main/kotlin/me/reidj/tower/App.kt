@@ -5,7 +5,6 @@ import dev.implario.bukkit.world.Label
 import dev.implario.games5e.sdk.cristalix.MapLoader
 import dev.implario.games5e.sdk.cristalix.WorldMeta
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
-import dev.xdark.paper.MaterialRegistry
 import implario.humanize.Humanize
 import io.netty.buffer.Unpooled
 import me.func.mod.Anime
@@ -28,12 +27,7 @@ import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
-import net.minecraft.server.v1_12_R1.BlockStone
-import net.minecraft.server.v1_12_R1.Blocks
-import net.minecraft.server.v1_12_R1.IBlockData
-import net.minecraft.server.v1_12_R1.Item
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.inventory.IInventoryService
@@ -62,37 +56,6 @@ class App : JavaPlugin() {
     override fun onEnable() {
         app = this
 
-        val material = Material("block", 274, 834)
-        val block = object : BlockStone() {
-            override fun isFullBlock(blockData: IBlockData): Boolean {
-                return true
-            }
-
-            override fun isTranslucent(iblockdata: IBlockData?): Boolean {
-                return false
-            }
-
-            override fun isFullCube(iblockdata: IBlockData?): Boolean {
-                return true
-            }
-
-            override fun isOpaqueCube(iblockdata: IBlockData): Boolean {
-                return true
-            }
-
-            override fun isTopSolid(blockData: IBlockData): Boolean {
-                return true
-            }
-        }
-        block.setHardness(1.5F)
-        MaterialRegistry.register(material)
-        Item.register(block)
-        Blocks.a(
-            274,
-            "block",
-            block
-        )
-
         createSimulator<App, User> {
             id = "tower"
             plugin = this@App
@@ -119,7 +82,7 @@ class App : JavaPlugin() {
 
         Platforms.set(PlatformDarkPaper())
 
-        Anime.include(Kit.NPC)
+        Anime.include(true, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.DIALOG, Kit.NPC, Kit.MULTI_CHAT, Kit.BATTLEPASS, Kit.HEALTH_BAR, Kit.DEBUG)
         ModLoader.loadAll("mods")
 
         // Конфигурация реалма

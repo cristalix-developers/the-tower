@@ -1,11 +1,9 @@
 package me.reidj.tower.listener
 
-import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
 import me.reidj.tower.after
 import me.reidj.tower.app
 import me.reidj.tower.user.User
-import me.reidj.tower.util.LobbyItems
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -24,17 +22,16 @@ object ConnectionHandler : Listener {
 
         user.player = this
         gameMode = GameMode.ADVENTURE
-        LobbyItems.initialActionsWithPlayer(this)
+        //LobbyItems.initialActionsWithPlayer(this)
 
         // Отправляем наш мод
         app.after(1) {
             ModLoader.send("tower-mod-bundle.jar", this)
-            Anime.loadTexture(player, "https://storage.c7x.dev/func/block.png")
+            //Anime.loadTexture(player, "https://storage.c7x.dev/func/block.png")
         }
 
         app.after(20) {
             user.giveMoney(-0)
         }
-
     }
 }

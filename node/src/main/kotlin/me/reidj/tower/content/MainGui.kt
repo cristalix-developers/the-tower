@@ -19,7 +19,7 @@ object MainGui {
 
     val backItem = item {
         text("§cНазад")
-        nbt("other", "cancel")
+        //nbt("other", "cancel")
     }
 
     val glass = item(STAINED_GLASS_PANE) {

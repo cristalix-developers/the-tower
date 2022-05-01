@@ -28,7 +28,7 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.6.0'
 
     compileOnly 'cristalix:bukkit-core:21.01.30'
-    compileOnly 'ru.cristalix:dark-paper:new-SNAPSHOT'
+    compileOnly 'cristalix:dark-paper:21.02.03'
     compileOnly 'dev.xdark:feder:1.0'
 
     implementation 'implario:bukkit-tools:4.4.12'
@@ -41,7 +41,7 @@ dependencies {
     implementation 'me.func:service-api:live-20220416.102520-1'
     implementation 'ru.kdev:simulator-api:live'
     implementation 'ru.kdev:simulator-commons:live'
-    implementation 'me.func.animation-api:animation-api:live-SNAPSHOT'
+    implementation 'me.func.animation-api:animation-api:test20-SNAPSHOT'
     implementation 'cristalix:boards-bukkit-api:3.0.15'
 }
 

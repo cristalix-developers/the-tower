@@ -1,4 +1,4 @@
-import dev.xdark.clientapi.entity.EntityLiving
+import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.*
 import dev.xdark.clientapi.opengl.GlStateManager
@@ -28,7 +28,7 @@ class App : KotlinMod() {
     var gameActive = false
 
     val playerBuffTextures: MutableMap<UUID, ResourceLocation> = mutableMapOf()
-    val activeEntities = mutableListOf<EntityLiving>()
+    val activeEntities = mutableListOf<EntityLivingBase>()
 
     override fun onEnable() {
         mod = this
@@ -54,12 +54,12 @@ class App : KotlinMod() {
             TowerManager
             Cube
 
-            playerBuffTextures[UUID.fromString("307264a1-2c69-11e8-b5ea-1cb72caa35fd")] =
-                ResourceLocation.of(NAMESPACE, "2.png")
+            playerBuffTextures[UUID.fromString("bf30a1df-85de-11e8-a6de-1cb72caa35fd")] =
+                ResourceLocation.of(NAMESPACE, "$NAMESPACE/2.png")
 
             registerHandler<NameTemplateRender> a@{
-                if (entity !is EntityLiving) return@a
-                val entity = entity as EntityLiving
+                if (entity !is EntityLivingBase) return@a
+                val entity = entity as EntityLivingBase
 
                 if (!activeEntities.contains(entity) && playerBuffTextures.containsKey(entity.uniqueID)) {
                     if (activeEntities.size > 30)
@@ -69,9 +69,16 @@ class App : KotlinMod() {
             }
 
             val scale = 1.5
-            val player = clientApi.minecraft().player
+            val minecraft = clientApi.minecraft()
+            val player = minecraft.player
 
             registerHandler<RenderPass> {
+                val entity = minecraft.renderViewEntity
+                val pt = minecraft.timer.renderPartialTicks
+                val prevX = entity.prevX
+                val prevY = entity.prevY
+                val prevZ = entity.prevZ
+
                 GlStateManager.disableLighting()
                 GlStateManager.disableAlpha()
                 GlStateManager.disableCull()
@@ -80,6 +87,14 @@ class App : KotlinMod() {
                 GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
                 activeEntities.forEach {
+                    GlStateManager.translate(-player.x, -player.y, -player.z)
+                    GlStateManager.translate(
+                        it.x - (entity.x - prevX) * pt - prevX,
+                        it.y - (entity.y - prevY) * pt - prevY,
+                        it.z - (entity.z - prevZ) * pt - prevZ
+                    )
+                    GlStateManager.translate(it.x, it.y, it.z)
+
                     clientApi.renderEngine().bindTexture(playerBuffTextures[it.uniqueID])
 
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
@@ -87,9 +102,6 @@ class App : KotlinMod() {
 
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
-
-                    GlStateManager.translate(-player.x, -player.y, -player.z)
-                    GlStateManager.translate(it.x, it.y, it.z)
 
                     glBegin(GL_QUADS)
 
