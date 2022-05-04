@@ -1,17 +1,6 @@
 package tower
 
-import dev.xdark.clientapi.event.render.RenderPass
-import dev.xdark.clientapi.opengl.GlStateManager
-import dev.xdark.clientapi.resource.ResourceLocation
-import mod
-import org.lwjgl.opengl.GL11
-import org.lwjgl.opengl.GL11.*
 import ru.cristalix.clientapi.JavaMod.clientApi
-import java.nio.ByteBuffer
-import java.nio.DoubleBuffer
-import java.nio.FloatBuffer
-import kotlin.math.cos
-import kotlin.math.sin
 
 /**
  * @project tower
@@ -26,7 +15,7 @@ object Cube {
 
         var lastRender = System.currentTimeMillis()
 
-        mod.registerHandler<RenderPass> {
+        /*mod.registerHandler<RenderPass> {
             if (mod.inited) {
                 val entity = mc.renderViewEntity
 
@@ -170,6 +159,6 @@ object Cube {
                 GlStateManager.enableAlpha()
                 GlStateManager.enableCull()
             }
-        }
+        }*/
     }
 }

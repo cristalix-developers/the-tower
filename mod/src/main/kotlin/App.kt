@@ -27,8 +27,8 @@ class App : KotlinMod() {
     var inited = false
     var gameActive = false
 
-    val playerBuffTextures: MutableMap<UUID, ResourceLocation> = mutableMapOf()
-    val activeEntities = mutableListOf<EntityLivingBase>()
+    private val playerBuffTextures: MutableMap<UUID, ResourceLocation> = mutableMapOf()
+    private val activeEntities = mutableListOf<EntityLivingBase>()
 
     override fun onEnable() {
         mod = this
@@ -69,15 +69,20 @@ class App : KotlinMod() {
             }
 
             val scale = 1.5
-            val minecraft = clientApi.minecraft()
-            val player = minecraft.player
 
             registerHandler<RenderPass> {
+                val minecraft = clientApi.minecraft()
                 val entity = minecraft.renderViewEntity
                 val pt = minecraft.timer.renderPartialTicks
                 val prevX = entity.prevX
                 val prevY = entity.prevY
                 val prevZ = entity.prevZ
+
+                if (playerBuffTextures.keys.contains(entity.uniqueID)) {
+                    if (activeEntities.size > 30)
+                        activeEntities.clear()
+                    activeEntities.add(entity as EntityLivingBase)
+                }
 
                 GlStateManager.disableLighting()
                 GlStateManager.disableAlpha()
@@ -87,14 +92,6 @@ class App : KotlinMod() {
                 GlStateManager.blendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
                 activeEntities.forEach {
-                    GlStateManager.translate(-player.x, -player.y, -player.z)
-                    GlStateManager.translate(
-                        it.x - (entity.x - prevX) * pt - prevX,
-                        it.y - (entity.y - prevY) * pt - prevY,
-                        it.z - (entity.z - prevZ) * pt - prevZ
-                    )
-                    GlStateManager.translate(it.x, it.y, it.z)
-
                     clientApi.renderEngine().bindTexture(playerBuffTextures[it.uniqueID])
 
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
@@ -102,6 +99,17 @@ class App : KotlinMod() {
 
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP)
                     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP)
+
+                    if (playerBuffTextures.containsKey(entity.uniqueID)) {
+                        GlStateManager.translate(-minecraft.player.x, -minecraft.player.y, -minecraft.player.z)
+                        GlStateManager.translate(it.x, it.y, it.z)
+                    } else {
+                        GlStateManager.translate(
+                            -(entity.x - prevX) * pt - prevX + it.x,
+                            -(entity.y - prevY) * pt - prevY + it.y,
+                            -(entity.z - prevZ) * pt - prevZ + it.z
+                        )
+                    }
 
                     glBegin(GL_QUADS)
 

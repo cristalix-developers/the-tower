@@ -8,6 +8,7 @@ import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import implario.humanize.Humanize
 import io.netty.buffer.Unpooled
 import me.func.mod.Anime
+import me.func.mod.Banners
 import me.func.mod.Glow
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
@@ -80,9 +81,10 @@ class App : JavaPlugin() {
             registerService(IInventoryService::class.java, InventoryService())
         }
 
+        Anime.include(false, Kit.EXPERIMENTAL, Kit.STANDARD)
+
         Platforms.set(PlatformDarkPaper())
 
-        Anime.include(true, Kit.STANDARD, Kit.LOOTBOX, Kit.EXPERIMENTAL, Kit.DIALOG, Kit.NPC, Kit.MULTI_CHAT, Kit.BATTLEPASS, Kit.HEALTH_BAR, Kit.DEBUG)
         ModLoader.loadAll("mods")
 
         // Конфигурация реалма
@@ -92,6 +94,17 @@ class App : JavaPlugin() {
             readableName = "Просто снос башки"
             groupName = "Секрет"
             servicedServers = arrayOf("SEC")
+        }
+
+        Banners.new {
+            x = 5.0
+            y = 94.0
+            z = 6.0
+            weight = 150
+            height = 150
+            opacity = 1.0
+            content = "EFF"
+            watchingOnPlayer = true
         }
 
         // Создание контента
