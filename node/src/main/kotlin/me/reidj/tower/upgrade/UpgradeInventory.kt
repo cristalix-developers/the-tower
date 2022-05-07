@@ -1,19 +1,11 @@
 package me.reidj.tower.upgrade
 
-import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.*
-import me.reidj.tower.content.MainGui.backItem
+import me.reidj.tower.command
+import me.reidj.tower.item
+import me.reidj.tower.nbt
+import me.reidj.tower.text
 import me.reidj.tower.user.User
-import me.reidj.tower.util.MoneyFormat
-import org.bukkit.Material.BARRIER
-import org.bukkit.Material.STAINED_GLASS_PANE
-import org.bukkit.entity.Player
-import org.bukkit.inventory.ItemStack
-import ru.cristalix.core.inventory.ClickableItem
-import ru.cristalix.core.inventory.ControlledInventory
-import ru.cristalix.core.inventory.InventoryContents
-import ru.cristalix.core.inventory.InventoryProvider
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -28,44 +20,12 @@ object UpgradeInventory {
         nbt("click", "workshop")
     }
 
-    private val menu = ControlledInventory.builder()
-        .title("§bМастерская")
-        .rows(4)
-        .columns(9)
-        .provider(object : InventoryProvider {
-            override fun init(player: Player, contents: InventoryContents) {
-                contents.setLayout(
-                    "XXXXXXXXX",
-                    "XOXOXOXOX",
-                    "XOXOXOXOX",
-                    "XXXXQXXXX"
-                )
-
-                val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
-
-                icon(
-                    user, contents, if (!user.inGame) {
-                        user.upgradeTypes
-                        user.tower.upgrades
-                    } else {
-                        user.session!!.upgrade
-                    }
-                )
-
-                contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
-                contents.fillMask('X', ClickableItem.empty(item(STAINED_GLASS_PANE) {
-                    data(7)
-                    text("&f")
-                }))
-            }
-        }).build()
-
     init {
-
         // Команда для открытия меню
         command("workshop") { player, _ ->
-            menu.open(player)
-            /*SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+            //ModTransfer().send("upgradegui:init", player)
+            //menu.open(player)
+            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 icon(
                     this, if (!inGame) {
                         upgradeTypes
@@ -74,12 +34,12 @@ object UpgradeInventory {
                         session!!.upgrade
                     }
                 )
-            }*/
+            }
 
         }
     }
 
-    fun icon(user: User, contents: InventoryContents, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
+    private fun icon(user: User, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
         upgradeTypes.forEachIndexed { index, mutableMap ->
             mutableMap.forEach { (upgradeType, upgrade) ->
                 val level = upgrade.level
@@ -89,7 +49,7 @@ object UpgradeInventory {
                     "upgradegui:init",
                     user.player
                 )
-                contents.add('O', ClickableItem.of(item {
+                /*contents.add('O', ClickableItem.of(item {
                     text(
                         """§b${upgradeType.title}
             §7Цена ${MoneyFormat.toMoneyFormat(cost)}
@@ -125,7 +85,7 @@ object UpgradeInventory {
                         user.player!!.closeInventory()
                         Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)
                     }
-                })
+                })*/
             }
         }
     }

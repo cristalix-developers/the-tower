@@ -8,7 +8,6 @@ import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
@@ -91,11 +90,10 @@ object InteractEvent : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {
-        //player.location.block.setTypeAndDataFast(274,0)
         if (item == null)
             return
-        val nmsItem = CraftItemStack.asNMSCopy(item)
-        if (nmsItem.hasTag() && nmsItem.tag.hasKeyOfType("click", 8))
-            player.performCommand(nmsItem.tag.getString("click"))
+        val tag = item.tag
+        if (tag != null && tag.hasKeyOfType("click", 8))
+            player.performCommand(tag.getString("click"))
     }
 }

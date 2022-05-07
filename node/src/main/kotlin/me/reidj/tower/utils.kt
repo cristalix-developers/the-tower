@@ -1,10 +1,10 @@
 package me.reidj.tower
 
+import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack
 import org.bukkit.entity.Player
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
@@ -30,10 +30,15 @@ fun App.after(ticks: Long, runnable: () -> Unit): BukkitTask =
 
 fun App.listener(vararg listener: Listener) = listener.forEach { Bukkit.getPluginManager().registerEvents(it, this) }
 
-fun ItemStack.nbt(key: String, value: String) = apply { CraftItemStack.asNMSCopy(this).tag.setString(key, value) }
+fun ItemStack.nbt(key: String, value: String) = apply {
+    if (tag == null)
+        handle.tag = NBTTagCompound()
+    tag.setString(key, value)
+}
 
 fun ItemStack.text(value: String) = apply {
     val strings = value.replace('&', '§').split("\n")
+    displayName = value
     lore = strings.drop(1).map { it.trimStart() }
 }
 

@@ -10,28 +10,22 @@ import java.util.*
  * @author Рейдж
  */
 data class Mob(
-    val uuid: UUID = UUID.randomUUID(),
-    var hp: Double = 5.0,
-    var x: Double = 0.0,
-    var y: Double = 0.0,
-    var z: Double = 0.0,
-    var damage: Double = 1.0,
-    var type: EntityType = EntityType.ZOMBIE
+    val uuid: UUID,
+    var hp: Double,
+    var x: Double,
+    var y: Double,
+    var z: Double,
+    var damage: Double,
+    var type: EntityType
 ) {
-
-    constructor(init: Mob.() -> Unit) : this() {
-        this.init()
-    }
-
-    fun create(player: Player): Mob {
-        ModTransfer()
-            .string(uuid.toString())
-            .integer(type.typeId.toInt())
-            .double(x)
-            .double(y)
-            .double(z)
-            .double(hp)
-            .send("mob:init", player)
-        return this
+    fun create(player: Player) {
+        ModTransfer(
+            uuid.toString(),
+            type.typeId.toInt(),
+            x,
+            y,
+            z,
+            hp
+        ).send("mob:init", player)
     }
 }

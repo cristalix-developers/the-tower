@@ -81,7 +81,7 @@ class App : JavaPlugin() {
             registerService(IInventoryService::class.java, InventoryService())
         }
 
-        Anime.include(false, Kit.EXPERIMENTAL, Kit.STANDARD)
+        Anime.include(Kit.EXPERIMENTAL, Kit.STANDARD, Kit.DEBUG)
 
         Platforms.set(PlatformDarkPaper())
 
