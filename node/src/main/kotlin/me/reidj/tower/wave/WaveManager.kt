@@ -22,7 +22,7 @@ object WaveManager : BukkitRunnable() {
                 if (it.wave!!.isStarting) {
                     if (((System.currentTimeMillis() - it.wave!!.startTime) / 1000 == 40.toLong() || it.wave!!.aliveMobs.isEmpty()))
                         it.wave!!.end()
-                    if (time % 20 == 0 && it.tower.health < it.tower.maxHealth) {
+                    if (time % 20 == 0 && it.tower.health < it.tower.maxHealth && it.session!!.upgrade[UpgradeType.REGEN]!!.getValue() > 0.0) {
                         it.tower.health = it.tower.maxHealth - maxOf(
                             0.0,
                             it.tower.maxHealth - it.tower.health - it.session!!.upgrade[UpgradeType.REGEN]!!.getValue()

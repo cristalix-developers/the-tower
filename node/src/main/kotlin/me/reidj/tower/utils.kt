@@ -38,7 +38,7 @@ fun ItemStack.nbt(key: String, value: String) = apply {
 
 fun ItemStack.text(value: String) = apply {
     val strings = value.replace('&', '§').split("\n")
-    displayName = value
+    displayName = strings.first()
     lore = strings.drop(1).map { it.trimStart() }
 }
 

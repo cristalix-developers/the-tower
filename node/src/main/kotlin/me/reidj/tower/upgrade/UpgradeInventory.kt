@@ -45,10 +45,13 @@ object UpgradeInventory {
                 val level = upgrade.level
                 val cost = upgradeType.price + level
                 val notInGame = !user.inGame
-                ModTransfer(index + 2, upgradeType.title, cost, level, upgradeType.lore).send(
-                    "upgradegui:init",
-                    user.player
-                )
+                ModTransfer(
+                    index + 7,
+                    upgradeType.title,
+                    cost,
+                    level,
+                    upgradeType.lore
+                ).send("upgradegui:init", user.player)
                 /*contents.add('O', ClickableItem.of(item {
                     text(
                         """§b${upgradeType.title}

@@ -30,9 +30,7 @@ object ConnectionHandler : Listener {
         LobbyItems.initialActionsWithPlayer(this)
 
         // Отправляем наш мод
-        app.after(1) {
-            ModLoader.send("tower-mod-bundle.jar", this)
-        }
+        app.after(1) { ModLoader.send("tower-mod-bundle.jar", this) }
 
         app.after(20) {
             user.giveMoney(-0)

@@ -4,8 +4,8 @@ import dev.xdark.feder.NetUtil
 import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.ContextGui
-import ru.cristalix.uiengine.utility.CENTER
 import ru.cristalix.uiengine.utility.Color
+import ru.cristalix.uiengine.utility.TOP
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.rectangle
 
@@ -16,8 +16,8 @@ object UpgradeGui {
 
     val upgrade = rectangle {
         size = V3(minecraft.displayWidth.toDouble(), minecraft.displayHeight.toDouble())
-        align = CENTER
-        origin = CENTER
+        align = TOP
+        origin = TOP
         color = Color(0,0,0,0.86)
     }
 
@@ -25,8 +25,14 @@ object UpgradeGui {
         gui + upgrade
 
         mod.registerChannel("upgradegui:init") {
-            if (upgrade.children.size <= readInt())
-                upgrade + Upgrade(NetUtil.readUtf8(this), readInt(), readInt(), NetUtil.readUtf8(this)).element
+            val index = readInt()
+            val title = NetUtil.readUtf8(this)
+            val cost = readInt()
+            val level = readInt()
+            val lore = NetUtil.readUtf8(this)
+            println(index)
+            if (upgrade.children.size <= index)
+                upgrade + Upgrade(title, cost, level, lore).element
             gui.open()
         }
     }

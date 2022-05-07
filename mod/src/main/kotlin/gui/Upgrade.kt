@@ -13,12 +13,13 @@ data class Upgrade(
     val lore: String,
     val element: RectangleElement = rectangle {
         val index = UpgradeGui.upgrade.children.size
-        val margin = 20.0
+        val margin = 75.0
         origin = TOP
         align = TOP
         offset = V3(
-            100 + if (index % 2 == 0) -205.0 else 5.0,
-            20.0 + margin * index / 2 + size.y * index / 2 + if (index % 2 == 0) 0.0 else -margin / 2
+            -(2 - index) * 105.0,
+            150.0 + (2 - index) / 2
+            //150.0 + margin * index / 2
         )
         size = V3(100.0, 70.0)
         color = Color(42,102,190,0.2)
