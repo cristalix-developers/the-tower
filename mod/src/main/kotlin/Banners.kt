@@ -36,7 +36,6 @@ object Banners {
 
         text.split("\n").forEachIndexed { index, line ->
             val currentSize = sizes[banner.uuid to index] ?: 1.0
-            val v3 = V3(currentSize, currentSize, currentSize)
 
             rectangle + text {
                 align = TOP

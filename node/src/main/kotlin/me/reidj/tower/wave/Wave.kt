@@ -50,6 +50,7 @@ class Wave(
     fun end() {
         val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
         val tokens = user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt()
+        Anime.timer(player, "",0)
         isStarting = false
         level++
         user.giveTokens(tokens)

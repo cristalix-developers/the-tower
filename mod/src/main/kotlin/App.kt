@@ -41,6 +41,7 @@ class App : KotlinMod() {
         registerHandler<ArmorRender> { isCancelled = true }
         registerHandler<AirBarRender> { isCancelled = true }
         registerHandler<VehicleHealthRender> { isCancelled = true }
+        registerHandler<PlayerListRender> { isCancelled = gameActive }
 
         registerChannel("tower:update-state") {
             gameActive = readBoolean()

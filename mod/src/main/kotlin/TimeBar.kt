@@ -58,17 +58,17 @@ object TimeBar {
             line.color = Color(readInt(), readInt(), readInt(), 1.0)
 
             if (time == 0) {
-                line.size.x = 0.0
                 cooldown.enabled = false
+                line.animate(1) { size.x = 180.0 }
                 return@registerChannel
             }
 
             content.content = text
-            line.size.x = 180.0
 
             line.animate(time - 0.1) {
                 size.x = 0.0
             }
+
             UIEngine.schedule(time) {
                 cooldown.enabled = false
                 line.size.x = 180.0
