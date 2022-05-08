@@ -1,12 +1,16 @@
 
 import dev.xdark.clientapi.event.entity.EntityLeftClick
+import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.*
-import gui.UpgradeGui
+import gui.StorageOpener
+import gui.storage
 import io.netty.buffer.Unpooled
 import mob.MobManager
+import org.lwjgl.input.Keyboard
 import player.Statistic
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
+import ru.cristalix.uiengine.element.debug
 import ru.cristalix.uiengine.utility.V3
 import tower.BarManager
 import tower.Cube
@@ -27,9 +31,14 @@ class App : KotlinMod() {
         mod = this
         UIEngine.initialize(this)
 
+
+        registerHandler<GameLoop> {
+            debug = Keyboard.isKeyDown(Keyboard.KEY_F12)
+        }
+
         Statistic
         TimeBar
-        UpgradeGui
+        StorageOpener(storage).open()
 
         BarManager
         TowerManager
