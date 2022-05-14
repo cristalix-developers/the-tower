@@ -24,7 +24,7 @@ enum class SwordType(
             val level = session!!.upgrade[UpgradeType.SWORD]!!.getValue()
             if ((level == 1.0 || level % 25 == 0.0) && getNext() != null) {
                 sword = getNext()!!
-                player!!.inventory.addItem(item(getNext()!!.material) { text(getNext()!!.title) })
+                player!!.inventory.setItem(0, item(getNext()!!.material) { text(getNext()!!.title) })
             }
         }
     }

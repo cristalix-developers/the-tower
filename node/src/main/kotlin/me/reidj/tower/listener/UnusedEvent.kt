@@ -8,6 +8,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.FoodLevelChangeEvent
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.CraftItemEvent
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 
 /**
@@ -51,4 +52,7 @@ object UnusedEvent : Listener {
 
     @EventHandler
     fun BlockBreakEvent.handle() = apply { isCancelled = true }
+
+    @EventHandler
+    fun InventoryClickEvent.handle() = apply { isCancelled = true }
 }

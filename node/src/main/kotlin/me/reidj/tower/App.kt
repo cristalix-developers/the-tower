@@ -168,6 +168,7 @@ class App : JavaPlugin() {
                         inGame = false
                         giveTokens(-tokens)
                         wave = null
+
                         if (reward == 0)
                             return@registerIncomingPluginChannel
                         Anime.cursorMessage(

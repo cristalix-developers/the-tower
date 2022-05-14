@@ -30,6 +30,7 @@ object LobbyItems {
 
     fun initialActionsWithPlayer(player: Player) = player.apply {
         teleport(app.spawn)
+        inventory.clear()
         inventory.setItem(0, startItem)
         inventory.setItem(4, settingsItem)
         inventory.setItem(8, backItem)

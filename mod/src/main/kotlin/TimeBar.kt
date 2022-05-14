@@ -59,7 +59,7 @@ object TimeBar {
 
             if (time == 0) {
                 cooldown.enabled = false
-                line.animate(1) { size.x = 180.0 }
+                line.animate(3) { size.x = 180.0 }
                 return@registerChannel
             }
 

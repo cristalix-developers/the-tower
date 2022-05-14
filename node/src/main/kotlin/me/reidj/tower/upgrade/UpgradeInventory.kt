@@ -38,19 +38,18 @@ object UpgradeInventory {
                     }
                 )
             }
-
         }
     }
 
-    private fun icon(user: User, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
+    private fun icon(user: User, vararg type: MutableMap<UpgradeType, Upgrade>) {
         val notInGame = !user.inGame
         val menu = selection {
-            title = "Улучшения башни"
+            title = "Улучшения"
             money = "Ваш баланс ${if (notInGame) user.money else user.tokens}"
             hint = "Купить"
             rows = 4
             columns = 3
-            upgradeTypes.map { upgrades ->
+            type.map { upgrades ->
                 storage = upgrades.map { entry ->
                     val key = entry.key
                     val value = entry.value
@@ -65,7 +64,7 @@ object UpgradeInventory {
                             if (if (notInGame) user.money >= cost else user.tokens >= cost) {
                                 if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
                                 value.level++
-                                user.player!!.performCommand("workshop")
+                                player.performCommand("workshop")
                                 user.tower.updateHealth()
                                 if (notInGame) {
                                     user.update(user)
@@ -82,7 +81,7 @@ object UpgradeInventory {
                                     )
                                 }
                             } else {
-                                user.player!!.closeInventory()
+                                player.closeInventory()
                                 Anime.itemTitle(player, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)
                             }
                         }
