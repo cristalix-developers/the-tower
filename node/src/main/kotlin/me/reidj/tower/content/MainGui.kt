@@ -1,6 +1,10 @@
 package me.reidj.tower.content
 
-import me.reidj.tower.*
+import me.func.mod.util.command
+import me.reidj.tower.data
+import me.reidj.tower.item
+import me.reidj.tower.nbt
+import me.reidj.tower.text
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.user.User
 import org.bukkit.Material.STAINED_GLASS_PANE

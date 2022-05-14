@@ -1,52 +1,51 @@
 package me.reidj.tower.upgrade
 
+import me.reidj.tower.item
+import me.reidj.tower.nbt
+import org.bukkit.inventory.ItemStack
+
 /**
  * @project tower
  * @author Рейдж
  */
 enum class UpgradeType(
-        val title: String,
-        val lore: String,
-        val nbt: String,
-        var value: Double,
-        var price: Int,
-        val step: Double
+    val lore: String,
+    val item: ItemStack,
+    var value: Double,
+    var price: Int,
+    val step: Double
 ) {
-    DAMAGE("Урон", "Увеличивает максимально наносимый урон\n§7на 6 единиц", "other:custom_sword", -5.0, 10, 6.0),
+    DAMAGE("Урон §3+6", item { nbt("other", "custom_sword") }, -5.0, 10, 6.0),
     BULLET_DELAY(
-            "Перезарядка",
-            "Уменьшает время перезарядки\n§7на 0.004 единицы",
-            "simulators:save_crystal",
-            .1,
-            8,
-            -.004
+        "Перезарядка §+30.004",
+        item { nbt("simulators", "save_crystal") },
+        .1,
+        8,
+        -.004
     ),
-    HEALTH("Здоровье", "Увеличивает максимальное здоровье\n§7на 1 единицу", "other:love", 4.0, 5, 1.0),
+    HEALTH("Здоровье §3+1", item { nbt("other", "love") }, 4.0, 5, 1.0),
     REGEN(
-            "Регенерация здоровья",
-            "Увеличивает регенирацию здоровья\n§7на 0.1 единицу/сек",
-            "other:heart",
-            -0.1,
-            30,
-            .1
+        "Регенерация §3+0.1",
+        item { nbt("other", "heart") },
+        -0.1,
+        30,
+        .1
     ),
-    PROTECTION("Защита", "Увеличивает защиту\n§7на 0.1 единицу", "other:guild", -0.1, 40, 0.1),
-    RADIUS("Радиус атаки", "Увеличивает радиус атаки\n§7на 0.1 единицу", "other:love", 9.9, 3, 0.1),
+    PROTECTION("Защита §3+0.1", item { nbt("other", "guild") }, -0.1, 40, 0.1),
+    RADIUS("Радиус атаки §3+0.1", item { nbt("other", "love") }, 9.9, 3, 0.1),
     CASH_BONUS_KILL(
-            "Денежный бонус за убийство",
-            "Увеличивает количество получаемых жетонов\n§7на 1 единицу",
-            "other:bank",
-            0.0,
-            130,
-            1.0
+        "Бонус за убийство §3+1",
+        item { nbt("other", "bank") },
+        0.0,
+        130,
+        1.0
     ),
     CASH_BONUS_WAVE_PASS(
-            "Денежный бонус за пройденную волну",
-            "Увеличивает количество получаемых жетонов\n§7на 1 единицу",
-            "other:bag1",
-            0.0,
-            160,
-            1.0
+        "Бонус за волну §3+1",
+        item { nbt("other", "bag1") },
+        0.0,
+        160,
+        1.0
     )
     ;
 }

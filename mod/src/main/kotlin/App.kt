@@ -2,8 +2,6 @@
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.*
-import gui.StorageOpener
-import gui.storage
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import org.lwjgl.input.Keyboard
@@ -38,7 +36,6 @@ class App : KotlinMod() {
 
         Statistic
         TimeBar
-        StorageOpener(storage).open()
 
         BarManager
         TowerManager

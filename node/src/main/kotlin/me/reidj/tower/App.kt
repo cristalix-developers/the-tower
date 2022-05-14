@@ -8,11 +8,12 @@ import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import implario.humanize.Humanize
 import io.netty.buffer.Unpooled
 import me.func.mod.Anime
-import me.func.mod.Banners
 import me.func.mod.Glow
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.util.command
+import me.func.mod.util.listener
 import me.func.protocol.EndStatus
 import me.func.protocol.GlowColor
 import me.reidj.tower.content.MainGui
@@ -96,23 +97,12 @@ class App : JavaPlugin() {
             servicedServers = arrayOf("SEC")
         }
 
-        Banners.new {
-            x = 5.0
-            y = 94.0
-            z = 6.0
-            weight = 150
-            height = 150
-            opacity = 1.0
-            content = "EFF"
-            watchingOnPlayer = true
-        }
-
         // Создание контента
         UpgradeInventory
         MainGui
 
         // Регистрация обработчиков событий
-        app.listener(ConnectionHandler, UnusedEvent, InteractEvent)
+        listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
         command("money") { player, args ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
@@ -121,7 +111,6 @@ class App : JavaPlugin() {
         command("tokens") { player, args ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
         }
-
 
         WaveManager.runTaskTimer(this@App, 0, 1)
 

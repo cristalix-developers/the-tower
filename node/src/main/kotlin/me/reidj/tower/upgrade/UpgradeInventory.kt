@@ -1,11 +1,15 @@
 package me.reidj.tower.upgrade
 
-import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.command
+import me.func.mod.Anime
+import me.func.mod.selection.button
+import me.func.mod.selection.selection
+import me.func.mod.util.command
 import me.reidj.tower.item
 import me.reidj.tower.nbt
 import me.reidj.tower.text
 import me.reidj.tower.user.User
+import org.bukkit.Material.BARRIER
+import org.bukkit.inventory.ItemStack
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -23,8 +27,6 @@ object UpgradeInventory {
     init {
         // Команда для открытия меню
         command("workshop") { player, _ ->
-            //ModTransfer().send("upgradegui:init", player)
-            //menu.open(player)
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 icon(
                     this, if (!inGame) {
@@ -40,56 +42,51 @@ object UpgradeInventory {
     }
 
     private fun icon(user: User, vararg upgradeTypes: MutableMap<UpgradeType, Upgrade>) {
-        upgradeTypes.forEachIndexed { index, mutableMap ->
-            mutableMap.forEach { (upgradeType, upgrade) ->
-                val level = upgrade.level
-                val cost = upgradeType.price + level
-                val notInGame = !user.inGame
-                ModTransfer(
-                    index + 7,
-                    upgradeType.title,
-                    cost,
-                    level,
-                    upgradeType.lore
-                ).send("upgradegui:init", user.player)
-                /*contents.add('O', ClickableItem.of(item {
-                    text(
-                        """§b${upgradeType.title}
-            §7Цена ${MoneyFormat.toMoneyFormat(cost)}
-
-            §b$level §f➠ §b${level + 1} уровень §a▲▲▲
-
-            §7${upgradeType.lore}
-
-            §aНажмите чтобы улучшить
-            """.trimIndent()
-                    )
-                    val pair = upgradeType.nbt.split(":")
-                    nbt(pair[0], pair[1])
-                }) {
-                    if (if (notInGame) user.money >= cost else user.tokens >= cost) {
-                        if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
-                        upgrade.level++
-                        user.player!!.performCommand("workshop")
-                        user.tower.updateHealth()
-                        if (notInGame)
-                            user.update(user)
-                        else
-                            user.session!!.update(
-                                user,
-                                UpgradeType.BULLET_DELAY,
-                                UpgradeType.DAMAGE,
-                                UpgradeType.HEALTH,
-                                UpgradeType.PROTECTION,
-                                UpgradeType.REGEN,
-                                UpgradeType.RADIUS
-                            )
-                    } else {
-                        user.player!!.closeInventory()
-                        Anime.itemTitle(user.player!!, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)
+        val notInGame = !user.inGame
+        val menu = selection {
+            title = "Улучшения башни"
+            money = "Ваш баланс ${if (notInGame) user.money else user.tokens}"
+            hint = "Купить"
+            rows = 4
+            columns = 3
+            upgradeTypes.map { upgrades ->
+                storage = upgrades.map { entry ->
+                    val key = entry.key
+                    val value = entry.value
+                    val level = value.level
+                    val cost = key.price + level
+                    button {
+                        item = key.item
+                        price = cost.toLong()
+                        title = "§3${value.level} LVL"
+                        description = key.lore
+                        onClick { player, _, _ ->
+                            if (if (notInGame) user.money >= cost else user.tokens >= cost) {
+                                if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
+                                value.level++
+                                user.player!!.performCommand("workshop")
+                                user.tower.updateHealth()
+                                if (notInGame)
+                                    user.update(user)
+                                else
+                                    user.session!!.update(
+                                        user,
+                                        UpgradeType.BULLET_DELAY,
+                                        UpgradeType.DAMAGE,
+                                        UpgradeType.HEALTH,
+                                        UpgradeType.PROTECTION,
+                                        UpgradeType.REGEN,
+                                        UpgradeType.RADIUS
+                                    )
+                            } else {
+                                user.player!!.closeInventory()
+                                Anime.itemTitle(player, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)
+                            }
+                        }
                     }
-                })*/
+                }
             }
         }
+        menu.open(user.player!!)
     }
 }

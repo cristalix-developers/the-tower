@@ -1,7 +1,7 @@
 package me.reidj.tower.wave
 
 import me.func.mod.Anime
-import me.reidj.tower.after
+import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
 import me.reidj.tower.upgrade.UpgradeType
@@ -60,6 +60,6 @@ class Wave(
         }
         startTime = System.currentTimeMillis()
         Anime.counting321(player)
-        app.after(3 * 20) { start() }
+        after(3 * 20) { start() }
     }
 }

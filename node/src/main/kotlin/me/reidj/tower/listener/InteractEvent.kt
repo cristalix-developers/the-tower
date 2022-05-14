@@ -2,7 +2,10 @@ package me.reidj.tower.listener
 
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.*
+import me.func.mod.util.after
+import me.func.mod.util.command
+import me.reidj.tower.HUB
+import me.reidj.tower.flying
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
@@ -68,7 +71,7 @@ object InteractEvent : Listener {
                 // Начинаю волну
                 inGame = true
                 giveTokens(80)
-                app.after(3 * 20) {
+                after(3 * 20) {
                     val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                     wave = current
                     current.start()
@@ -93,6 +96,7 @@ object InteractEvent : Listener {
         if (item == null)
             return
         val tag = item.tag
+        println(tag)
         if (tag != null && tag.hasKeyOfType("click", 8))
             player.performCommand(tag.getString("click"))
     }

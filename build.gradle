@@ -6,6 +6,16 @@ allprojects {
     repositories {
         maven {
             url 'https://repo.c7x.ru/repository/maven-public/'
+        }
+        maven {
+            url 'https://repo.c7x.ru/repository/maven-snapshots/'
+            credentials {
+                username = System.getenv("CRI_REPO_LOGIN") ?: project.properties["CRI_REPO_LOGIN"] as String
+                password = System.getenv("CRI_REPO_PASSWORD") ?: project.properties["CRI_REPO_PASSWORD"] as String
+            }
+        }
+        maven {
+            url 'https://repo.c7x.ru/repository/maven-releases/'
             credentials {
                 username = System.getenv("CRI_REPO_LOGIN") ?: project.properties["CRI_REPO_LOGIN"] as String
                 password = System.getenv("CRI_REPO_PASSWORD") ?: project.properties["CRI_REPO_PASSWORD"] as String
