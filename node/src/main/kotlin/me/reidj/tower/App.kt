@@ -71,7 +71,10 @@ class App : JavaPlugin() {
                     uuid,
                     0,
                     values().associateWith { Upgrade(it, 1) }.toMutableMap(),
-                    Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap())
+                    Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap()),
+                    0,
+                    0,
+                    0
                 )
             }
         }

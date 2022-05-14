@@ -14,8 +14,15 @@ import java.util.*
  * @project tower
  * @author Рейдж
  */
-class User(val id: UUID, var maxWavePassed: Int, var upgradeTypes: MutableMap<UpgradeType, Upgrade>, val tower: Tower) :
-    SimulatorUser(), Upgradable {
+class User(
+    val id: UUID,
+    var maxWavePassed: Int,
+    var upgradeTypes: MutableMap<UpgradeType, Upgrade>,
+    val tower: Tower,
+    var day: Int,
+    var dailyClaimTimestamp: Long,
+    var lastEnter: Long,
+) : SimulatorUser(), Upgradable {
 
     @Transient
     var wave: Wave? = null
