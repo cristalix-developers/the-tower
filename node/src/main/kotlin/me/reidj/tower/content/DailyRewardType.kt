@@ -1,8 +1,8 @@
 package me.reidj.tower.content
 
 import me.func.mod.data.DailyReward
+import me.func.mod.util.nbt
 import me.reidj.tower.item
-import me.reidj.tower.nbt
 import me.reidj.tower.user.User
 import java.util.function.Consumer
 

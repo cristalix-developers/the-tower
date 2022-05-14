@@ -1,6 +1,5 @@
 package me.reidj.tower
 
-import net.minecraft.server.v1_12_R1.NBTTagCompound
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -12,16 +11,10 @@ fun Player.flying(state: Boolean = true) = apply {
 
 fun ItemStack.text(value: String) = apply {
     val strings = value.replace('&', '§').split("\n")
-    displayName = strings.first()
+    itemMeta.displayName = strings.first()
     lore = strings.drop(1).map { it.trimStart() }
+    itemMeta = itemMeta
 }
-
-fun ItemStack.nbt(key: String, value: String) = apply {
-    if (tag == null)
-        handle.tag = NBTTagCompound()
-    tag.setString(key, value)
-}
-
 fun ItemStack.data(value: Short) = apply { durability = value }
 
 fun item(material: Material, apply: ItemStack.() -> Unit): ItemStack = ItemStack(material).apply { apply.invoke(this) }

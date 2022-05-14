@@ -1,8 +1,8 @@
 package me.reidj.tower.util
 
+import me.func.mod.util.nbt
 import me.reidj.tower.app
 import me.reidj.tower.item
-import me.reidj.tower.nbt
 import me.reidj.tower.text
 import org.bukkit.entity.Player
 

@@ -1,7 +1,7 @@
 package me.reidj.tower.upgrade
 
+import me.func.mod.util.nbt
 import me.reidj.tower.item
-import me.reidj.tower.nbt
 import org.bukkit.inventory.ItemStack
 
 /**
