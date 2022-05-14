@@ -6,6 +6,7 @@ import me.func.mod.util.after
 import me.func.mod.util.command
 import me.reidj.tower.HUB
 import me.reidj.tower.flying
+import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
@@ -71,6 +72,7 @@ object InteractEvent : Listener {
                 // Начинаю волну
                 inGame = true
                 giveTokens(80)
+                sword = SwordType.NONE
                 after(3 * 20) {
                     val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                     wave = current
@@ -96,7 +98,6 @@ object InteractEvent : Listener {
         if (item == null)
             return
         val tag = item.tag
-        println(tag)
         if (tag != null && tag.hasKeyOfType("click", 8))
             player.performCommand(tag.getString("click"))
     }

@@ -115,9 +115,11 @@ class App : JavaPlugin() {
         WaveManager.runTaskTimer(this@App, 0, 1)
 
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
+            val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                findMob(this, bytes)?.let { mob ->
-                    mob.hp -= session!!.upgrade[DAMAGE]!!.getValue().toInt()
+                findMob(this, pair[0].encodeToByteArray())?.let { mob ->
+                    mob.hp -= if (pair[1].toBoolean()) sword.damage else session!!.upgrade[DAMAGE]!!.getValue()
+
                     if (mob.hp <= 0) {
                         val token = session!!.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
 
@@ -140,8 +142,9 @@ class App : JavaPlugin() {
             }
         }
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
+            val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                findMob(this, bytes)?.let { mob ->
+                findMob(this, pair[0].encodeToByteArray())?.let { mob ->
                     val wavePassed = wave
                     val waveLevel = wavePassed!!.level
                     val reward = formula(waveLevel)

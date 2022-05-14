@@ -7,6 +7,7 @@ import me.func.mod.util.command
 import me.reidj.tower.item
 import me.reidj.tower.nbt
 import me.reidj.tower.text
+import me.reidj.tower.upgrade.UpgradeType.*
 import me.reidj.tower.user.User
 import org.bukkit.Material.BARRIER
 import org.bukkit.inventory.ItemStack
@@ -66,18 +67,20 @@ object UpgradeInventory {
                                 value.level++
                                 user.player!!.performCommand("workshop")
                                 user.tower.updateHealth()
-                                if (notInGame)
+                                if (notInGame) {
                                     user.update(user)
-                                else
+                                } else {
+                                    user.sword.update(user, SWORD)
                                     user.session!!.update(
                                         user,
-                                        UpgradeType.BULLET_DELAY,
-                                        UpgradeType.DAMAGE,
-                                        UpgradeType.HEALTH,
-                                        UpgradeType.PROTECTION,
-                                        UpgradeType.REGEN,
-                                        UpgradeType.RADIUS
+                                        BULLET_DELAY,
+                                        DAMAGE,
+                                        HEALTH,
+                                        PROTECTION,
+                                        REGEN,
+                                        RADIUS,
                                     )
+                                }
                             } else {
                                 user.player!!.closeInventory()
                                 Anime.itemTitle(player, ItemStack(BARRIER), "Ошибка", "Недостаточно средств", 2.0)

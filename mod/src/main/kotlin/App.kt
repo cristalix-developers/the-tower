@@ -83,7 +83,7 @@ class App : KotlinMod() {
         registerHandler<EntityLeftClick> {
             clientApi.clientConnection().sendPayload(
                 "mob:hit",
-                Unpooled.copiedBuffer(entity.uniqueID.toString(), Charsets.UTF_8)
+                Unpooled.copiedBuffer("${entity.uniqueID}:true", Charsets.UTF_8)
             )
         }
     }

@@ -1,6 +1,7 @@
 package me.reidj.tower.user
 
 import me.func.mod.conversation.ModTransfer
+import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.wave.Wave
@@ -31,6 +32,9 @@ class User(val id: UUID, var maxWavePassed: Int, var upgradeTypes: MutableMap<Up
 
     @Transient
     var session: Session? = null
+
+    @Transient
+    lateinit var sword: SwordType
 
     @Transient
     var tokens = 0

@@ -79,7 +79,7 @@ object TowerManager {
                 activeAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1 }.forEach {
                     JavaMod.clientApi.clientConnection().sendPayload(
                         "mob:hit",
-                        Unpooled.copiedBuffer(it.target.uniqueID.toString(), Charsets.UTF_8)
+                        Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
                     )
                     activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
 
