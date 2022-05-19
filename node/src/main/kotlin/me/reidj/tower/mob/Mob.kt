@@ -11,12 +11,14 @@ import java.util.*
  * @author Рейдж
  */
 data class Mob(
+    val uuid: UUID = UUID.randomUUID(),
     var hp: Double = 1.0,
     var x: Double = 0.0,
     var y: Double = 0.0,
     var z: Double = 0.0,
     var damage: Double = 1.0,
-    var type: EntityType = EntityType.ZOMBIE
+    var type: EntityType = EntityType.ZOMBIE,
+    var isBoss: Boolean = false
 ) {
     constructor(init: Mob.() -> Unit) : this() {
         this.init()
@@ -32,7 +34,7 @@ data class Mob(
 
     fun create(player: Player) = apply {
         ModTransfer(
-            UUID.randomUUID(),
+            uuid,
             type.typeId.toInt(),
             x,
             y,

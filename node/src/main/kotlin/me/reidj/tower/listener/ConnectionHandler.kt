@@ -36,6 +36,7 @@ object ConnectionHandler : Listener {
 
         after(20) {
             user.giveMoney(-0)
+
             Anime.loadTextures(this, NAMESPACE + "health_bar.png", NAMESPACE + "energy.png", NAMESPACE + "xp_bar.png")
 
             val now = System.currentTimeMillis()
