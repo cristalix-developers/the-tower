@@ -1,5 +1,4 @@
 
-import com.google.gson.Gson
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.lifecycle.GameLoop
@@ -30,7 +29,6 @@ class App : KotlinMod() {
     override fun onEnable() {
         mod = this
         UIEngine.initialize(this)
-
 
         registerHandler<GameLoop> {
             debug = Keyboard.isKeyDown(Keyboard.KEY_F12)

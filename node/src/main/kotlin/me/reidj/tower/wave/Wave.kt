@@ -4,13 +4,14 @@ import me.func.mod.Anime
 import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
+import me.reidj.tower.mob.MobType
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
+import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.listener.SessionListener
-import java.util.*
 
 /**
  * @project tower
@@ -30,20 +31,25 @@ class Wave(
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = SessionListener.simulator.getUser<User>(player.uniqueId)?.session ?: return@runTaskLater
-                val v3 = session.generators.random()
-                drawMob(v3.x + Math.random() * 4 - 2, v3.y, v3.z + Math.random() * 4 - 2)
+                drawMob(session.generators.random().apply {
+                    x += Math.random() * 4 - 2
+                    z += Math.random() * 4 - 2
+                })
             }, minOf(it.toLong() * 12, 400))
         }
     }
 
-    private fun drawMob(x: Double, y: Double, z: Double) {
+    private fun drawMob(location: Location) {
+        val type = MobType.values().first { it.wave.contains(level) }
         if (level % 10 == 0) {
             println(1)
             // TODO создание босса
         }
-        val mob = Mob(UUID.randomUUID(), 1.0 + level * 0.3, x, y, z, 0.5 + level * 0.05, EntityType.ZOMBIE)
-        aliveMobs.add(mob)
-        mob.create(player)
+        aliveMobs.add(Mob {
+            hp = type.hp + level * 0.3
+            damage = type.damage + level * 0.05
+            this.type = EntityType.valueOf(type.name)
+        }.location(location).create(player))
     }
 
     fun end() {
