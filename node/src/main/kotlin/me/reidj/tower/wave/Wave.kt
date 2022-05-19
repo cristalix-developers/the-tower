@@ -42,7 +42,11 @@ class Wave(
     }
 
     private fun drawMob(x: Double, y: Double, z: Double) {
-        val mob = Mob(UUID.randomUUID(), 7.0 + level * 0.3, x, y, z, 0.5 + level * 0.05, EntityType.ZOMBIE)
+        if (level % 10 == 0) {
+            println(1)
+            // TODO создание босса
+        }
+        val mob = Mob(UUID.randomUUID(), 1.0 + level * 0.3, x, y, z, 0.5 + level * 0.05, EntityType.ZOMBIE)
         aliveMobs.add(mob)
         mob.create(player)
     }

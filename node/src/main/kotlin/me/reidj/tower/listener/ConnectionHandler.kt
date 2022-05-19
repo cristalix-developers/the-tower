@@ -2,6 +2,7 @@ package me.reidj.tower.listener
 
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
+import me.func.mod.selection.Confirmation
 import me.func.mod.util.after
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.user.User
@@ -30,8 +31,6 @@ object ConnectionHandler : Listener {
         gameMode = GameMode.ADVENTURE
         LobbyItems.initialActionsWithPlayer(this)
 
-        setResourcePack(System.getenv("RESOURCE_PACK"), "105")
-
         // Отправляем наш мод
         after(1) { ModLoader.send("tower-mod-bundle.jar", this) }
 
@@ -47,11 +46,17 @@ object ConnectionHandler : Listener {
                 user.dailyClaimTimestamp = now
                 Anime.openDailyRewardMenu(this, user.day, *DailyRewardType.values().map { it.reward }.toTypedArray())
                 val dailyReward = DailyRewardType.values()[user.day]
-                player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
+                sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
+                performCommand("lootboxsound")
                 dailyReward.give.accept(user)
                 user.day++
             }
             user.lastEnter = now
+        }
+
+        after(40) {
+            Confirmation("Рекомендуем установить", "ресурспак") {
+                    player -> player.performCommand("resourcepack") }.open(this)
         }
     }
 }
