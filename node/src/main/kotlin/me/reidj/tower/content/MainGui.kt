@@ -1,18 +1,12 @@
 package me.reidj.tower.content
 
+import me.func.mod.selection.button
+import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
-import me.reidj.tower.data
 import me.reidj.tower.item
-import me.reidj.tower.text
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.user.User
-import org.bukkit.Material.STAINED_GLASS_PANE
-import org.bukkit.entity.Player
-import ru.cristalix.core.inventory.ClickableItem
-import ru.cristalix.core.inventory.ControlledInventory
-import ru.cristalix.core.inventory.InventoryContents
-import ru.cristalix.core.inventory.InventoryProvider
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -21,47 +15,36 @@ import ru.kdev.simulatorapi.listener.SessionListener
  */
 object MainGui {
 
-    val backItem = item {
-        text("§cНазад")
-        nbt("other", "cancel")
-    }
-
-    val glass = item(STAINED_GLASS_PANE) {
-        data(7)
-        text("&f")
-    }
-
-    private val menu = ControlledInventory.builder()
-        .title("Tower Simulator")
-        .rows(5)
-        .columns(9)
-        .provider(object : InventoryProvider {
-            override fun init(player: Player, contents: InventoryContents) {
-                contents.setLayout(
-                    "XXXXXXXXX",
-                    "XXXDUAXXX",
-                    "XXXXSXXXX",
-                    "XXXXXXXXX",
-                    "XXXXQXXXX"
-                )
-
-                val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
-
-                contents.add('U', ClickableItem.of(UpgradeInventory.workshop) { player.performCommand("workshop") })
-                contents.add('S', ClickableItem.empty(item {
-                    text(
-                        "§f§l > §bСтатистика\n" +
-                                "§7    Монет: §e${user.money}\n" +
-                                "§7    Волн пройдено: §b${user.maxWavePassed}\n"
-                    )
-                    nbt("other", "quest_week")
-                }))
-                contents.add('Q', ClickableItem.of(backItem) { player.closeInventory() })
-                contents.fillMask('X', ClickableItem.empty(glass))
+    private val menu = selection {
+        title = "Tower Simulator"
+        rows = 2
+        columns = 1
+        money = ""
+        buttons(
+            button {
+                item = UpgradeInventory.workshop
+                title = "Мастерская"
+                description = "Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!"
+                onClick { player, _, _ -> player.performCommand("workshop") }
+                hint("Открыть")
             }
-        }).build()
+        )
+    }
 
     init {
-        command("menu") { player, _ -> menu.open(player) }
+        command("menu") { opened, _ ->
+            val user = SessionListener.simulator.getUser<User>(opened.uniqueId)!!
+            if (menu.storage.size == 2)
+                menu.storage.removeAt(1)
+            menu.storage.add(button {
+                item = item {}.nbt("other", "quest_week")
+                title = "§f§l > §bСтатистика"
+                description = """
+                            §7    Монет: §e${user.money}
+                            §7    Волн пройдено: §b${user.maxWavePassed}
+                        """.trimIndent()
+            })
+            menu.open(opened)
+        }
     }
 }

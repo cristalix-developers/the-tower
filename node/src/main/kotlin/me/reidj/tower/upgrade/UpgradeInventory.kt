@@ -19,11 +19,8 @@ import ru.kdev.simulatorapi.listener.SessionListener
  */
 object UpgradeInventory {
 
-    val workshop = item {
-        text("§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!")
-        nbt("other", "friend_add")
-        nbt("click", "workshop")
-    }
+    val workshop = item {}.nbt("other", "friend_add").nbt("click", "workshop")
+        .text("§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!")
 
     init {
         // Команда для открытия меню
@@ -86,7 +83,7 @@ object UpgradeInventory {
                             }
                         }
                     }
-                }
+                }.toMutableList()
             }
         }
         menu.open(user.player!!)

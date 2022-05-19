@@ -45,8 +45,7 @@ object ConnectionHandler : Listener {
                 user.day = 0
             if (now - user.dailyClaimTimestamp > 12 * 60 * 60 * 1000) {
                 user.dailyClaimTimestamp = now
-                DailyRewardType.values().forEach { Anime.openDailyRewardMenu(this, user.day, it.reward) }
-
+                Anime.openDailyRewardMenu(this, user.day, *DailyRewardType.values().map { it.reward }.toTypedArray())
                 val dailyReward = DailyRewardType.values()[user.day]
                 player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
                 dailyReward.give.accept(user)

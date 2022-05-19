@@ -12,21 +12,9 @@ import org.bukkit.entity.Player
  */
 object LobbyItems {
 
-    private val startItem = item {
-        text("§bИграть")
-        nbt("other", "guild_members")
-        nbt("click", "play")
-    }
-    private var backItem = item {
-        text("§cВыйти")
-        nbt("other", "cancel")
-        nbt("click", "leave")
-    }
-    private var settingsItem = item {
-        text("§aПерсонаж")
-        nbt("other", "clothes")
-        nbt("click", "menu")
-    }
+    private val startItem = item {}.nbt("other", "guild_members").nbt("click", "play").text("§bИграть")
+    private var backItem = item {}.nbt("other", "cancel").nbt("click", "leave").text("§cВыйти")
+    private var settingsItem = item {}.nbt("other", "clothes").nbt("click", "menu").text("§aПерсонаж")
 
     fun initialActionsWithPlayer(player: Player) = player.apply {
         teleport(app.spawn)
