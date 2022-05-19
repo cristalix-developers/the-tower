@@ -2,7 +2,6 @@ package tower
 
 import Banner
 import Banners
-import Vector
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import io.netty.buffer.Unpooled
@@ -16,6 +15,7 @@ import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.sphere
 import updateNameHealth
+import util.Vector
 import kotlin.math.max
 import kotlin.math.pow
 

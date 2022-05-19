@@ -15,7 +15,7 @@ import ru.cristalix.uiengine.utility.*
 import tower.TowerManager.health
 import tower.TowerManager.maxHealth
 import tower.TowerManager.protection
-import java.text.DecimalFormat
+import util.Formatter
 import kotlin.math.max
 import kotlin.math.min
 
@@ -34,11 +34,6 @@ object BarManager {
     private var level = 0
 
     private var airHide: Boolean = false
-
-    private val MONEY_FORMAT = DecimalFormat("##.#")
-
-    fun toMoneyFormat(health: Double): String = MONEY_FORMAT.format(health)
-
     init {
         registerHandler<GameLoop> {
             healthIndicator!!.enabled = mod.gameActive
@@ -137,7 +132,7 @@ object BarManager {
             bar.animate(0.1, Easings.CUBIC_OUT) {
                 bar.size.x = maxX * min(1.0, current / max)
             }
-            this.text.content = "§f${toMoneyFormat(current)}/${toMoneyFormat(max)} ❤"
+            this.text.content = "§f${Formatter.toFormat(current)}/${Formatter.toFormat(max)} ❤"
         }
     }
 
@@ -172,7 +167,7 @@ object BarManager {
         }
 
         fun updatePercentage(protection: Double) {
-            this.text.content = "§f${toMoneyFormat(protection)} 㱈"
+            this.text.content = "§f${Formatter.toFormat(protection)} 㱈"
         }
     }
 

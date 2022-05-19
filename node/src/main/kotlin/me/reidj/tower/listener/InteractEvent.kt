@@ -74,7 +74,6 @@ object InteractEvent : Listener {
                 inGame = true
                 giveTokens(80)
                 sword = SwordType.NONE
-                Anime.timer(player, "",0)
                 after(3 * 20) {
                     val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                     wave = current

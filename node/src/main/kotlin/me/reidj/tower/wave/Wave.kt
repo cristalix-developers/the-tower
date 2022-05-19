@@ -42,18 +42,16 @@ class Wave(
     }
 
     private fun drawMob(x: Double, y: Double, z: Double) {
-        val mob = Mob(UUID.randomUUID(), 1.0 + level * 0.3, x, y, z, 0.5 + level * 0.05, EntityType.ZOMBIE)
+        val mob = Mob(UUID.randomUUID(), 7.0 + level * 0.3, x, y, z, 0.5 + level * 0.05, EntityType.ZOMBIE)
         aliveMobs.add(mob)
         mob.create(player)
     }
 
     fun end() {
         val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
-        val tokens = user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt()
-        Anime.timer(player, "",0)
         isStarting = false
         level++
-        user.giveTokens(tokens)
+        user.giveTokens(user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt())
         if (level % 10 == 0) {
             Anime.cursorMessage(player, "§e+10 §fмонет")
             user.giveMoney(10)
