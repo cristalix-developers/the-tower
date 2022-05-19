@@ -1,13 +1,14 @@
 package mob
 
-import Vector
+import Banners
+import TimeBar
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
 import mod
 import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.uiengine.UIEngine
-import sun.security.jgss.GSSToken.readInt
+import util.Vector
 import java.util.*
 import kotlin.math.pow
 
@@ -65,6 +66,9 @@ object MobManager {
             UIEngine.schedule(2) { Banners.remove(uuid) }
 
             mobs.remove(mob)
+
+            if (mobs.isEmpty())
+                UIEngine.overlayContext.removeChild(TimeBar.cooldown)
         }
     }
 

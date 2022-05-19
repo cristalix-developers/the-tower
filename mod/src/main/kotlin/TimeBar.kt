@@ -1,7 +1,5 @@
-
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
-import mob.MobManager
 import ru.cristalix.clientapi.registerHandler
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
@@ -11,33 +9,33 @@ import ru.cristalix.uiengine.utility.*
 
 object TimeBar {
 
-    private lateinit var line: RectangleElement
+    lateinit var line: RectangleElement
     private lateinit var content: TextElement
 
-    init {
-        val cooldown = rectangle {
-            offset.y += 30
+    val cooldown = rectangle {
+        offset.y += 30
+        origin = TOP
+        align = TOP
+        size = V3(180.0, 5.0, 0.0)
+        color = Color(0, 0, 0, 0.62)
+        line = +rectangle {
+            origin = LEFT
+            align = LEFT
+            size = V3(180.0, 5.0, 0.0)
+            color = Color(42, 102, 189, 1.0)
+        }
+        content = +text {
             origin = TOP
             align = TOP
-            size = V3(180.0, 5.0, 0.0)
-            color = Color(0, 0, 0, 0.62)
-            line = +rectangle {
-                origin = LEFT
-                align = LEFT
-                size = V3(180.0, 5.0, 0.0)
-                color = Color(42, 102, 189, 1.0)
-            }
-            content = +text {
-                origin = TOP
-                align = TOP
-                color = WHITE
-                shadow = true
-                content = "Загрузка..."
-                offset.y -= 15
-            }
-            enabled = false
+            color = WHITE
+            shadow = true
+            content = "Загрузка..."
+            offset.y -= 15
         }
+        enabled = false
+    }
 
+    init {
         var time = 0
         var currentTime = System.currentTimeMillis()
 
@@ -48,7 +46,6 @@ object TimeBar {
                 content.content = content.content.dropLast(7) + (time / 60).toString()
                     .padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0') + " ⏳"
             }
-            if (MobManager.mobs.isEmpty()) cooldown.enabled = false else cooldown.enabled = mod.gameActive
         }
 
         mod.registerChannel("func:bar") {
@@ -58,16 +55,18 @@ object TimeBar {
             line.color = Color(readInt(), readInt(), readInt(), 1.0)
 
             if (time == 0) {
+                line.size.x = 0.0
                 cooldown.enabled = false
-                line.animate(3) { size.x = 180.0 }
+                UIEngine.overlayContext.removeChild(cooldown)
                 return@registerChannel
             }
 
+            UIEngine.overlayContext.addChild(cooldown)
+            line.size.x = 180.0
             content.content = text
+            cooldown.enabled = true
 
-            line.animate(time - 0.1) {
-                size.x = 0.0
-            }
+            line.animate(time - 0.1) { size.x = 0.0 }
 
             UIEngine.schedule(time) {
                 cooldown.enabled = false

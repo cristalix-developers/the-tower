@@ -1,4 +1,6 @@
 
+import com.google.gson.Gson
+import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.*
@@ -73,6 +75,8 @@ class App : KotlinMod() {
 
                 MobManager
 
+                TimeBar.cooldown.enabled = gameActive
+
                 UIEngine.schedule(1.0) { TowerManager.updateHealth(TowerManager.health, TowerManager.maxHealth) }
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
@@ -85,6 +89,7 @@ class App : KotlinMod() {
                 "mob:hit",
                 Unpooled.copiedBuffer("${entity.uniqueID}:true", Charsets.UTF_8)
             )
+            (entity as EntityLivingBase).updateHealth()
         }
     }
 }

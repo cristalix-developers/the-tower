@@ -84,6 +84,7 @@ object TowerManager {
                     activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
 
                     it.target.updateHealth()
+                    it.remove()
                     activeAmmo.remove(it)
                 }
                 activeAmmo.forEach {
