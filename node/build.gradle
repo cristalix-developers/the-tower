@@ -41,7 +41,7 @@ dependencies {
     implementation 'me.func:service-api:live-SNAPSHOT'
     implementation 'ru.kdev:simulator-api:live'
     implementation 'ru.kdev:simulator-commons:live'
-    implementation 'me.func.animation-api:animation-api:live-SNAPSHOT'
+    implementation 'me.func:animation-api:reidj-SNAPSHOT'
     implementation 'cristalix:boards-bukkit-api:3.0.15'
 }
 

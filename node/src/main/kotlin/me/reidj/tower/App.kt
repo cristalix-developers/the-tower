@@ -14,9 +14,9 @@ import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.command
 import me.func.mod.util.listener
-import me.func.mod.util.nbt
 import me.func.protocol.EndStatus
 import me.func.protocol.GlowColor
+import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
@@ -104,6 +104,9 @@ class App : JavaPlugin() {
         // Создание контента
         UpgradeInventory
         MainGui
+
+        // Регистрация команд
+        PlayerCommands
 
         // Регистрация обработчиков событий
         listener(ConnectionHandler, UnusedEvent, InteractEvent)
