@@ -14,7 +14,7 @@ import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.sphere
-import updateNameHealth
+import updateHealth
 import util.Vector
 import kotlin.math.max
 import kotlin.math.pow
@@ -32,7 +32,7 @@ object TowerManager {
     var ticksBeforeStrike = 30
     var ticksStrike = 30
     private var speedAttack = 0.05 // BULLET_DELAY
-    private var damage = 0.0
+    var damage = 0.0
     var health = 5.0
     var maxHealth = 5.0
     var protection = 0.0
@@ -83,8 +83,8 @@ object TowerManager {
                     )
                     activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
 
-                    it.target.health -= damage.toFloat()
-                    it.target.updateNameHealth()
+                    it.target.updateHealth()
+                    activeAmmo.remove(it)
                 }
                 activeAmmo.forEach {
                     val vector = Vector(it.target.x - it.x, it.target.y + 1.5 - it.y, it.target.z - it.z).normalize()
