@@ -37,7 +37,7 @@ object InteractEvent : Listener {
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 if (inGame)
                     return@apply
-                session = Session(tower.upgrades)
+                session = Session(upgradeTypes)
 
                 session?.upgrade?.values?.forEach { it.level = 1 }
 

@@ -18,6 +18,7 @@ class User(
     val id: UUID,
     var maxWavePassed: Int,
     var upgradeTypes: MutableMap<UpgradeType, Upgrade>,
+    var sword: SwordType,
     val tower: Tower,
     var day: Int,
     var dailyClaimTimestamp: Long,
@@ -39,9 +40,6 @@ class User(
 
     @Transient
     var session: Session? = null
-
-    @Transient
-    lateinit var sword: SwordType
 
     @Transient
     var tokens = 0

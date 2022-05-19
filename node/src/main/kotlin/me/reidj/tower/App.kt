@@ -22,6 +22,7 @@ import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
+import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
@@ -71,8 +72,15 @@ class App : JavaPlugin() {
                 User(
                     uuid,
                     0,
-                    values().associateWith { Upgrade(it, 1) }.toMutableMap(),
-                    Tower(null, 5.0, 5.0, UpgradeType.values().associateWith { Upgrade(it, 1) }.toMutableMap()),
+                    values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
+                    SwordType.NONE,
+                    Tower(
+                        null,
+                        5.0,
+                        5.0,
+                        UpgradeType.values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }
+                            .toMutableMap()
+                    ),
                     0,
                     0,
                     0
