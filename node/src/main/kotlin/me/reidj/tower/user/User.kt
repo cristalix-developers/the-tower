@@ -1,11 +1,13 @@
 package me.reidj.tower.user
 
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.Game
+import me.reidj.tower.app
+import me.reidj.tower.game.Game
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.wave.Wave
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.common.SimulatorUser
 import ru.kdev.simulatorapi.listener.SessionListener
@@ -47,6 +49,21 @@ class User(
 
     @Transient
     var tokens = 0
+
+    fun hideFromAll() {
+        Bukkit.getOnlinePlayers().filterNotNull().forEach { current ->
+            player!!.hidePlayer(app, current)
+            current.hidePlayer(app, player)
+        }
+    }
+    fun showToAll() {
+        Bukkit.getOnlinePlayers().mapNotNull { SessionListener.simulator.getUser<User>(it.uniqueId) }
+            .filter { !it.inGame }
+            .forEach {
+                it.player!!.showPlayer(app, player)
+                player!!.showPlayer(app, it.player)
+            }
+    }
 
     fun giveTokens(tokens: Int) {
         this.tokens += tokens

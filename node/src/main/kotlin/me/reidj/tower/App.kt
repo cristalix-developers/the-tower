@@ -173,6 +173,7 @@ class App : JavaPlugin() {
                             maxWavePassed = waveLevel
                         LobbyItems.initialActionsWithPlayer(player)
                         player.flying(false)
+                        showToAll()
 
                         // Игра закончилась
                         ModTransfer(false).send("tower:update-state", player)
