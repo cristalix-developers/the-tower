@@ -12,7 +12,6 @@ import me.reidj.tower.flying
 import me.reidj.tower.game.Normal
 import me.reidj.tower.game.Rating
 import me.reidj.tower.item
-import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.user.Session
@@ -42,7 +41,9 @@ object InteractEvent : Listener {
             item = item {}.nbt("other", "villager")
             onClick { player, _, _ ->
                 SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                    session = Session(upgradeTypes)
+                    Anime.close(player)
+
+                    session = Session(tower.upgrades)
 
                     session?.upgrade?.values?.forEach { it.level = 1 }
                     game = Normal()
@@ -53,6 +54,8 @@ object InteractEvent : Listener {
                         inventory.setItem(4, UpgradeInventory.workshop)
                         flying()
                     }
+
+                    sword.giveSword(this)
 
                     tower.health = tower.maxHealth
                     tower.updateHealth()
@@ -79,7 +82,6 @@ object InteractEvent : Listener {
                     // Начинаю волну
                     inGame = true
                     giveTokens(80)
-                    sword = SwordType.NONE
                     after(3 * 20) {
                         val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                         wave = current
@@ -119,6 +121,7 @@ object InteractEvent : Listener {
                     return@apply
                 choicer {
                     title = "Tower Simulator"
+                    description = "Выберите под-режим"
                     storage = buttons.toMutableList()
                 }.open(player)
             }

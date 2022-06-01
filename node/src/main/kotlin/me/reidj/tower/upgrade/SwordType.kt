@@ -21,13 +21,18 @@ enum class SwordType(
 
     override fun update(user: User, vararg type: UpgradeType) {
         user.apply {
-            val level = session!!.upgrade[UpgradeType.SWORD]!!.getValue()
-            if ((level == 1.0 || level % 25 == 0.0) && getNext() != null) {
+            val level = upgradeTypes[UpgradeType.SWORD]!!.getValue()
+            if ((level == 1.0 || level % 25 == 0.0) && getNext() != null)
                 sword = getNext()!!
-                player!!.inventory.setItem(0, item(getNext()!!.material) { text(getNext()!!.title) })
-            }
         }
     }
+
+    fun giveSword(user: User) = user.apply {
+        if (sword.material != Material.AIR)
+            player!!.inventory.setItem(0, item(sword.material) { text(sword.title) })
+    }
+
+    fun update(user: User) = update(user, UpgradeType.SWORD)
 
     open fun getNext(): SwordType? =
         if (ordinal >= SwordType.values().size - 1) null else SwordType.values()[ordinal + 1]

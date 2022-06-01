@@ -106,7 +106,6 @@ class App : JavaPlugin() {
             isLobbyServer = true
             readableName = "Просто снос башки"
             groupName = "Секрет"
-            servicedServers = arrayOf("SEC")
         }
 
         // Создание контента
@@ -136,7 +135,7 @@ class App : JavaPlugin() {
                     mob.hp -= if (pair[1].toBoolean()) sword.damage else session!!.upgrade[DAMAGE]!!.getValue()
 
                     if (mob.hp <= 0) {
-                        val token = session!!.upgrade[CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
 
                         giveTokens(token)
 
