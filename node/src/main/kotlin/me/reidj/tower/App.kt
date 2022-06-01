@@ -12,10 +12,10 @@ import me.func.mod.Glow
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
-import me.func.mod.util.command
 import me.func.mod.util.listener
 import me.func.protocol.EndStatus
 import me.func.protocol.GlowColor
+import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.listener.ConnectionHandler
@@ -115,20 +115,17 @@ class App : JavaPlugin() {
         // Регистрация команд
         PlayerCommands
 
+        // Регистрация админ команд
+        AdminCommands
+
         // Регистрация обработчиков событий
         listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
-        command("money") { player, args ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt())
-        }
-
-        command("tokens") { player, args ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt())
-        }
-
         WaveManager.runTaskTimer(this@App, 0, 1)
 
+        // Если моб есть в списке, то отнимаем его хп
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
+            // Нужно для проверки кто нанёс урон, башня или игрок
             val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 findMob(this, pair[0].encodeToByteArray())?.let { mob ->
@@ -156,6 +153,7 @@ class App : JavaPlugin() {
             }
         }
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
+            // Если моб есть в списке, то отнимаем хп у башни
             val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 findMob(this, pair[0].encodeToByteArray())?.let { mob ->
@@ -168,6 +166,7 @@ class App : JavaPlugin() {
 
                     tower.updateHealth()
 
+                    // Провожу действия с игроком если он проигрывает
                     if (tower.health <= 0) {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
