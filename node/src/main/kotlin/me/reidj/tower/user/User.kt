@@ -1,6 +1,7 @@
 package me.reidj.tower.user
 
 import me.func.mod.conversation.ModTransfer
+import me.reidj.tower.Game
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeType
@@ -27,6 +28,9 @@ class User(
 
     @Transient
     var wave: Wave? = null
+
+    @Transient
+    var game: Game? = null
 
     @Transient
     var player: Player? = null

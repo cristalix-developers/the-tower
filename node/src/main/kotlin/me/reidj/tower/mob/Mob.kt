@@ -34,7 +34,7 @@ data class Mob(
 
     fun create(player: Player) = apply {
         ModTransfer(
-            uuid,
+            uuid.toString(),
             type.typeId.toInt(),
             x,
             y,
