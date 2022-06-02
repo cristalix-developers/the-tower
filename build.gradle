@@ -25,27 +25,29 @@ allprojects {
     }
 }
 
-apply plugin: 'kotlin'
+subprojects {
+    apply plugin: 'kotlin'
 
-group = 'me.func'
-version = '1.0-SNAPSHOT'
+    group = 'me.reidj'
+    version = '1.0-SNAPSHOT'
 
-afterEvaluate {
-    jar {
-        from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
-        duplicatesStrategy DuplicatesStrategy.EXCLUDE
+    afterEvaluate {
+        jar {
+            from configurations.runtimeClasspath.collect { it.directory ? it : zipTree(it) }
+            duplicatesStrategy DuplicatesStrategy.EXCLUDE
+        }
     }
-}
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-}
+    tasks.withType(JavaCompile) {
+        options.encoding = "UTF-8"
+        sourceCompatibility = "1.8"
+        targetCompatibility = "1.8"
+    }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = '1.8'
+    compileKotlin {
+        kotlinOptions.jvmTarget = '1.8'
+    }
 }
