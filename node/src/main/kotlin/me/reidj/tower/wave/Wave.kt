@@ -1,6 +1,7 @@
 package me.reidj.tower.wave
 
 import me.func.mod.Anime
+import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.mob.BossType
@@ -28,7 +29,7 @@ class Wave(
 
     fun start() {
         isStarting = true
-        Anime.timer(player, "$level волна", 40)
+        ModTransfer("$level волна", 40).send("tower:timebar", player)
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = SessionListener.simulator.getUser<User>(player.uniqueId)?.session ?: return@runTaskLater

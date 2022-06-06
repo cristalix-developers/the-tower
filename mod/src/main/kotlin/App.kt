@@ -29,6 +29,7 @@ class App : KotlinMod() {
 
         mod = this
 
+        TimeBar
         Statistic
 
         BarManager
@@ -74,6 +75,7 @@ class App : KotlinMod() {
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 inited = false
+                UIEngine.overlayContext.removeChild(TimeBar.bar!!)
                 MobManager.clear()
             }
         }

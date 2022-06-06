@@ -1,5 +1,6 @@
 package mob
 
+import TimeBar
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
@@ -66,6 +67,9 @@ object MobManager {
             UIEngine.schedule(2) { Banners.remove(uuid) }
 
             mobs.remove(mob)
+
+            if(mobs.isEmpty())
+                UIEngine.overlayContext.removeChild(TimeBar.bar!!)
         }
     }
 
