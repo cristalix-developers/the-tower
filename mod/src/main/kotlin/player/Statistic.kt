@@ -13,17 +13,16 @@ import ru.cristalix.uiengine.utility.*
  */
 object Statistic {
 
+    val tokensBox = text {
+        enabled = false
+        offset = V3(-3.0, -24.0)
+        origin = BOTTOM_RIGHT
+        shadow = true
+        content = ""
+    }
     init {
         val moneyBox = text {
             offset = V3(-3.0, -14.0)
-            origin = BOTTOM_RIGHT
-            shadow = true
-            content = ""
-        }
-
-        val tokensBox = text {
-            enabled = false
-            offset = V3(-3.0, -24.0)
             origin = BOTTOM_RIGHT
             shadow = true
             content = ""
@@ -34,10 +33,6 @@ object Statistic {
             align = Relative.BOTTOM_RIGHT
             origin = BOTTOM_RIGHT
             addChild(moneyBox, tokensBox)
-        }
-
-        registerHandler<GameLoop> {
-            tokensBox.enabled = mod.gameActive
         }
 
         UIEngine.overlayContext + box

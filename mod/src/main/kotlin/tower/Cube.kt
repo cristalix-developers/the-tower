@@ -5,7 +5,7 @@ import dev.xdark.clientapi.opengl.GlStateManager
 import dev.xdark.clientapi.resource.ResourceLocation
 import mod
 import org.lwjgl.opengl.GL11.*
-import ru.cristalix.clientapi.JavaMod.clientApi
+import ru.cristalix.uiengine.UIEngine
 import java.lang.Math.cos
 import java.lang.Math.sin
 
@@ -17,7 +17,7 @@ object Cube {
 
     init {
         var angle = 0.0
-        val mc = clientApi.minecraft()
+        val mc = UIEngine.clientApi.minecraft()
         val distanceBetweenTowerAndGround = 9.0
 
         var lastRender = System.currentTimeMillis()
@@ -51,7 +51,7 @@ object Cube {
                 )
                 GlStateManager.translate(mod.cube.x, mod.cube.y - distanceBetweenTowerAndGround, mod.cube.z)
 
-                clientApi.renderEngine()
+                UIEngine.clientApi.renderEngine()
                     .bindTexture(ResourceLocation.of("minecraft", "textures/blocks/diamond_block.png"))
 
                 // Рисуем выделение зоны

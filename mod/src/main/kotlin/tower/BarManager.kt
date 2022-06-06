@@ -28,42 +28,10 @@ object BarManager {
     var healthIndicator: HealthIndicator? = null
     var protectionIndicator: ProtectionIndicator? = null
     private var lvlIndicator: LevelIndicator? = null
-    private var airBar: RectangleElement? = null
 
     private var exp = 0
     private var level = 0
-
-    private var airHide: Boolean = false
     init {
-        registerHandler<GameLoop> {
-            healthIndicator!!.enabled = mod.gameActive
-            protectionIndicator!!.enabled = mod.gameActive
-        }
-
-        registerHandler<RenderTickPre> {
-            if (airBar != null) {
-                var air = JavaMod.clientApi.minecraft().player.air
-                air = max(0, air)
-
-                if (!airHide)
-                    airBar!!.children[0].size.x = air.toDouble() / 300 * 260.0
-
-                if (air == 300 && !airHide) {
-                    airHide = true
-                    UIEngine.overlayContext.removeChild(airBar!!)
-                }
-
-                if (air < 300 && airHide) {
-                    airHide = false
-                    UIEngine.overlayContext.addChild(airBar!!)
-                }
-            }
-            healthIndicator?.updatePercentage(health, maxHealth)
-        }
-        display()
-    }
-
-    private fun display() {
         healthIndicator = HealthIndicator()
         protectionIndicator = ProtectionIndicator()
         lvlIndicator = LevelIndicator()
@@ -84,19 +52,6 @@ object BarManager {
         healthIndicator!!.updatePercentage(health, maxHealth)
         protectionIndicator!!.updatePercentage(protection)
         lvlIndicator!!.updatePercentage(level, exp, 0)
-
-        airBar = rectangle {
-            size = V3(260.0, 3.0)
-            color.alpha = 0.68
-            origin = Relative.BOTTOM
-            align = Relative.BOTTOM
-            offset.y = -51.0
-            addChild(rectangle {
-                size = V3(260.0, 3.0)
-                color = WHITE
-            })
-        }
-        UIEngine.overlayContext.addChild(airBar!!)
     }
 
     class HealthIndicator : RectangleElement() {

@@ -1,6 +1,8 @@
+package banner
+
 import dev.xdark.clientapi.event.render.RenderTickPre
 import dev.xdark.clientapi.opengl.GlStateManager
-import ru.cristalix.clientapi.registerHandler
+import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.Context3D
 import ru.cristalix.uiengine.element.RectangleElement
@@ -16,7 +18,7 @@ object Banners {
     private fun toBlackText(string: String) = "¨222200" + string.replace(Regex("(§[0-9a-fA-F]|¨......)"), "¨222200")
 
     init {
-        registerHandler<RenderTickPre> {
+        mod.registerHandler<RenderTickPre> {
             val player = UIEngine.clientApi.minecraft().player
             val timer = UIEngine.clientApi.minecraft().timer
             val yaw =

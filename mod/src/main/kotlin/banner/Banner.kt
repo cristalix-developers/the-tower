@@ -1,3 +1,5 @@
+package banner
+
 import java.util.*
 
 class Banner(

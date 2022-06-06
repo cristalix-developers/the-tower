@@ -14,11 +14,8 @@ class Mob(
     private var hp: Double
 ) {
 
-    lateinit var mob: EntityLivingBase
-
     fun create(): EntityLivingBase {
-        mob = UIEngine.clientApi.entityProvider().newEntity(id, UIEngine.clientApi.minecraft().world) as EntityLivingBase
-        mob.dataManager.
+        val mob = UIEngine.clientApi.entityProvider().newEntity(id, UIEngine.clientApi.minecraft().world) as EntityLivingBase
         mob.entityId = (Math.random() * Int.MAX_VALUE).toInt()
         mob.setUniqueId(uuid)
         mob.teleport(x, y, z)

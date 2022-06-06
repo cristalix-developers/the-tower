@@ -1,12 +1,10 @@
 package mob
 
-import Banners
-import TimeBar
+import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
 import mod
-import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.uiengine.UIEngine
 import util.Vector
 import java.util.*
@@ -25,6 +23,8 @@ object MobManager {
 
     init {
         mod.registerHandler<GameLoop> {
+            if (mobs.isEmpty())
+                return@registerHandler
             val now = System.currentTimeMillis()
             if (now - lastTick > .01 * 1000) {
                 lastTick = now
@@ -61,14 +61,11 @@ object MobManager {
 
             Banners.create(uuid, mob.x, mob.y + 2, mob.z, text)
 
-            JavaMod.clientApi.minecraft().world.removeEntity(mob)
+            UIEngine.clientApi.minecraft().world.removeEntity(mob)
 
             UIEngine.schedule(2) { Banners.remove(uuid) }
 
             mobs.remove(mob)
-
-            if (mobs.isEmpty())
-                UIEngine.overlayContext.removeChild(TimeBar.cooldown)
         }
     }
 

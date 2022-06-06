@@ -1,15 +1,13 @@
-
+import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
-import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.event.render.*
 import io.netty.buffer.Unpooled
 import mob.MobManager
-import org.lwjgl.input.Keyboard
 import player.Statistic
+import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.element.debug
 import ru.cristalix.uiengine.utility.V3
 import tower.BarManager
 import tower.Cube
@@ -27,15 +25,11 @@ class App : KotlinMod() {
     var gameActive = false
 
     override fun onEnable() {
-        mod = this
         UIEngine.initialize(this)
 
-        registerHandler<GameLoop> {
-            debug = Keyboard.isKeyDown(Keyboard.KEY_F12)
-        }
+        mod = this
 
         Statistic
-        TimeBar
 
         BarManager
         TowerManager
@@ -51,6 +45,9 @@ class App : KotlinMod() {
 
         registerChannel("tower:update-state") {
             gameActive = readBoolean()
+            BarManager.healthIndicator!!.enabled = gameActive
+            BarManager.protectionIndicator!!.enabled = gameActive
+            Statistic.tokensBox.enabled = gameActive
             if (gameActive) {
                 mod.cube = V3(
                     readDouble(),
@@ -73,11 +70,10 @@ class App : KotlinMod() {
 
                 MobManager
 
-                TimeBar.cooldown.enabled = gameActive
-
                 UIEngine.schedule(1.0) { TowerManager.updateHealth(TowerManager.health, TowerManager.maxHealth) }
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
+                inited = false
                 MobManager.clear()
             }
         }

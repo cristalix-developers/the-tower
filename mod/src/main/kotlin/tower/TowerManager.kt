@@ -1,15 +1,15 @@
 package tower
 
-import Banner
-import Banners
+import banner.Banner
+import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import mod
-import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.Context3D
+import ru.cristalix.uiengine.element.SphereElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
@@ -65,6 +65,8 @@ object TowerManager {
 
     init {
         mod.registerHandler<GameLoop> {
+            if (MobManager.mobs.isEmpty())
+                return@registerHandler
             val now = System.currentTimeMillis()
             if (now - lastTickMove > speedAttack * 1000) {
                 ticksBeforeStrike--
@@ -77,7 +79,7 @@ object TowerManager {
                 }
                 activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { it.remove() }
                 activeAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1 }.forEach {
-                    JavaMod.clientApi.clientConnection().sendPayload(
+                    UIEngine.clientApi.clientConnection().sendPayload(
                         "mob:hit",
                         Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
                     )
@@ -104,7 +106,7 @@ object TowerManager {
                 lastTickHit = now
                 // TODO тут пиздец надо переехать на сервер
                 MobManager.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 8.0 }.forEach {
-                    JavaMod.clientApi.clientConnection()
+                    UIEngine.clientApi.clientConnection()
                         .sendPayload("tower:hittower", Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8))
                 }
             }
