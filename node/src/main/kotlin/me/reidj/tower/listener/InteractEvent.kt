@@ -7,7 +7,6 @@ import me.func.mod.selection.choicer
 import me.func.mod.util.after
 import me.func.mod.util.command
 import me.func.mod.util.nbt
-import me.reidj.tower.HUB
 import me.reidj.tower.flying
 import me.reidj.tower.game.Normal
 import me.reidj.tower.game.Rating
@@ -22,8 +21,6 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
-import ru.cristalix.core.realm.RealmId
-import ru.cristalix.core.transfer.ITransferService
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -50,8 +47,6 @@ object InteractEvent : Listener {
     )
 
     init {
-        command("leave") { player, _ -> ITransferService.get().transfer(player.uniqueId, RealmId.of(HUB)) }
-
         command("play") { player, _ ->
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 if (inGame)
