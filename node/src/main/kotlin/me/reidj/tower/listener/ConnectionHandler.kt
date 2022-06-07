@@ -22,7 +22,7 @@ import ru.kdev.simulatorapi.listener.SessionListener
  * @author Рейдж
  */
 
-private const val NAMESPACE = "http://storage.c7x.ru/reidj/"
+private const val NAMESPACE = "http://storage.c7x.ru/reidj"
 
 object ConnectionHandler : Listener {
 
@@ -40,7 +40,7 @@ object ConnectionHandler : Listener {
                     Alert.button(
                         "Установить",
                         "/resourcepack",
-                        Tricolor(0, 180,0)
+                        Tricolor(0, 180, 0)
                     ),
                     Alert.button(
                         "Закрыть",
@@ -69,7 +69,7 @@ object ConnectionHandler : Listener {
 
             Alert.find("resourcepack").send(player)
 
-            Anime.loadTextures(this, NAMESPACE + "health_bar.png", NAMESPACE + "energy.png", NAMESPACE + "xp_bar.png")
+            Anime.loadTextures(this, "$NAMESPACE/health_bar.png", "$NAMESPACE/energy.png", "$NAMESPACE/xp_bar.png")
 
             val now = System.currentTimeMillis()
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7

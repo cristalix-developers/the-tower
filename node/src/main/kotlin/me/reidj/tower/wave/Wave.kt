@@ -4,7 +4,6 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.reidj.tower.app
-import me.reidj.tower.mob.BossType
 import me.reidj.tower.mob.Mob
 import me.reidj.tower.mob.MobType
 import me.reidj.tower.upgrade.UpgradeType
@@ -45,20 +44,14 @@ class Wave(
     private val damageStatus = level * 0.05
 
     private fun drawMob(location: Location) {
-        val mobType = MobType.values().first { it.wave.contains(level) }
-        if (level % 10 == 0 && aliveMobs.none { it.isBoss }) {
-            val bossType = BossType.values().first { it.wave.contains(level) }
-            aliveMobs.add(Mob {
-                hp = bossType.hp + hpStatus
-                damage = bossType.damage + damageStatus
-                type = EntityType.valueOf(bossType.name)
-                isBoss = true
-            }.location(location).create(player))
-        }
+        val has = level % 10 == 0 && aliveMobs.none { it.isBoss }
+        val type = if (has) MobType.values()
+            .first { it.wave.contains(level) && it.isBoss } else MobType.values().first { it.wave.contains(level) }
         aliveMobs.add(Mob {
-            hp = mobType.hp + hpStatus
-            damage = mobType.damage + damageStatus
-            type = EntityType.valueOf(mobType.name)
+            hp = type.hp + hpStatus
+            damage = type.damage + damageStatus
+            this.type = EntityType.valueOf(type.name)
+            isBoss = has
         }.location(location).create(player))
     }
 
