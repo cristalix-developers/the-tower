@@ -1,9 +1,12 @@
 package me.reidj.tower.listener
 
+import me.func.mod.Alert
+import me.func.mod.Alert.send
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
-import me.func.mod.selection.Confirmation
 import me.func.mod.util.after
+import me.func.protocol.GlowColor
+import me.func.protocol.alert.NotificationData
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
@@ -23,6 +26,33 @@ private const val NAMESPACE = "http://storage.c7x.ru/reidj/"
 
 object ConnectionHandler : Listener {
 
+    init {
+        Alert.put(
+            "resourcepack",
+            NotificationData(
+                null,
+                "notify",
+                "Рекуомендуем установить ресурспак",
+                0x2a66bd,
+                0x183968,
+                30000,
+                listOf(
+                    Alert.button(
+                        "Установить",
+                        "/resourcepack",
+                        GlowColor.GREEN
+                    ),
+                    Alert.button(
+                        "Закрыть",
+                        "/anime:debug",
+                        GlowColor.RED
+                    )
+                ),
+                null
+            )
+        )
+    }
+
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
         val user = SessionListener.simulator.getUser<User>(uniqueId)!!
@@ -36,6 +66,8 @@ object ConnectionHandler : Listener {
 
         after(20) {
             user.giveMoney(-0)
+
+            Alert.find("resourcepack").send(player)
 
             Anime.loadTextures(this, NAMESPACE + "health_bar.png", NAMESPACE + "energy.png", NAMESPACE + "xp_bar.png")
 
@@ -53,11 +85,6 @@ object ConnectionHandler : Listener {
                 user.day++
             }
             user.lastEnter = now
-        }
-
-        after(40) {
-            Confirmation("Рекомендуем установить", "ресурспак") {
-                    player -> player.performCommand("resourcepack") }.open(this)
         }
     }
 }

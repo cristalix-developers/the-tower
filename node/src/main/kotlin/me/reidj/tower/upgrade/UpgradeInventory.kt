@@ -5,11 +5,10 @@ import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
+import me.reidj.tower.barrier
 import me.reidj.tower.item
 import me.reidj.tower.text
 import me.reidj.tower.user.User
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
@@ -72,7 +71,7 @@ object UpgradeInventory {
                         }
                     } else {
                         player.closeInventory()
-                        Anime.itemTitle(player, ItemStack(Material.BARRIER), "Ошибка", "Недостаточно средств", 2.0)
+                        Anime.itemTitle(player, barrier, "Ошибка", "Недостаточно средств", 2.0)
                     }
                 }
             }
