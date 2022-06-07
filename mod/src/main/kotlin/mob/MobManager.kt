@@ -58,17 +58,22 @@ object MobManager {
         mod.registerChannel("mob:kill") {
             val uuid = UUID.fromString(NetUtil.readUtf8(this))
             val text = NetUtil.readUtf8(this)
+
+            if (mobs.isEmpty())
+                return@registerChannel
+
             val mob = mobs.filter { it.uniqueID == uuid }[0]
 
-            Banners.create(uuid, mob.x, mob.y + 2, mob.z, text)
+            if (text.isNotEmpty()) {
+                Banners.create(uuid, mob.x, mob.y + 2, mob.z, text)
+                UIEngine.schedule(2) { Banners.remove(uuid) }
+            }
 
             UIEngine.clientApi.minecraft().world.removeEntity(mob)
 
-            UIEngine.schedule(2) { Banners.remove(uuid) }
-
             mobs.remove(mob)
 
-            if(mobs.isEmpty())
+            if (mobs.isEmpty())
                 UIEngine.overlayContext.removeChild(TimeBar.bar!!)
         }
     }

@@ -1,5 +1,7 @@
 package me.reidj.tower
 
+import me.func.mod.conversation.ModTransfer
+import me.reidj.tower.mob.Mob
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -25,3 +27,8 @@ fun item(material: Material, apply: ItemStack.() -> Unit): ItemStack =
 
 fun item(itemStack: ItemStack, apply: ItemStack.() -> Unit): Unit = apply.invoke(itemStack)
 fun item(apply: ItemStack.() -> Unit): ItemStack = ItemStack(Material.CLAY_BALL).apply { apply.invoke(this) }
+
+fun MutableList<Mob>.clear(player: Player) = apply {
+    forEach { ModTransfer(it.uuid.toString(), "").send("mob:kill", player) }
+    clear()
+}

@@ -46,7 +46,8 @@ class Wave(
     private fun drawMob(location: Location) {
         val has = level % 10 == 0 && aliveMobs.none { it.isBoss }
         val type = if (has) MobType.values()
-            .first { it.wave.contains(level) && it.isBoss } else MobType.values().first { it.wave.contains(level) }
+            .first { it.wave.any { action -> level % action == 0 && it.isBoss } } else MobType.values()
+            .first { it.wave.contains(level) }
         aliveMobs.add(Mob {
             hp = type.hp + hpStatus
             damage = type.damage + damageStatus

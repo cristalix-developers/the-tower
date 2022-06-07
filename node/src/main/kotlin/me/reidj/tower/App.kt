@@ -189,8 +189,9 @@ class App : JavaPlugin() {
                         ModTransfer(false).send("tower:update-state", player)
 
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        wavePassed.aliveMobs.clear()
+                        wavePassed.aliveMobs.clear(player)
                         inGame = false
+                        session = null
                         giveTokens(-tokens)
                         wave = null
 

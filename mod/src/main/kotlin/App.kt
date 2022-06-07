@@ -84,12 +84,12 @@ class App : KotlinMod() {
 
         registerHandler<EntityLeftClick> {
             if (!isArmsLock) {
+                isArmsLock = true
                 clientApi.clientConnection().sendPayload(
                     "mob:hit",
                     Unpooled.copiedBuffer("${entity.uniqueID}:true", Charsets.UTF_8)
                 )
                 (entity as EntityLivingBase).updateHealth()
-                isArmsLock = true
             }
             UIEngine.schedule(3) { isArmsLock = false }
         }

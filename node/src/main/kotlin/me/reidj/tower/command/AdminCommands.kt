@@ -15,7 +15,7 @@ object AdminCommands {
     init {
         adminConsume("money") { user, args -> user.giveMoney(args[0].toInt()) }
 
-        adminConsume("tokens") { user, args -> user.giveMoney(args[0].toInt()) }
+        adminConsume("tokens") { user, args -> user.giveTokens(args[0].toInt()) }
     }
 
     private fun adminConsume(name: String, consumer: (user: User, args: Array<out String>) -> Unit) {
