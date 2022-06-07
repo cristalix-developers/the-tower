@@ -36,9 +36,10 @@ object UpgradeInventory {
 
     private fun icon(user: User, type: MutableMap<UpgradeType, Upgrade>) {
         val notInGame = !user.inGame
-        menu.money = "Ваш баланс ${if (notInGame) user.money else user.tokens}"
+        menu.money = if (notInGame) "Монет ${user.money}" else "Токенов ${user.tokens}"
         menu.rows = if (notInGame) 3 else 4
         menu.columns = if (notInGame) 1 else 3
+        menu.vault = if (notInGame) "coin" else "ruby"
         menu.storage = type.map { upgrades ->
             val key = upgrades.key
             val value = upgrades.value

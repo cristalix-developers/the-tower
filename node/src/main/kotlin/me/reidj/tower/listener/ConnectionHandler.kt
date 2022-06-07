@@ -5,7 +5,7 @@ import me.func.mod.Alert.send
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
 import me.func.mod.util.after
-import me.func.protocol.GlowColor
+import me.func.protocol.Tricolor
 import me.func.protocol.alert.NotificationData
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.user.User
@@ -32,7 +32,7 @@ object ConnectionHandler : Listener {
             NotificationData(
                 null,
                 "notify",
-                "Рекуомендуем установить ресурспак",
+                "Рекомендуем установить ресурспак",
                 0x2a66bd,
                 0x183968,
                 30000,
@@ -40,12 +40,12 @@ object ConnectionHandler : Listener {
                     Alert.button(
                         "Установить",
                         "/resourcepack",
-                        GlowColor.GREEN
+                        Tricolor(0, 180,0)
                     ),
                     Alert.button(
                         "Закрыть",
                         "/anime:debug",
-                        GlowColor.RED
+                        Tricolor(180, 0, 0)
                     )
                 ),
                 null
