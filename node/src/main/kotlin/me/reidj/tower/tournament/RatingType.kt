@@ -1,4 +1,4 @@
-package me.reidj.tower.rating
+package me.reidj.tower.tournament
 
 enum class RatingType {
     BRONZE(),

@@ -18,10 +18,12 @@ import me.func.protocol.GlowColor
 import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
+import me.reidj.tower.data.WipeDate
 import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
+import me.reidj.tower.tournament.TournamentHandler
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
@@ -52,10 +54,13 @@ const val HUB = "HUB-2"
 
 lateinit var app: App
 
+var isTournament = false
+
 class App : JavaPlugin() {
 
     val map = WorldMeta(MapLoader.load("func", "tower"))
     val spawn: Label = map.getLabel("spawn").apply { yaw = -90f }
+    val wipeDate = WipeDate(GregorianCalendar(2022, Calendar.JUNE, 1)).calendar
 
     override fun onEnable() {
         app = this
@@ -121,7 +126,13 @@ class App : JavaPlugin() {
         // Регистрация обработчиков событий
         listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
-        WaveManager.runTaskTimer(this@App, 0, 1)
+        // Обработка каждого тика
+        TimerHandler(
+            listOf(
+                WaveManager,
+                TournamentHandler
+            )
+        ).runTaskTimer(this, 0, 1)
 
         // Если моб есть в списке, то отнимаем его хп
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->

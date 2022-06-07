@@ -91,7 +91,7 @@ class App : KotlinMod() {
                 (entity as EntityLivingBase).updateHealth()
                 isArmsLock = true
             }
-            UIEngine.schedule(4) { isArmsLock = false }
+            UIEngine.schedule(3) { isArmsLock = false }
         }
     }
 }

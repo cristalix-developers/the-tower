@@ -1,15 +1,19 @@
 package me.reidj.tower.listener
 
 import me.func.mod.Anime
+import me.func.mod.Glow
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.selection.button
 import me.func.mod.selection.choicer
 import me.func.mod.util.after
 import me.func.mod.util.command
 import me.func.mod.util.nbt
+import me.func.protocol.GlowColor
+import me.reidj.tower.barrier
 import me.reidj.tower.flying
 import me.reidj.tower.game.Normal
 import me.reidj.tower.game.Rating
+import me.reidj.tower.isTournament
 import me.reidj.tower.item
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
@@ -42,7 +46,14 @@ object InteractEvent : Listener {
         button {
             title = "Рейтинговая"
             item = item {}.nbt("other", "collection")
-            onClick { player, _, _ -> start(player).game = Rating() }
+            onClick { player, _, _ ->
+                if (isTournament) {
+                    start(player).game = Rating()
+                } else {
+                    Glow.set(player, GlowColor.RED)
+                    Anime.itemTitle(player, barrier, "Ошибка", "Турнир ещё не начался!")
+                }
+            }
         }
     )
 
