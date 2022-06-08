@@ -75,12 +75,11 @@ class App : KotlinMod() {
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 inited = false
-                TimeBar.time = 0
                 MobManager.clear()
             }
         }
 
-        var isArmsLock: Boolean = false
+        var isArmsLock = false
 
         registerHandler<EntityLeftClick> {
             if (!isArmsLock) {

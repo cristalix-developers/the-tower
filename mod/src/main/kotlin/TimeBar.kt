@@ -1,20 +1,26 @@
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
+import mob.MobManager
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
+import ru.cristalix.uiengine.eventloop.EventLoopImpl
+import ru.cristalix.uiengine.eventloop.Task
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
+import kotlin.reflect.KMutableProperty
 
 object TimeBar {
 
-    var bar: RectangleElement? = null
-    var time = 0
     private lateinit var line: RectangleElement
     private lateinit var content: TextElement
 
+    var isRemove = false
+
     init {
         var currentTime = System.currentTimeMillis()
+        var bar: RectangleElement? = null
+        var time = 0
 
         mod.registerHandler<GameLoop> {
             if (System.currentTimeMillis() - currentTime > 1000) {
@@ -22,6 +28,10 @@ object TimeBar {
                 currentTime = System.currentTimeMillis()
                 content.content = content.content.dropLast(7) + (time / 60).toString()
                     .padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0') + " ⏳"
+                if (MobManager.mobs.isEmpty() || !mod.gameActive) {
+                    isRemove = true
+                    UIEngine.overlayContext.removeChild(bar!!)
+                }
             }
         }
 
@@ -41,7 +51,7 @@ object TimeBar {
             line = rectangle {
                 origin = LEFT
                 align = LEFT
-                size = V3(0.0, 5.0, 0.0)
+                size = V3(180.0, 5.0, 0.0)
                 color = Color(42, 102, 189, 1.0)
             }
 
@@ -62,12 +72,16 @@ object TimeBar {
             }
 
             UIEngine.overlayContext + bar!!
-            bar!!.enabled = true
             content.content = text
+            bar!!.enabled = true
+            isRemove = false
 
             line.animate(time - 0.1) { size.x = 0.0 }
 
-            UIEngine.schedule(time) { UIEngine.overlayContext.removeChild(bar!!) }
+            UIEngine.schedule(time) {
+                if (isRemove)
+                    UIEngine.overlayContext.removeChild(bar!!)
+            }
         }
     }
 }

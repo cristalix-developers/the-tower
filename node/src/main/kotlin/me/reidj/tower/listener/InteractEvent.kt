@@ -49,15 +49,12 @@ object InteractEvent : Listener {
             onClick { player, _, _ ->
                 val tournament = SessionListener.simulator.getUser<User>(player.uniqueId)!!.tournament
                 if (tournament.isTournamentStarted()) {
-                    if (tournament.tournamentMaxWavePassed.size == 3) {
+                    if (tournament.tournamentMaxWavePassed.size == 3)
                         start(player)
-                    } else {
-                        Glow.set(player, GlowColor.RED)
-                        Anime.itemTitle(player, barrier, "Ошибка", "У вас закончились попытки!")
-                    }
+                    else
+                        error(player, "У вас закончились попытки!")
                 } else {
-                    Glow.set(player, GlowColor.RED)
-                    Anime.itemTitle(player, barrier, "Ошибка", "Турнир ещё не начался!")
+                    error(player, "Турнир ещё не начался!")
                 }
             }
         }
@@ -132,7 +129,7 @@ object InteractEvent : Listener {
             inGame = true
             giveTokens(80)
             after(3 * 20) {
-                val current = Wave(true, System.currentTimeMillis(), 20, mutableListOf(), player)
+                val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
                 wave = current
                 current.start()
 
@@ -148,5 +145,11 @@ object InteractEvent : Listener {
                 ).send("tower:update-state", player)
             }
         }
+    }
+
+    private fun error(player: Player, subTitle: String) {
+        Glow.animate(player, 2.0, GlowColor.RED)
+        Anime.itemTitle(player, barrier, "Ошибка", subTitle)
+        Anime.close(player)
     }
 }

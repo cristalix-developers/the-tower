@@ -72,9 +72,6 @@ object MobManager {
             UIEngine.clientApi.minecraft().world.removeEntity(mob)
 
             mobs.remove(mob)
-
-            if (mobs.isEmpty())
-                TimeBar.time = 0
         }
     }
 
