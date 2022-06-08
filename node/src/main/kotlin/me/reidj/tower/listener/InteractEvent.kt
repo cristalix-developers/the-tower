@@ -11,9 +11,6 @@ import me.func.mod.util.nbt
 import me.func.protocol.GlowColor
 import me.reidj.tower.barrier
 import me.reidj.tower.flying
-import me.reidj.tower.game.Normal
-import me.reidj.tower.game.Rating
-import me.reidj.tower.isTournament
 import me.reidj.tower.item
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
@@ -37,18 +34,27 @@ object InteractEvent : Listener {
     private const val CONST_TICKS_BEFORE_STRIKE = 20
     private const val TICKS_BEFORE_STRIKE = 40
 
+    private val normal = item {}.nbt("other", "villager")
+    private val tournament = item {}.nbt("other", "collection")
+
     private val buttons = listOf(
         button {
             title = "Обычная"
-            item = item {}.nbt("other", "villager")
-            onClick { player, _, _ -> start(player).game = Normal() }
+            item = normal
+            onClick { player, _, _ -> start(player) }
         },
         button {
-            title = "Рейтинговая"
-            item = item {}.nbt("other", "collection")
+            title = "Турнир"
+            item = tournament
             onClick { player, _, _ ->
-                if (isTournament) {
-                    start(player).game = Rating()
+                val tournament = SessionListener.simulator.getUser<User>(player.uniqueId)!!.tournament
+                if (tournament.isTournamentStarted()) {
+                    if (tournament.tournamentMaxWavePassed.size == 3) {
+                        start(player)
+                    } else {
+                        Glow.set(player, GlowColor.RED)
+                        Anime.itemTitle(player, barrier, "Ошибка", "У вас закончились попытки!")
+                    }
                 } else {
                     Glow.set(player, GlowColor.RED)
                     Anime.itemTitle(player, barrier, "Ошибка", "Турнир ещё не начался!")
@@ -81,64 +87,66 @@ object InteractEvent : Listener {
             player.performCommand(tag.getString("click"))
     }
 
-    private fun start(player: Player) = SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-        Anime.close(player)
+    private fun start(player: Player) {
+        SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+            Anime.close(player)
 
-        hideFromAll()
+            hideFromAll()
 
-        session = Session(tower.upgrades)
+            session = Session(tower.upgrades)
 
-        session?.upgrade?.values?.forEach { it.level = 1 }
+            session?.upgrade?.values?.forEach { it.level = 1 }
 
-        player.apply {
-            inventory.clear()
-            teleport(session?.arenaSpawn)
-            inventory.setItem(4, UpgradeInventory.workshop)
-            flying()
-        }
+            player.apply {
+                inventory.clear()
+                teleport(session?.arenaSpawn)
+                inventory.setItem(4, UpgradeInventory.workshop)
+                flying()
+            }
 
-        sword.giveSword(this)
+            sword.giveSword(this)
 
-        tower.health = tower.maxHealth
-        tower.updateHealth()
-        tower.update(
-            this,
-            UpgradeType.BULLET_DELAY,
-            UpgradeType.DAMAGE,
-            UpgradeType.HEALTH,
-            UpgradeType.PROTECTION,
-            UpgradeType.REGEN,
-            UpgradeType.RADIUS
-        )
-        update(
-            this,
-            UpgradeType.CASH_BONUS_KILL,
-            UpgradeType.CASH_BONUS_WAVE_PASS,
-        )
+            tower.health = tower.maxHealth
+            tower.updateHealth()
+            tower.update(
+                this,
+                UpgradeType.BULLET_DELAY,
+                UpgradeType.DAMAGE,
+                UpgradeType.HEALTH,
+                UpgradeType.PROTECTION,
+                UpgradeType.REGEN,
+                UpgradeType.RADIUS
+            )
+            update(
+                this,
+                UpgradeType.CASH_BONUS_KILL,
+                UpgradeType.CASH_BONUS_WAVE_PASS,
+            )
 
-        // Отправляем точки со спавнерами
-        session?.generators?.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
+            // Отправляем точки со спавнерами
+            session?.generators?.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
 
-        Anime.counting321(player)
+            Anime.counting321(player)
 
-        // Начинаю волну
-        inGame = true
-        giveTokens(80)
-        after(3 * 20) {
-            val current = Wave(true, System.currentTimeMillis(), 20, mutableListOf(), player)
-            wave = current
-            current.start()
+            // Начинаю волну
+            inGame = true
+            giveTokens(80)
+            after(3 * 20) {
+                val current = Wave(true, System.currentTimeMillis(), 20, mutableListOf(), player)
+                wave = current
+                current.start()
 
-            // Игра началась
-            ModTransfer(
-                true,
-                session!!.cubeLocation.x,
-                session!!.cubeLocation.y,
-                session!!.cubeLocation.z,
-                MOVE_SPEED,
-                TICKS_BEFORE_STRIKE,
-                CONST_TICKS_BEFORE_STRIKE
-            ).send("tower:update-state", player)
+                // Игра началась
+                ModTransfer(
+                    true,
+                    session!!.cubeLocation.x,
+                    session!!.cubeLocation.y,
+                    session!!.cubeLocation.z,
+                    MOVE_SPEED,
+                    TICKS_BEFORE_STRIKE,
+                    CONST_TICKS_BEFORE_STRIKE
+                ).send("tower:update-state", player)
+            }
         }
     }
 }

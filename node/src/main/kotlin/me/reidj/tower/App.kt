@@ -23,7 +23,8 @@ import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
-import me.reidj.tower.tournament.TournamentHandler
+import me.reidj.tower.tournament.RatingType
+import me.reidj.tower.tournament.Tournament
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
@@ -53,8 +54,6 @@ import kotlin.math.sqrt
 const val HUB = "HUB-2"
 
 lateinit var app: App
-
-var isTournament = false
 
 class App : JavaPlugin() {
 
@@ -88,7 +87,8 @@ class App : JavaPlugin() {
                     ),
                     0,
                     0,
-                    0
+                    0,
+                    Tournament(RatingType.NONE, mutableListOf())
                 )
             }
         }
@@ -127,12 +127,7 @@ class App : JavaPlugin() {
         listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
         // Обработка каждого тика
-        TimerHandler(
-            listOf(
-                WaveManager,
-                TournamentHandler
-            )
-        ).runTaskTimer(this, 0, 1)
+        TimerHandler(listOf(WaveManager)).runTaskTimer(this, 0, 1)
 
         // Если моб есть в списке, то отнимаем его хп
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
@@ -168,8 +163,7 @@ class App : JavaPlugin() {
             val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
             SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
                 findMob(this, pair[0].encodeToByteArray())?.let { mob ->
-                    val wavePassed = wave
-                    val waveLevel = wavePassed!!.level
+                    val waveLevel = wave!!.level
                     val reward = formula(waveLevel)
 
                     tower.health -= mob.damage - session!!.upgrade[PROTECTION]!!.getValue()
@@ -181,6 +175,9 @@ class App : JavaPlugin() {
                     if (tower.health <= 0) {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
+                        if (tournament != null)
+                            tournament!!.end(this)
+
                         LobbyItems.initialActionsWithPlayer(player)
                         player.flying(false)
                         showToAll()
@@ -189,7 +186,7 @@ class App : JavaPlugin() {
                         ModTransfer(false).send("tower:update-state", player)
 
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        wavePassed.aliveMobs.clear(player)
+                        wave!!.aliveMobs.clear(player)
                         inGame = false
                         session = null
                         giveTokens(-tokens)
@@ -197,6 +194,7 @@ class App : JavaPlugin() {
 
                         if (reward == 0)
                             return@registerIncomingPluginChannel
+
                         Anime.cursorMessage(
                             player,
                             "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"

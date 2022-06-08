@@ -74,7 +74,7 @@ object MobManager {
             mobs.remove(mob)
 
             if (mobs.isEmpty())
-                UIEngine.overlayContext.removeChild(TimeBar.bar!!)
+                TimeBar.time = 0
         }
     }
 

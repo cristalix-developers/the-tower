@@ -9,11 +9,11 @@ import ru.cristalix.uiengine.utility.*
 object TimeBar {
 
     var bar: RectangleElement? = null
+    var time = 0
     private lateinit var line: RectangleElement
     private lateinit var content: TextElement
 
     init {
-        var time = 0
         var currentTime = System.currentTimeMillis()
 
         mod.registerHandler<GameLoop> {
@@ -62,7 +62,6 @@ object TimeBar {
             }
 
             UIEngine.overlayContext + bar!!
-            line.size.x = 180.0
             bar!!.enabled = true
             content.content = text
 

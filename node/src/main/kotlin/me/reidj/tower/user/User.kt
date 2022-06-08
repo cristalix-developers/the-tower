@@ -2,7 +2,7 @@ package me.reidj.tower.user
 
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.app
-import me.reidj.tower.game.Game
+import me.reidj.tower.tournament.Tournament
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeType
@@ -26,13 +26,11 @@ class User(
     var day: Int,
     var dailyClaimTimestamp: Long,
     var lastEnter: Long,
+    var tournament: Tournament,
 ) : SimulatorUser(), Upgradable {
 
     @Transient
     var wave: Wave? = null
-
-    @Transient
-    var game: Game? = null
 
     @Transient
     var player: Player? = null

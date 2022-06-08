@@ -75,7 +75,7 @@ class App : KotlinMod() {
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 inited = false
-                UIEngine.overlayContext.removeChild(TimeBar.bar!!)
+                TimeBar.time = 0
                 MobManager.clear()
             }
         }
