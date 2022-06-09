@@ -129,7 +129,7 @@ object InteractEvent : Listener {
             inGame = true
             giveTokens(80)
             after(3 * 20) {
-                val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), player)
+                val current = Wave(true, System.currentTimeMillis(), 10, mutableListOf(), mutableListOf(), player)
                 wave = current
                 current.start()
 

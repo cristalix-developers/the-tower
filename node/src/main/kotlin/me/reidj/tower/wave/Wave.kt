@@ -23,6 +23,7 @@ class Wave(
     var startTime: Long,
     var level: Int,
     val aliveMobs: MutableList<Mob>,
+    val mobs: MutableList<Mob>,
     private val player: Player
 ) {
 
@@ -44,22 +45,26 @@ class Wave(
     private val damageStatus = level * 0.05
 
     private fun drawMob(location: Location) {
-        val has = level % 10 == 0 && aliveMobs.none { it.isBoss }
-        val type = if (has) MobType.values()
-            .first { it.wave.any { action -> level % action == 0 && it.isBoss } } else MobType.values()
-            .first { it.wave.contains(level) }
-        aliveMobs.add(Mob {
-            hp = type.hp + hpStatus
-            damage = type.damage + damageStatus
-            this.type = EntityType.valueOf(type.name)
-            isBoss = has
-        }.location(location).create(player))
+        val has = level % 10 == 0 && mobs.none { it.isBoss }
+        (if (has) MobType.values()
+            .filter { it.wave.any { wave -> level % wave == 0 && it.isBoss } } else MobType.values()
+            .filter { it.wave.any { wave -> level % wave == 0 } }).forEach {
+            val mob = Mob {
+                hp = it.hp + hpStatus
+                damage = it.damage + damageStatus
+                this.type = EntityType.valueOf(it.name)
+                isBoss = has
+            }.location(location).create(player)
+            aliveMobs.add(mob)
+            mobs.add(mob)
+        }
     }
 
     fun end() {
         val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
         isStarting = false
         level++
+        mobs.clear()
         user.giveTokens(user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt())
         if (level % 10 == 0) {
             Anime.cursorMessage(player, "§e+10 §fмонет")
