@@ -48,7 +48,7 @@ class Wave(
         val has = level % 10 == 0 && mobs.none { it.isBoss }
         (if (has) MobType.values()
             .filter { it.wave.any { wave -> level % wave == 0 && it.isBoss } } else MobType.values()
-            .filter { it.wave.any { wave -> level % wave == 0 } }).forEach {
+            .filter { it.wave.any { wave -> level % wave == 0 && !it.isBoss} }).forEach {
             val mob = Mob {
                 hp = it.hp + hpStatus
                 damage = it.damage + damageStatus

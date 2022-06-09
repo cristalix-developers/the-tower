@@ -175,8 +175,9 @@ class App : JavaPlugin() {
                     if (tower.health <= 0) {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
-                        if (tournament != null)
-                            tournament!!.end(this)
+
+                        if (tournament.isTournamentStarted())
+                            tournament.end(this)
 
                         LobbyItems.initialActionsWithPlayer(player)
                         player.flying(false)
