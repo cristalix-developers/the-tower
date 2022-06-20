@@ -14,7 +14,7 @@ import me.func.protocol.alert.NotificationData
 import me.func.protocol.npc.NpcBehaviour
 import me.reidj.tower.app
 import me.reidj.tower.content.DailyRewardType
-import me.reidj.tower.npc.NAMESPACE
+import me.reidj.tower.npc.WEB_DATA
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import org.bukkit.GameMode
@@ -71,6 +71,11 @@ object ConnectionHandler : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
+        npcStatistic.data.run {
+            skinUrl = "$WEB_DATA${this@apply.uniqueId}"
+            skinDigest = this@apply.uniqueId.toString()
+        }
+
         val user = SessionListener.simulator.getUser<User>(uniqueId)
 
         user?.player = this
@@ -95,7 +100,7 @@ object ConnectionHandler : Listener {
             if (!user?.isAutoInstallResourcepack!!) Alert.find("resourcepack")
                 .send(this) else performCommand("resourcepack")
 
-            Anime.loadTextures(this, "${NAMESPACE}health_bar.png", "${NAMESPACE}energy.png", "${NAMESPACE}xp_bar.png")
+            Anime.loadTextures(this, "${WEB_DATA}health_bar.png", "${WEB_DATA}energy.png", "${WEB_DATA}xp_bar.png")
 
             val now = System.currentTimeMillis()
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
@@ -111,11 +116,6 @@ object ConnectionHandler : Listener {
                 user.day++
             }
             user.lastEnter = now
-
-            npcStatistic.data.run {
-                skinUrl = "$NAMESPACE${this@apply.uniqueId}"
-                skinDigest = this@apply.uniqueId.toString()
-            }
         }
     }
 }

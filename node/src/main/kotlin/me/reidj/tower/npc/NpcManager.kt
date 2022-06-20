@@ -9,7 +9,7 @@ import me.reidj.tower.app
 import me.reidj.tower.user.User
 import ru.kdev.simulatorapi.listener.SessionListener
 
-const val NAMESPACE = "https://webdata.c7x.dev/textures/skin/"
+const val WEB_DATA = "https://webdata.c7x.dev/textures/skin/"
 
 object NpcManager {
 
@@ -29,7 +29,7 @@ object NpcManager {
                 }
                 location(it.clone().add(.5, 0.0, .5))
                 behaviour = NpcBehaviour.STARE_AT_PLAYER
-                skinUrl = "$NAMESPACE${data.getString("skin")}"
+                skinUrl = "$WEB_DATA${data.getString("skin")}"
                 skinDigest = data.getString("skin")
                 pitch = data.getDouble("pitch").toFloat()
             }

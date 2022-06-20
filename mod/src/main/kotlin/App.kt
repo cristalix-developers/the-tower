@@ -82,7 +82,8 @@ class App : KotlinMod() {
                     "mob:hit",
                     Unpooled.copiedBuffer("${entity.uniqueID}:true", Charsets.UTF_8)
                 )
-                (entity as EntityLivingBase).updateHealth()
+                if (MobManager.mobs.contains(entity))
+                    (entity as EntityLivingBase).updateHealth()
             }
             UIEngine.schedule(3) { isArmsLock = false }
         }
