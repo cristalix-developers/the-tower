@@ -18,7 +18,8 @@ import java.util.*
  * @author Рейдж
  */
 class User(
-    val id: UUID,
+    @Transient
+    private var id: UUID,
     var maxWavePassed: Int,
     var upgradeTypes: MutableMap<UpgradeType, Upgrade>,
     var sword: SwordType,
@@ -27,7 +28,8 @@ class User(
     var dailyClaimTimestamp: Long,
     var lastEnter: Long,
     var tournament: Tournament,
-) : SimulatorUser(), Upgradable {
+    var isAutoInstallResourcepack: Boolean,
+) : SimulatorUser(id), Upgradable {
 
     @Transient
     var wave: Wave? = null
@@ -40,7 +42,10 @@ class User(
         }
 
     @Transient
-    var inGame: Boolean = false
+    var inGame = false
+
+    @Transient
+    var isArmLocked = false
 
     @Transient
     var session: Session? = null

@@ -49,7 +49,7 @@ object InteractEvent : Listener {
             onClick { player, _, _ ->
                 val tournament = SessionListener.simulator.getUser<User>(player.uniqueId)!!.tournament
                 if (tournament.isTournamentStarted()) {
-                    if (tournament.tournamentMaxWavePassed.size == 3)
+                    if (tournament.wavePassed.size == 3)
                         start(player)
                     else
                         error(player, "У вас закончились попытки!")

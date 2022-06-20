@@ -23,6 +23,7 @@ import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.mob.Mob
+import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.tournament.RatingType
 import me.reidj.tower.tournament.Tournament
 import me.reidj.tower.upgrade.SwordType
@@ -42,6 +43,7 @@ import ru.cristalix.core.inventory.InventoryService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.party.IPartyService
 import ru.cristalix.core.party.PartyService
+import ru.cristalix.core.permissions.PermissionService
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmStatus
 import ru.cristalix.core.transfer.ITransferService
@@ -58,7 +60,7 @@ lateinit var app: App
 class App : JavaPlugin() {
 
     val map = WorldMeta(MapLoader.load("func", "tower"))
-    val spawn: Label = map.getLabel("spawn").apply { yaw = -90f }
+    val spawn: Label = map.getLabel("spawn").apply { yaw = 0f }
     val wipeDate = WipeDate(GregorianCalendar(2022, Calendar.JUNE, 1)).calendar
 
     override fun onEnable() {
@@ -88,22 +90,28 @@ class App : JavaPlugin() {
                     0,
                     0,
                     0,
-                    Tournament(RatingType.NONE, mutableListOf())
+                    Tournament(RatingType.NONE, 0, mutableListOf()),
+                    false
                 )
             }
         }
 
         CoreApi.get().apply {
-            registerService(ITransferService::class.java, TransferService(this.socketClient))
+            PermissionService(socketClient).enable()
+            registerService(ITransferService::class.java, TransferService(socketClient))
             registerService(IPartyService::class.java, PartyService(ISocketClient.get()))
             registerService(IInventoryService::class.java, InventoryService())
         }
 
-        Anime.include(Kit.EXPERIMENTAL, Kit.STANDARD, Kit.DEBUG)
+        Anime.include(Kit.NPC, Kit.DIALOG, Kit.EXPERIMENTAL, Kit.STANDARD)
 
         Platforms.set(PlatformDarkPaper())
 
         ModLoader.loadAll("mods")
+
+        // Регистрация конфига
+        config.options().copyDefaults(true)
+        saveConfig()
 
         // Конфигурация реалма
         IRealmService.get().currentRealmInfo.apply {
@@ -116,6 +124,7 @@ class App : JavaPlugin() {
         // Создание контента
         UpgradeInventory
         MainGui
+        NpcManager
 
         // Регистрация команд
         PlayerCommands

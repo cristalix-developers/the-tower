@@ -36,12 +36,6 @@ class App : KotlinMod() {
         TowerManager
         Cube
 
-        registerHandler<HealthRender> { isCancelled = true }
-        registerHandler<ExpBarRender> { isCancelled = true }
-        registerHandler<HungerRender> { isCancelled = true }
-        registerHandler<ArmorRender> { isCancelled = true }
-        registerHandler<AirBarRender> { isCancelled = true }
-        registerHandler<VehicleHealthRender> { isCancelled = true }
         registerHandler<PlayerListRender> { isCancelled = gameActive }
 
         registerChannel("tower:update-state") {

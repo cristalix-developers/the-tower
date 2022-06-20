@@ -15,6 +15,9 @@ import ru.kdev.simulatorapi.listener.SessionListener
  */
 object MainGui {
 
+    private val resourcepack = item { }.nbt("other", "settings")
+    private val statistic = item {}.nbt("other", "quest_week")
+
     private val menu = selection {
         title = "Tower Simulator"
         rows = 2
@@ -23,28 +26,35 @@ object MainGui {
         hint = ""
     }
 
-    private val buttons = listOf(
-            button {
-                item = UpgradeInventory.workshop
-                title = "Мастерская"
-                description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
-                onClick { player, _, _ -> player.performCommand("workshop") }
-            }.hint("Открыть")
-    )
+    private val workshop = button {
+        item = UpgradeInventory.workshop
+        title = "Мастерская"
+        description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
+        hint("Открыть")
+        onClick { player, _, _ -> player.performCommand("workshop") }
+    }.hint("Открыть")
 
     init {
         command("menu") { opened, _ ->
             val user = SessionListener.simulator.getUser<User>(opened.uniqueId)!!
             menu.storage.clear()
-            menu.storage.add(button {
-                item = item {}.nbt("other", "quest_week")
-                title = "§f§l > §bСтатистика"
-                description = """
+            menu.storage.addAll(listOf(
+                button {
+                    item = statistic
+                    title = "§f§l > §bСтатистика"
+                    description = """
                             §7    Монет: §e${user.money}
                             §7    Волн пройдено: §b${user.maxWavePassed}
                         """.trimIndent()
-            })
-            menu.storage.addAll(buttons)
+                },
+                workshop,
+                button {
+                    item = resourcepack
+                    title =
+                        if (user.isAutoInstallResourcepack) "Не устанавливать ресурспак" else "Устанавливать ресурспак автоматически"
+                    hint("Переключить")
+                }
+            ))
             menu.open(opened)
         }
     }

@@ -8,7 +8,7 @@ import ru.cristalix.core.transfer.ITransferService
 object PlayerCommands {
 
     init {
-        command("resourcepack") { player, args -> player.setResourcePack(System.getenv("RESOURCE_PACK"), "109") }
+        command("resourcepack") { player, _ -> player.setResourcePack(System.getenv("RESOURCE_PACK"), "109") }
 
         command("leave") { player, _ -> ITransferService.get().transfer(player.uniqueId, RealmId.of(HUB)) }
     }
