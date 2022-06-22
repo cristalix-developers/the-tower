@@ -25,8 +25,8 @@ class User(
     var sword: SwordType,
     val tower: Tower,
     var day: Int,
-    var dailyClaimTimestamp: Long,
-    var lastEnter: Long,
+    var dailyClaimTimestamp: Double,
+    var lastEnter: Double,
     var tournament: Tournament,
     var isAutoInstallResourcepack: Boolean,
 ) : SimulatorUser(id), Upgradable {
@@ -43,6 +43,9 @@ class User(
 
     @Transient
     var inGame = false
+
+    @Transient
+    var isTournament = false
 
     @Transient
     var isArmLocked = false

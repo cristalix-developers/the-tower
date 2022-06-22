@@ -70,6 +70,8 @@ class App : JavaPlugin() {
             id = "tower"
             plugin = this@App
 
+            topEnable()
+
             levelFormula { ((sqrt(5.0) * sqrt((this * 80 + 5).toDouble()) + 5) / 20).toInt() }
 
             expFormula { this * this - this / 2 }
@@ -88,13 +90,15 @@ class App : JavaPlugin() {
                             .toMutableMap()
                     ),
                     0,
-                    0,
-                    0,
+                    0.0,
+                    0.0,
                     Tournament(RatingType.NONE, 0, mutableListOf()),
                     false
                 )
             }
         }
+
+        //TopManager.create("rebirth", "Топ по Ребитху", "Ребитх", map.getLabel("top").clone().add(0.0, 4.0, 0.0))
 
         CoreApi.get().apply {
             PermissionService(socketClient).enable()
@@ -108,10 +112,6 @@ class App : JavaPlugin() {
         Platforms.set(PlatformDarkPaper())
 
         ModLoader.loadAll("mods")
-
-        // Регистрация конфига
-        config.options().copyDefaults(true)
-        saveConfig()
 
         // Конфигурация реалма
         IRealmService.get().currentRealmInfo.apply {
@@ -185,8 +185,10 @@ class App : JavaPlugin() {
                         if (maxWavePassed > waveLevel)
                             maxWavePassed = waveLevel
 
-                        if (tournament.isTournamentStarted())
+                        if (isTournament) {
                             tournament.end(this)
+                            isTournament = false
+                        }
 
                         LobbyItems.initialActionsWithPlayer(player)
                         player.flying(false)

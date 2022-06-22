@@ -1,13 +1,11 @@
 package me.reidj.tower.listener
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent
+import me.reidj.tower.app
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
-import org.bukkit.event.entity.EntityExplodeEvent
-import org.bukkit.event.entity.FoodLevelChangeEvent
+import org.bukkit.event.entity.*
 import org.bukkit.event.hanging.HangingBreakByEntityEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -15,6 +13,7 @@ import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent
 import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.event.player.PlayerMoveEvent
 import org.bukkit.event.player.PlayerSwapHandItemsEvent
 
 /**
@@ -22,6 +21,9 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent
  * @author Рейдж
  */
 object UnusedEvent : Listener {
+
+    @EventHandler
+    fun PlayerMoveEvent.handle() { if (player.location.y <= 80) player.teleport(app.spawn) }
 
     @EventHandler
     fun BlockPlaceEvent.handle() { isCancelled = true }
@@ -64,6 +66,9 @@ object UnusedEvent : Listener {
 
     @EventHandler
     fun InventoryMoveItemEvent.handle() { isCancelled = true }
+
+    @EventHandler
+    fun CreatureSpawnEvent.handle() { isCancelled = true }
 
     @EventHandler
     fun PlayerAdvancementCriterionGrantEvent.handle() { isCancelled = true }

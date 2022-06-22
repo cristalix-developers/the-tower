@@ -16,7 +16,6 @@ dependencies {
     implementation 'implario:bukkit-tools:4.4.12'
     implementation 'dev.implario.bukkit:dark-paper:1.0.0'
 
-    implementation 'clepto:clepto-bukkit:3.4.2'
     implementation 'clepto:clepto-cristalix:3.0.2'
 
     implementation 'implario:bukkit-worker-core:2.1.20'

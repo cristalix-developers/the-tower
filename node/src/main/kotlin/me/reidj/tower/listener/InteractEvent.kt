@@ -47,15 +47,19 @@ object InteractEvent : Listener {
             title = "Турнир"
             item = tournament
             onClick { player, _, _ ->
-                val tournament = SessionListener.simulator.getUser<User>(player.uniqueId)!!.tournament
-                if (tournament.isTournamentStarted()) {
-                    if (tournament.wavePassed.size == 3)
-                        start(player)
-                    else
-                        error(player, "У вас закончились попытки!")
-                } else {
-                    error(player, "Турнир ещё не начался!")
+                SessionListener.simulator.getUser<User>(player.uniqueId)!!.run {
+                    if (tournament.isTournamentStarted()) {
+                        if (tournament.wavePassed.size != 3) {
+                            start(player)
+                            isTournament = true
+                        } else {
+                            error(player, "У вас закончились попытки!")
+                        }
+                    } else {
+                        error(player, "Турнир ещё не начался!")
+                    }
                 }
+
             }
         }
     )
