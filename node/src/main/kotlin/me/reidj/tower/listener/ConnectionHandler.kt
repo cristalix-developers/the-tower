@@ -5,10 +5,13 @@ import me.func.mod.Alert.send
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
 import me.func.mod.util.after
+import me.func.mod.util.command
 import me.func.protocol.Indicators
 import me.func.protocol.Tricolor
 import me.func.protocol.alert.NotificationData
+import me.func.protocol.dialog.*
 import me.reidj.tower.content.DailyRewardType
+import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import org.bukkit.GameMode
@@ -52,11 +55,32 @@ object ConnectionHandler : Listener {
                 null
             )
         )
+        command("info") { player, _ -> Anime.openDialog(player, "tournamentPageTwo") }
     }
+
+    private val dialog = Dialog(
+        Entrypoint(
+            "tournamentPageOne",
+            "Турнир",
+            Screen("тут букафы какие то").buttons(
+                Button("Начать").actions(Action(Actions.COMMAND).command("/tournament"), Action(Actions.CLOSE)),
+                Button("Что это такое?").actions(Action.command("/info")),
+                Button("Закрыть").actions(Action(Actions.CLOSE))
+            )
+        ),
+        Entrypoint(
+            "tournamentPageTwo",
+            "Турнир",
+            Screen("тут инфа про турнир").buttons(
+                Button("Понятно").actions(Action(Actions.CLOSE)),
+                Button("Назад").actions(Action(Actions.OPEN_SCREEN).screen(Screen("tournamentPageOne")))
+            )
+        )
+    )
 
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
-        //NpcManager.createNpcWithPlayerSkin(uniqueId)
+        NpcManager.createNpcWithPlayerSkin(uniqueId)
 
         val user = SessionListener.simulator.getUser<User>(uniqueId)
 
@@ -76,6 +100,8 @@ object ConnectionHandler : Listener {
                 Indicators.VEHICLE,
                 Indicators.AIR_BAR
             )
+
+            Anime.dialog(this, dialog, "tournamentPageOne")
 
             user?.giveMoney(-0)
 

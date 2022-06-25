@@ -26,6 +26,7 @@ import me.reidj.tower.mob.Mob
 import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.tournament.RatingType
 import me.reidj.tower.tournament.Tournament
+import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
@@ -136,7 +137,7 @@ class App : JavaPlugin() {
         listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
         // Обработка каждого тика
-        TimerHandler(listOf(WaveManager)).runTaskTimer(this, 0, 1)
+        TimerHandler(listOf(WaveManager, NpcManager)).runTaskTimer(this, 0, 1)
 
         // Если моб есть в списке, то отнимаем его хп
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
@@ -186,7 +187,7 @@ class App : JavaPlugin() {
                             maxWavePassed = waveLevel
 
                         if (isTournament) {
-                            tournament.end(this)
+                            TournamentManager.end(this)
                             isTournament = false
                         }
 

@@ -7,22 +7,23 @@ import me.func.mod.Npc.onClick
 import me.func.mod.util.after
 import me.func.protocol.npc.NpcBehaviour
 import me.reidj.tower.app
+import me.reidj.tower.ticker.Ticked
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.listener.SessionListener
+import java.util.*
 
 private const val WEB_DATA = "https://webdata.c7x.dev/textures/skin/"
 
-object NpcManager {
+object NpcManager : Ticked {
 
-    /*private val npcStatistic = Npc.npc {
-        val data = app.config.getConfigurationSection("npc.character")
-        onClick { event -> performCommand(event.player, data.getString("command")) }
+    private val npcStatistic = Npc.npc {
+        onClick { event -> performCommand(event.player, "menu") }
         location(app.map.getLabel("character").clone().add(0.5, 0.0, 0.5))
         behaviour = NpcBehaviour.STARE_AT_PLAYER
-        pitch = data.getDouble("pitch").toFloat()
-    }*/
+        pitch = 160f
+    }
 
     init {
         NpcType.values().forEach {
@@ -34,20 +35,15 @@ object NpcManager {
                 skinDigest = it.skin
                 pitch = it.pitch
             }
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(app, {
-                if (Bukkit.getOnlinePlayers().isEmpty())
-                    return@scheduleSyncRepeatingTask
-                Bukkit.getOnlinePlayers().forEach { player -> Banners.content(player.player, it.banner, it.description) }
-            }, 0, 1)
         }
     }
 
-    /*fun createNpcWithPlayerSkin(uuid: UUID) {
+    fun createNpcWithPlayerSkin(uuid: UUID) {
         npcStatistic.data.run {
             skinUrl = "$WEB_DATA${uuid}"
             skinDigest = uuid.toString()
         }
-    }*/
+    }
 
     private fun performCommand(player: Player, command: String) {
         SessionListener.simulator.getUser<User>(player.uniqueId)?.run {
@@ -56,6 +52,14 @@ object NpcManager {
             isArmLocked = true
             player.performCommand(command)
             after(5) { isArmLocked = false }
+        }
+    }
+
+    override fun tick(vararg args: Int) {
+        if (args[0] % 20 != 0)
+            return
+        Bukkit.getOnlinePlayers().forEach { player ->
+            NpcType.values().forEach { Banners.content(player, it.banner, it.contentBuilder()) }
         }
     }
 }
