@@ -42,7 +42,7 @@ object GameManager {
     )
 
     fun ratingGameStart(user: User) = user.run {
-        if (TournamentManager.isTournamentStarted()) {
+        if (TournamentManager.isTournamentDay()) {
             if (tournament.wavePassed.size != 3) {
                 start(player!!)
                 isTournament = true

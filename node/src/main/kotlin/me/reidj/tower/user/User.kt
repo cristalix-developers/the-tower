@@ -82,7 +82,8 @@ class User(
     }
 
     fun giveExperience(exp: Int) {
-        //val prevLevel = SessionListener.simulator.run { this@User.getLevel() }
+
+        //val prevLevel = SessionListener.simulator.run { getLevel() }
         this.exp += exp
         ModTransfer()
             .integer(SessionListener.simulator.run { getLevel() })
