@@ -18,7 +18,6 @@ import me.func.protocol.GlowColor
 import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
-import me.reidj.tower.data.WipeDate
 import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
@@ -62,7 +61,6 @@ class App : JavaPlugin() {
 
     val map = WorldMeta(MapLoader.load("func", "tower"))
     val spawn: Label = map.getLabel("spawn").apply { yaw = 0f }
-    val wipeDate = WipeDate(GregorianCalendar(2022, Calendar.JUNE, 1)).calendar
 
     override fun onEnable() {
         app = this

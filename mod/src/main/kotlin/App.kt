@@ -1,11 +1,11 @@
+
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
-import dev.xdark.clientapi.event.render.*
+import dev.xdark.clientapi.event.render.PlayerListRender
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import player.Statistic
-import ru.cristalix.clientapi.JavaMod
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3

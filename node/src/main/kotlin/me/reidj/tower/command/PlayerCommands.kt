@@ -1,10 +1,12 @@
 package me.reidj.tower.command
 
+import me.func.mod.Anime
 import me.func.mod.selection.choicer
 import me.func.mod.util.command
 import me.reidj.tower.HUB
 import me.reidj.tower.game.GameManager
 import me.reidj.tower.user.User
+import me.reidj.tower.util.DialogUtil
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.transfer.ITransferService
 import ru.kdev.simulatorapi.listener.SessionListener
@@ -31,5 +33,15 @@ object PlayerCommands {
                 }.open(player)
             }
         }
+
+        command("tournamentDialog") { player, _ ->
+            Anime.dialog(
+                player,
+                DialogUtil.tournamentDialog,
+                "tournamentPageOne"
+            )
+        }
+
+        command("tournamentInfo") { player, _ -> Anime.openDialog(player, "tournamentPageTwo") }
     }
 }
