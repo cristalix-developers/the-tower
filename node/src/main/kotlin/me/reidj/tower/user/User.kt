@@ -1,6 +1,9 @@
 package me.reidj.tower.user
 
+import me.func.mod.Anime
+import me.func.mod.Glow
 import me.func.mod.conversation.ModTransfer
+import me.func.protocol.GlowColor
 import me.reidj.tower.app
 import me.reidj.tower.tournament.Tournament
 import me.reidj.tower.upgrade.SwordType
@@ -56,6 +59,10 @@ class User(
     @Transient
     var tokens = 0
 
+    fun level() = SessionListener.simulator.run { return@run getLevel() }
+
+    fun requiredExp() = SessionListener.simulator.run { return@run getNextLevelExp() }
+
     fun hideFromAll() {
         Bukkit.getOnlinePlayers().filterNotNull().forEach { current ->
             player!!.hidePlayer(app, current)
@@ -82,21 +89,13 @@ class User(
     }
 
     fun giveExperience(exp: Int) {
-
-        //val prevLevel = SessionListener.simulator.run { getLevel() }
+        val prevLevel = level()
         this.exp += exp
-        ModTransfer()
-            .integer(SessionListener.simulator.run { getLevel() })
-            .integer(exp)
-            .integer(SessionListener.simulator.run { getNextLevelExp() })
-            .send("tower:exp", player)
-        /*if (exp >= prevLevel) {
-            Glow.animate(player!!, .5, GlowColor.GREEN)
-            Anime.topMessage(
-                player!!,
-                "§bВаш уровень был повышен!\n§7$prevLevel §f ➠ §l${SessionListener.simulator.run { this@User.getLevel() }}"
-            )
-        }*/
+        ModTransfer(level(), exp, requiredExp()).send("tower:exp", player)
+        if (exp >= prevLevel) {
+            Anime.alert(player!!, "§lПоздравляем!", "Ваш уровень был повышен!\n§7$prevLevel §f ➠ §l${level()}")
+            Glow.animate(player!!, .5, GlowColor.BLUE)
+        }
     }
 
     override fun update(user: User, vararg type: UpgradeType) =

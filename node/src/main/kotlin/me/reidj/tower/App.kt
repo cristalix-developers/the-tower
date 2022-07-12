@@ -201,7 +201,9 @@ class App : JavaPlugin() {
                         inGame = false
                         session = null
                         giveTokens(-tokens)
+                        giveExperience(waveLevel * 3)
                         wave = null
+
 
                         if (reward == 0)
                             return@registerIncomingPluginChannel

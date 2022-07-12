@@ -4,6 +4,7 @@ import me.func.mod.Alert
 import me.func.mod.Alert.send
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
+import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.func.protocol.Indicators
 import me.func.protocol.Tricolor
@@ -75,10 +76,12 @@ object ConnectionHandler : Listener {
 
             user?.giveMoney(-0)
 
+            ModTransfer(user!!.level(), user.exp, user.requiredExp()).send("tower:exp", this)
+
             if (!user?.isAutoInstallResourcepack!!) Alert.find("resourcepack")
                 .send(this) else performCommand("resourcepack")
 
-            Anime.loadTextures(this, "${NAMESPACE}health_bar.png", "${NAMESPACE}energy.png", "${NAMESPACE}xp_bar.png")
+            Anime.loadTextures(this, "${NAMESPACE}health_bar.png", "${NAMESPACE}energy.png")
 
             val now = System.currentTimeMillis().toDouble()
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7

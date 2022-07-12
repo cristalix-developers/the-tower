@@ -5,6 +5,7 @@ import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.PlayerListRender
 import io.netty.buffer.Unpooled
 import mob.MobManager
+import player.Indicator
 import player.Statistic
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
@@ -35,6 +36,7 @@ class App : KotlinMod() {
         BarManager
         TowerManager
         Cube
+        Indicator
 
         registerHandler<PlayerListRender> { isCancelled = gameActive }
 
@@ -42,6 +44,7 @@ class App : KotlinMod() {
             gameActive = readBoolean()
             BarManager.healthIndicator!!.enabled = gameActive
             BarManager.protectionIndicator!!.enabled = gameActive
+            Indicator.levelBar.enabled = !gameActive
             Statistic.tokensBox.enabled = gameActive
             if (gameActive) {
                 mod.cube = V3(

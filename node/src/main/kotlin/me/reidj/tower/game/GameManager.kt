@@ -97,7 +97,7 @@ object GameManager {
 
             // Начинаю волну
             inGame = true
-            giveTokens(80)
+            giveTokens(level() * 1000)
             after(3 * 20) {
                 val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
                 wave = current
