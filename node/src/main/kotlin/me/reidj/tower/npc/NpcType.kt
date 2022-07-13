@@ -7,16 +7,16 @@ import me.reidj.tower.app
 import org.bukkit.Location
 
 enum class NpcType(
-    val title: String,
-    val location: Location,
+    val bannerTitle: String,
+    val npcName: String,
     val command: String,
     val skin: String,
     val pitch: Float,
-    var banner: Banner
+    var banner: Banner?
 ) {
     NORMAL(
         "§bОбычная",
-        app.map.getLabel("normal"),
+        "",
         "normal",
         "307264a1-2c69-11e8-b5ea-1cb72caa35fd",
         179f,
@@ -24,7 +24,7 @@ enum class NpcType(
     ),
     RATING(
         "§bТурнир",
-        app.map.getLabel("rating"),
+        "",
         "tournamentDialog",
         "bf30a1df-85de-11e8-a6de-1cb72caa35fd",
         179f,
@@ -32,12 +32,20 @@ enum class NpcType(
     ),
     CHARACTER(
         "§6Ваш профиль Tower",
-        app.map.getLabel("character"),
+        "§eНАЖМИТЕ ДЛЯ ПРОСМОТРА",
         "menu",
-        "",
+        "307264a1-2c69-11e8-b5ea-1cb72caa35fd",
         160f,
         createBanner(app.map.getLabel("character"), 150.0, 0.0, 6.0, 0.5,true)
     ),
+    GUIDE(
+        "",
+        "§aОбучение",
+        "guide",
+        "d5c6967a-2fd9-11eb-acca-1cb72caa35fd",
+        -156.5f,
+        null
+    )
     ;
 }
 
@@ -50,7 +58,7 @@ private fun createBanner(
     watchingOnPlayer: Boolean
 ): Banner = Banners.new {
     height = 40
-    weight = 73
+    weight = 89
     location(location.clone().add(0.5, y, z))
     motionSettings = hashMapOf(
         "yaw" to yaw,

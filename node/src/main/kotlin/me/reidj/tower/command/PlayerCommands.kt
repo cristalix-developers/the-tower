@@ -43,5 +43,13 @@ object PlayerCommands {
         }
 
         command("tournamentInfo") { player, _ -> Anime.openDialog(player, "tournamentPageTwo") }
+
+        command("guide") { player, _ ->
+            Anime.dialog(
+                player,
+                DialogUtil.guideDialog,
+                "guidePageOne"
+            )
+        }
     }
 }

@@ -3,6 +3,8 @@ package me.reidj.tower.tournament
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import ru.kdev.simulatorapi.listener.SessionListener
+import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -10,7 +12,7 @@ object TournamentManager {
 
     private const val COUNTDOWN_DAYS = 3
 
-    private val startDate = Date(2022, 6, 3)
+    private val startDate = Date(2022, 7, 2)
 
     fun end(user: User) = user.run {
         tournament.wavePassed.add(user.wave!!.level)
@@ -32,6 +34,5 @@ object TournamentManager {
         return unit.convert(nextTournament - now, TimeUnit.MILLISECONDS)
     }
 
-    fun getTimeAfter(unit: TimeUnit) =
-        unit.convert((COUNTDOWN_DAYS - 1) * 86_400_000 - getTimeBefore(TimeUnit.MILLISECONDS), TimeUnit.MILLISECONDS)
+    fun getTimeAfter(unit: ChronoUnit) = unit.between(LocalTime.now(), LocalTime.MAX)
 }

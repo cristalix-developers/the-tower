@@ -123,7 +123,6 @@ class App : JavaPlugin() {
         // Создание контента
         UpgradeInventory
         MainGui
-        NpcManager
 
         // Регистрация команд
         PlayerCommands

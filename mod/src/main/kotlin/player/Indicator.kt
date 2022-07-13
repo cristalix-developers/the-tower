@@ -15,7 +15,7 @@ object Indicator {
 
     val levelBar = rectangle {
         enabled = true
-        offset = V3(0.0, -37.0)
+        offset = V3(0.0, -27.0)
         origin = BOTTOM
         align = BOTTOM
         size = V3(180.0, 5.0, 0.0)

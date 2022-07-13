@@ -28,4 +28,23 @@ object DialogUtil {
             )
         )
     )
+
+    val guideDialog = Dialog(
+        Entrypoint(
+            "guidePageOne",
+            "Обучение",
+            Screen("бла бла").buttons(
+                Button("ага да").actions(Action(Actions.COMMAND).command("/tournament"), Action(Actions.CLOSE)),
+                Button("Уйти").actions(Action(Actions.CLOSE))
+            )
+        ),
+        Entrypoint(
+            "guidePageTwo",
+            "Обучение",
+            Screen("тут инфа про турнир").buttons(
+                Button("Понятно").actions(Action(Actions.CLOSE)),
+                Button("Назад").actions(Action.command("/tournamentDialog"))
+            )
+        )
+    )
 }

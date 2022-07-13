@@ -75,8 +75,7 @@ object ConnectionHandler : Listener {
             )
 
             user?.giveMoney(-0)
-
-            ModTransfer(user!!.level(), user.exp, user.requiredExp()).send("tower:exp", this)
+            user?.giveExperience(-0)
 
             if (!user?.isAutoInstallResourcepack!!) Alert.find("resourcepack")
                 .send(this) else performCommand("resourcepack")

@@ -13,9 +13,11 @@ object AdminCommands {
     )
 
     init {
-        adminConsume("money") { user, args -> user.giveMoney(args[0].toInt()) }
+        command("money") { player, args -> SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveMoney(args[0].toInt()) }
 
-        adminConsume("tokens") { user, args -> user.giveTokens(args[0].toInt()) }
+        command("tokens") { player, args -> SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveTokens(args[0].toInt()) }
+
+        command("exp") { player, args -> SessionListener.simulator.getUser<User>(player.uniqueId)!!.giveExperience(args[0].toInt()) }
 
         adminConsume("rebirth") { user, args -> user.rebirth += args[0].toInt() }
     }

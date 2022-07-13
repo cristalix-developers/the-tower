@@ -1,9 +1,13 @@
 package me.reidj.tower.npc
 
+import implario.humanize.Humanize
 import me.func.mod.Banners
 import me.func.mod.Npc
 import me.func.mod.Npc.location
 import me.func.mod.Npc.onClick
+import me.func.mod.Npc.skin
+import me.func.mod.data.NpcSmart
+import me.func.mod.emotion.Emotions
 import me.func.mod.util.after
 import me.func.protocol.npc.NpcBehaviour
 import me.reidj.tower.app
@@ -13,40 +17,31 @@ import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.kdev.simulatorapi.listener.SessionListener
+import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
-
-private const val WEB_DATA = "https://webdata.c7x.dev/textures/skin/"
+import kotlin.math.pow
 
 object NpcManager : Ticked {
 
-    private val character = Npc.npc {
-        onClick { event -> performCommand(event.player, "menu") }
-        location(app.map.getLabel("character").clone().add(0.5, 0.0, 0.5))
-        behaviour = NpcBehaviour.STARE_AT_PLAYER
-        pitch = 160f
-        name = "§eНАЖМИТЕ ДЛЯ ПРОСМОТРА"
-    }
+    private val npcs = mutableMapOf<String, NpcSmart>()
 
     init {
         NpcType.values().forEach {
-            Npc.npc {
+            npcs[it.name] = Npc.npc {
                 onClick { event -> performCommand(event.player, it.command) }
-                location(it.location.clone().add(.5, .0, .5))
+                location(app.map.getLabel(it.name.lowercase()).clone().add(.5, .0, .5))
+                skin(UUID.fromString(it.skin))
                 behaviour = NpcBehaviour.STARE_AT_PLAYER
-                skinUrl = "$WEB_DATA${it.skin}"
-                skinDigest = it.skin
                 pitch = it.pitch
+                name = it.npcName
             }
         }
     }
 
-    fun createNpcWithPlayerSkin(uuid: UUID) {
-        character.data.run {
-            skinUrl = "$WEB_DATA${uuid}"
-            skinDigest = uuid.toString()
-        }
-    }
+    private val guide = npcs[NpcType.GUIDE.name]!!
+
+    fun createNpcWithPlayerSkin(uuid: UUID) = npcs[NpcType.CHARACTER.name]!!.data.skin(uuid)
 
     private fun performCommand(player: Player, command: String) {
         SessionListener.simulator.getUser<User>(player.uniqueId)?.run {
@@ -59,36 +54,46 @@ object NpcManager : Ticked {
     }
 
     override fun tick(vararg args: Int) {
-        if (args[0] % 20 != 0)
-            return
-        println("days ${TournamentManager.getTimeAfter(TimeUnit.DAYS)}")
-        println("hours ${TournamentManager.getTimeAfter(TimeUnit.HOURS)}")
-        println("seconds ${TournamentManager.getTimeAfter(TimeUnit.SECONDS)}")
-        Bukkit.getOnlinePlayers().forEach { player ->
-            Banners.content(
-                player,
-                NpcType.NORMAL.banner,
-                "${NpcType.NORMAL.title}\n§e${TournamentManager.getOnlinePlayers().size} игроков"
-            )
-            Banners.content(
-                player, NpcType.RATING.banner, String.format(
-                    "%s\n${if (TournamentManager.isTournamentDay()) "§e%d игроков\n§6До конца %d:%d:%d" else "§6До начала %d:%d:%d"}",
-                    NpcType.RATING.title,
-                    TournamentManager.getOnlinePlayers().filter { it.isTournament }.size,
-                    TournamentManager.getTimeAfter(TimeUnit.DAYS),
-                    TournamentManager.getTimeAfter(TimeUnit.HOURS),
-                    TournamentManager.getTimeAfter(TimeUnit.SECONDS),
-                    TournamentManager.getTimeBefore(TimeUnit.DAYS),
-                    TournamentManager.getTimeBefore(TimeUnit.HOURS),
-                    TournamentManager.getTimeBefore(TimeUnit.SECONDS),
+        if (args[0] % 20 != 0) {
+            // Обновляю текст на баннерах
+            val size = TournamentManager.getOnlinePlayers().size
+            val plurals = Humanize.plurals("игрок", "игрока", "игроков", size)
+            Bukkit.getOnlinePlayers().forEach { player ->
+                Banners.content(
+                    player,
+                    NpcType.NORMAL.banner!!,
+                    "${NpcType.NORMAL.bannerTitle}\n§e${size} $plurals"
                 )
-            )
-            val user = SessionListener.simulator.getUser<User>(player.uniqueId)
-            Banners.content(
-                player,
-                NpcType.CHARACTER.banner,
-                "${NpcType.CHARACTER.title}\n\n§fМонет: §3${user?.money}\n§fВолн пройдено: §3${user?.maxWavePassed}"
-            )
+                val daysTotal = TournamentManager.getTimeBefore(TimeUnit.MINUTES) / 60 / 24
+                Banners.content(
+                    player, NpcType.RATING.banner!!, String.format(
+                        "%s\n§e%d $plurals\n${
+                            if (TournamentManager.isTournamentDay()) "§6До конца %d ${
+                                Humanize.plurals(
+                                    "час", "часа", "часов",
+                                    TournamentManager.getTimeAfter(ChronoUnit.HOURS).toInt()
+                                )
+                            }" else "§6До начала %d ${Humanize.plurals("день", "дня", "дней", daysTotal.toInt())}"
+                        }",
+                        NpcType.RATING.bannerTitle,
+                        TournamentManager.getOnlinePlayers().filter { it.isTournament }.size,
+                        TournamentManager.getTimeAfter(ChronoUnit.HOURS),
+                        daysTotal.toInt()
+                    )
+                )
+                val user = SessionListener.simulator.getUser<User>(player.uniqueId)
+                Banners.content(
+                    player,
+                    NpcType.CHARACTER.banner!!,
+                    "${NpcType.CHARACTER.bannerTitle}\n\n§fМонет: §3${user?.money}\n§fВолн пройдено: §3${user?.maxWavePassed}"
+                )
+            }
+        }
+        // Анимация нпс
+        if (args[0] % 80 == 0) {
+            val nearPlayers = Bukkit.getOnlinePlayers()
+                .filter { (it.location.x - guide.data.x).pow(2.0) + (it.location.z - guide.data.z).pow(2.0) < 120 }
+            Emotions.play(Emotions.WAVE, guide.data.uuid, nearPlayers)
         }
     }
 }

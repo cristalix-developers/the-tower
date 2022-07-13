@@ -91,8 +91,8 @@ class User(
     fun giveExperience(exp: Int) {
         val prevLevel = level()
         this.exp += exp
-        ModTransfer(level(), exp, requiredExp()).send("tower:exp", player)
-        if (exp >= prevLevel) {
+        ModTransfer(level(), this.exp, requiredExp()).send("tower:exp", player)
+        if (exp >= requiredExp()) {
             Anime.alert(player!!, "§lПоздравляем!", "Ваш уровень был повышен!\n§7$prevLevel §f ➠ §l${level()}")
             Glow.animate(player!!, .5, GlowColor.BLUE)
         }
