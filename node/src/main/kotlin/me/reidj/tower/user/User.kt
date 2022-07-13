@@ -92,7 +92,7 @@ class User(
         val prevLevel = level()
         this.exp += exp
         ModTransfer(level(), this.exp, requiredExp()).send("tower:exp", player)
-        if (exp >= requiredExp()) {
+        if (level() > prevLevel) {
             Anime.alert(player!!, "§lПоздравляем!", "Ваш уровень был повышен!\n§7$prevLevel §f ➠ §l${level()}")
             Glow.animate(player!!, .5, GlowColor.BLUE)
         }
