@@ -40,10 +40,18 @@ enum class NpcType(
     ),
     GUIDE(
         "",
-        "§aОбучение",
+        "§aОБУЧЕНИЕ",
         "guide",
         "d5c6967a-2fd9-11eb-acca-1cb72caa35fd",
         -156.5f,
+        null
+    ),
+    LABORATORY(
+        "",
+        "§6РАБОТНИК ЛАБОРАТОРИИ",
+        "laboratory",
+        "c87bbbbf-c7a4-11eb-acca-1cb72caa35fd",
+        131.5f,
         null
     )
     ;

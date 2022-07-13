@@ -1,5 +1,6 @@
 package player
 
+import dev.xdark.clientapi.event.lifecycle.GameLoop
 import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
@@ -40,6 +41,11 @@ object Indicator {
 
     init {
         UIEngine.overlayContext.addChild(levelBar)
+
+        mod.registerHandler<GameLoop> {
+            val currentScreen = UIEngine.clientApi.minecraft().currentScreen()
+            levelBar.enabled = currentScreen == null || currentScreen::class.java.simpleName != "aV"
+        }
 
         mod.registerChannel("tower:exp") {
             val level = readInt()
