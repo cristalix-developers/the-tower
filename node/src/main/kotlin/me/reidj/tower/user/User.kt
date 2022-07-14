@@ -70,7 +70,7 @@ class User(
         }
     }
     fun showToAll() {
-        Bukkit.getOnlinePlayers().mapNotNull { SessionListener.simulator.getUser<User>(it.uniqueId) }
+        Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }
             .filter { !it.inGame }
             .forEach {
                 it.player!!.showPlayer(app, player)
@@ -86,6 +86,10 @@ class User(
     fun giveMoney(money: Int) {
         this.money += money
         ModTransfer(this.money).send("tower:money", player)
+    }
+
+    fun giveRebirth(rebirth: Int) {
+        this.rebirth += rebirth
     }
 
     fun giveExperience(exp: Int) {

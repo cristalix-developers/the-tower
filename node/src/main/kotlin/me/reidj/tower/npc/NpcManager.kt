@@ -13,10 +13,8 @@ import me.func.protocol.npc.NpcBehaviour
 import me.reidj.tower.app
 import me.reidj.tower.ticker.Ticked
 import me.reidj.tower.tournament.TournamentManager
-import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import ru.kdev.simulatorapi.listener.SessionListener
 import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -44,7 +42,7 @@ object NpcManager : Ticked {
     fun createNpcWithPlayerSkin(uuid: UUID) = npcs[NpcType.CHARACTER.name]!!.data.skin(uuid)
 
     private fun performCommand(player: Player, command: String) {
-        SessionListener.simulator.getUser<User>(player.uniqueId)?.run {
+        app.getUser(player)?.run {
             if (isArmLocked)
                 return@run
             isArmLocked = true
@@ -64,7 +62,11 @@ object NpcManager : Ticked {
                     NpcType.NORMAL.banner!!,
                     "${NpcType.NORMAL.bannerTitle}\n§e${size} $plurals"
                 )
-                val daysTotal = TournamentManager.getTimeBefore(TimeUnit.MINUTES) / 60 / 24
+                val minutesTotal = TournamentManager.getTimeBefore(TimeUnit.MINUTES)
+                val hoursTotal = minutesTotal / 60
+                val daysTotal = (hoursTotal / 24) % 24
+                val hours = hoursTotal - daysTotal * 24
+                val minutes = (hoursTotal - hours) % 60
                 Banners.content(
                     player, NpcType.RATING.banner!!, String.format(
                         "%s\n§e%d $plurals\n${
@@ -73,15 +75,17 @@ object NpcManager : Ticked {
                                     "час", "часа", "часов",
                                     TournamentManager.getTimeAfter(ChronoUnit.HOURS).toInt()
                                 )
-                            }" else "§6До начала %d ${Humanize.plurals("день", "дня", "дней", daysTotal.toInt())}"
+                            }" else "§6До начала %d:%d:%d"
                         }",
                         NpcType.RATING.bannerTitle,
                         TournamentManager.getOnlinePlayers().filter { it.isTournament }.size,
                         TournamentManager.getTimeAfter(ChronoUnit.HOURS),
-                        daysTotal.toInt()
+                        daysTotal,
+                        hours,
+                        minutes
                     )
                 )
-                val user = SessionListener.simulator.getUser<User>(player.uniqueId)
+                val user = app.getUser(player)
                 Banners.content(
                     player,
                     NpcType.CHARACTER.banner!!,

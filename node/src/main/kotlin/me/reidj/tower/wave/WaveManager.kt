@@ -1,11 +1,10 @@
 package me.reidj.tower.wave
 
+import me.reidj.tower.app
 import me.reidj.tower.clear
 import me.reidj.tower.ticker.Ticked
 import me.reidj.tower.upgrade.UpgradeType
-import me.reidj.tower.user.User
 import org.bukkit.Bukkit
-import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -14,7 +13,7 @@ import ru.kdev.simulatorapi.listener.SessionListener
 object WaveManager : Ticked {
 
     override fun tick(vararg args: Int) {
-        Bukkit.getOnlinePlayers().mapNotNull { SessionListener.simulator.getUser<User>(it.uniqueId) }
+        Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }
             .filter { it.wave != null && it.session != null }
             .forEach {
                 if (it.wave!!.isStarting) {

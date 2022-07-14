@@ -1,4 +1,4 @@
-package me.reidj.tower.game
+package me.reidj.tower.util
 
 import me.func.mod.Anime
 import me.func.mod.Glow
@@ -7,6 +7,7 @@ import me.func.mod.selection.button
 import me.func.mod.util.after
 import me.func.mod.util.nbt
 import me.func.protocol.GlowColor
+import me.reidj.tower.app
 import me.reidj.tower.barrier
 import me.reidj.tower.flying
 import me.reidj.tower.item
@@ -17,9 +18,8 @@ import me.reidj.tower.user.Session
 import me.reidj.tower.user.User
 import me.reidj.tower.wave.Wave
 import org.bukkit.entity.Player
-import ru.kdev.simulatorapi.listener.SessionListener
 
-object GameManager {
+object GameUtil {
 
     private const val MOVE_SPEED: Double = .01
     private const val CONST_TICKS_BEFORE_STRIKE = 20
@@ -55,28 +55,28 @@ object GameManager {
     }
 
     fun start(player: Player) {
-        SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
+        app.getUser(player)?.let {
             Anime.close(player)
 
-            hideFromAll()
+            it.hideFromAll()
 
-            session = Session(tower.upgrades)
+            it.session = Session(it.tower.upgrades)
 
-            session?.upgrade?.values?.forEach { it.level = 1 }
+            it.session?.upgrade?.values?.forEach { upgrade -> upgrade.level = 1 }
 
             player.apply {
                 inventory.clear()
-                teleport(session?.arenaSpawn)
+                teleport(it.session?.arenaSpawn)
                 inventory.setItem(4, UpgradeInventory.workshop)
                 flying()
             }
 
-            sword.giveSword(this)
+            it.sword.giveSword(it)
 
-            tower.health = tower.maxHealth
-            tower.updateHealth()
-            tower.update(
-                this,
+            it.tower.health = it.tower.maxHealth
+            it.tower.updateHealth()
+            it.tower.update(
+                it,
                 UpgradeType.BULLET_DELAY,
                 UpgradeType.DAMAGE,
                 UpgradeType.HEALTH,
@@ -84,31 +84,31 @@ object GameManager {
                 UpgradeType.REGEN,
                 UpgradeType.RADIUS
             )
-            update(
-                this,
+            it.update(
+                it,
                 UpgradeType.CASH_BONUS_KILL,
                 UpgradeType.CASH_BONUS_WAVE_PASS,
             )
 
             // Отправляем точки со спавнерами
-            session?.generators?.forEach { ModTransfer(it.x, it.y, it.z).send("mobs:init", player) }
+            it.session?.generators?.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
 
             Anime.counting321(player)
 
             // Начинаю волну
-            inGame = true
-            giveTokens(level() * 1000)
+            it.inGame = true
+            it.giveTokens(it.level() * 1000)
             after(3 * 20) {
                 val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
-                wave = current
+                it.wave = current
                 current.start()
 
                 // Игра началась
                 ModTransfer(
                     true,
-                    session!!.cubeLocation.x,
-                    session!!.cubeLocation.y,
-                    session!!.cubeLocation.z,
+                    it.session!!.cubeLocation.x,
+                    it.session!!.cubeLocation.y,
+                    it.session!!.cubeLocation.z,
                     MOVE_SPEED,
                     TICKS_BEFORE_STRIKE,
                     CONST_TICKS_BEFORE_STRIKE

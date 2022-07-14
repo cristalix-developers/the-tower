@@ -4,21 +4,19 @@ import me.func.mod.Alert
 import me.func.mod.Alert.send
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
-import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.func.protocol.Indicators
 import me.func.protocol.Tricolor
 import me.func.protocol.alert.NotificationData
+import me.reidj.tower.app
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.npc.NpcManager
-import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import ru.cristalix.core.formatting.Formatting
-import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -53,7 +51,7 @@ object ConnectionHandler : Listener {
 
     @EventHandler
     fun PlayerJoinEvent.handle() = player.apply {
-        val user = SessionListener.simulator.getUser<User>(uniqueId)
+        val user = app.getUser(player)
 
         user?.player = this
         gameMode = GameMode.ADVENTURE

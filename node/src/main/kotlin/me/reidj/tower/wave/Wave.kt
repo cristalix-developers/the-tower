@@ -7,12 +7,10 @@ import me.reidj.tower.app
 import me.reidj.tower.mob.Mob
 import me.reidj.tower.mob.MobType
 import me.reidj.tower.upgrade.UpgradeType
-import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
-import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -32,7 +30,7 @@ class Wave(
         ModTransfer("$level волна", 40).send("tower:timebar", player)
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
-                val session = SessionListener.simulator.getUser<User>(player.uniqueId)?.session ?: return@runTaskLater
+                val session = app.getUser(player)?.session ?: return@runTaskLater
                 drawMob(session.generators.random().apply {
                     x += Math.random() * 4 - 2
                     z += Math.random() * 4 - 2
@@ -61,14 +59,14 @@ class Wave(
     }
 
     fun end() {
-        val user = SessionListener.simulator.getUser<User>(player.uniqueId)!!
+        val user = app.getUser(player)
         isStarting = false
         level++
         mobs.clear()
-        user.giveTokens(user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt())
+        user?.giveTokens(user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt())
         if (level % 10 == 0) {
             Anime.cursorMessage(player, "§e+10 §fмонет")
-            user.giveMoney(10)
+            user?.giveMoney(10)
         }
         startTime = System.currentTimeMillis()
         Anime.counting321(player)

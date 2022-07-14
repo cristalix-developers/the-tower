@@ -4,12 +4,11 @@ import me.func.mod.Anime
 import me.func.mod.selection.choicer
 import me.func.mod.util.command
 import me.reidj.tower.HUB
-import me.reidj.tower.game.GameManager
-import me.reidj.tower.user.User
+import me.reidj.tower.app
 import me.reidj.tower.util.DialogUtil
+import me.reidj.tower.util.GameUtil
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.transfer.ITransferService
-import ru.kdev.simulatorapi.listener.SessionListener
 
 object PlayerCommands {
 
@@ -18,18 +17,18 @@ object PlayerCommands {
 
         command("leave") { player, _ -> ITransferService.get().transfer(player.uniqueId, RealmId.of(HUB)) }
 
-        command("normal") { player, _ -> GameManager.start(player) }
+        command("normal") { player, _ -> GameUtil.start(player) }
 
-        command("tournament") { player, _ -> GameManager.ratingGameStart(SessionListener.simulator.getUser(player.uniqueId)!!) }
+        command("tournament") { player, _ -> app.getUser(player)?.let { GameUtil.ratingGameStart(it) } }
 
         command("play") { player, _ ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                if (inGame)
-                    return@apply
+            app.getUser(player)?.let {
+                if (it.inGame)
+                    return@command
                 choicer {
                     title = "Tower Simulator"
                     description = "Выберите под-режим"
-                    storage = GameManager.buttons.toMutableList()
+                    storage = GameUtil.buttons.toMutableList()
                 }.open(player)
             }
         }

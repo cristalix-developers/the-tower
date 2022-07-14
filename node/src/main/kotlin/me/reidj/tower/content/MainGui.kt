@@ -4,10 +4,9 @@ import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
+import me.reidj.tower.app
 import me.reidj.tower.item
 import me.reidj.tower.upgrade.UpgradeInventory
-import me.reidj.tower.user.User
-import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -36,7 +35,7 @@ object MainGui {
 
     init {
         command("menu") { opened, _ ->
-            val user = SessionListener.simulator.getUser<User>(opened.uniqueId)!!
+            val user = app.getUser(opened) ?: return@command
             menu.storage.clear()
             menu.storage.addAll(listOf(
                 button {

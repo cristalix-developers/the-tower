@@ -1,8 +1,8 @@
 package me.reidj.tower.tournament
 
+import me.reidj.tower.app
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
-import ru.kdev.simulatorapi.listener.SessionListener
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.*
@@ -19,7 +19,7 @@ object TournamentManager {
         tournament.maxWavePassed = Collections.max(tournament.wavePassed)
     }
 
-    fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { SessionListener.simulator.getUser<User>(it.uniqueId) }.filter { it.inGame }
+    fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter { it.inGame }
 
     fun isTournamentDay() =
         TimeUnit.DAYS.convert(System.currentTimeMillis() - startDate.time, TimeUnit.MILLISECONDS) % COUNTDOWN_DAYS == 0L

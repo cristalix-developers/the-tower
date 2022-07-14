@@ -18,6 +18,7 @@ import me.func.protocol.GlowColor
 import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
+import me.reidj.tower.laboratory.LaboratoryManager
 import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
@@ -36,6 +37,7 @@ import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.Bukkit
+import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.inventory.IInventoryService
@@ -123,6 +125,7 @@ class App : JavaPlugin() {
         // Создание контента
         UpgradeInventory
         MainGui
+        LaboratoryManager
 
         // Регистрация команд
         PlayerCommands
@@ -140,14 +143,14 @@ class App : JavaPlugin() {
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
             // Нужно для проверки кто нанёс урон, башня или игрок
             val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                findMob(this, pair[0].encodeToByteArray())?.let { mob ->
-                    mob.hp -= if (pair[1].toBoolean()) sword.damage else session!!.upgrade[DAMAGE]!!.getValue()
+            getUser(player)?.let {
+                findMob(it, pair[0].encodeToByteArray())?.let { mob ->
+                    mob.hp -= if (pair[1].toBoolean()) it.sword.damage else it.session!!.upgrade[DAMAGE]!!.getValue()
 
                     if (mob.hp <= 0) {
-                        val token = upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = it.upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
 
-                        giveTokens(token)
+                        it.giveTokens(token)
 
                         ModTransfer(
                             mob.uuid.toString(), "§b+$token §f${
@@ -160,7 +163,7 @@ class App : JavaPlugin() {
                             }"
                         ).send("mob:kill", player)
 
-                        wave!!.aliveMobs.remove(mob)
+                        it.wave!!.aliveMobs.remove(mob)
                     }
                 }
             }
@@ -168,40 +171,40 @@ class App : JavaPlugin() {
         Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
             // Если моб есть в списке, то отнимаем хп у башни
             val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                findMob(this, pair[0].encodeToByteArray())?.let { mob ->
-                    val waveLevel = wave!!.level
+            getUser(player)?.let {
+                findMob(it, pair[0].encodeToByteArray())?.let { mob ->
+                    val waveLevel = it.wave!!.level
                     val reward = formula(waveLevel)
 
-                    tower.health -= mob.damage - session!!.upgrade[PROTECTION]!!.getValue()
+                    it.tower.health -= mob.damage - it.session!!.upgrade[PROTECTION]!!.getValue()
                     Glow.animate(player, .5, GlowColor.RED)
 
-                    tower.updateHealth()
+                    it.tower.updateHealth()
 
                     // Провожу действия с игроком если он проигрывает
-                    if (tower.health <= 0) {
-                        if (maxWavePassed > waveLevel)
-                            maxWavePassed = waveLevel
+                    if (it.tower.health <= 0) {
+                        if (it.maxWavePassed > waveLevel)
+                            it.maxWavePassed = waveLevel
 
-                        if (isTournament) {
-                            TournamentManager.end(this)
-                            isTournament = false
+                        if (it.isTournament) {
+                            TournamentManager.end(it)
+                            it.isTournament = false
                         }
 
                         LobbyItems.initialActionsWithPlayer(player)
                         player.flying(false)
-                        showToAll()
+                        it.showToAll()
 
                         // Игра закончилась
                         ModTransfer(false).send("tower:update-state", player)
 
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        wave!!.aliveMobs.clear(player)
-                        inGame = false
-                        session = null
-                        giveTokens(-tokens)
-                        giveExperience(waveLevel * 3)
-                        wave = null
+                        it.wave!!.aliveMobs.clear(player)
+                        it.inGame = false
+                        it.session = null
+                        it.giveTokens(-it.tokens)
+                        it.giveExperience(waveLevel * 3)
+                        it.wave = null
 
 
                         if (reward == 0)
@@ -211,7 +214,7 @@ class App : JavaPlugin() {
                             player,
                             "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
                         )
-                        giveMoney(reward)
+                        it.giveMoney(reward)
                     }
                 }
             }
@@ -237,4 +240,8 @@ class App : JavaPlugin() {
     }
 
     private fun formula(number: Int): Int = (number * number - number) / 4
+
+    fun getUser(uuid: UUID) = SessionListener.simulator.getUser<User>(uuid)
+
+    fun getUser(player: Player) = getUser(player.uniqueId)
 }

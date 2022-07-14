@@ -5,11 +5,11 @@ import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
+import me.reidj.tower.app
 import me.reidj.tower.barrier
 import me.reidj.tower.item
 import me.reidj.tower.text
 import me.reidj.tower.user.User
-import ru.kdev.simulatorapi.listener.SessionListener
 
 /**
  * @project tower
@@ -23,8 +23,8 @@ object UpgradeInventory {
     init {
         // Команда для открытия меню
         command("workshop") { player, _ ->
-            SessionListener.simulator.getUser<User>(player.uniqueId)!!.apply {
-                icon(this, if (!inGame) upgradeTypes else session!!.upgrade)
+            app.getUser(player)?.let {
+                icon(it, if (!it.inGame) it.upgradeTypes else it.session!!.upgrade)
             }
         }
     }
