@@ -19,6 +19,7 @@ import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.laboratory.LaboratoryManager
+import me.reidj.tower.laboratory.Research
 import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
@@ -30,7 +31,6 @@ import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
-import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.upgrade.UpgradeType.*
 import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
@@ -71,8 +71,6 @@ class App : JavaPlugin() {
             id = "tower"
             plugin = this@App
 
-            topEnable()
-
             levelFormula { ((sqrt(5.0) * sqrt((this * 80 + 5).toDouble()) + 5) / 20).toInt() }
 
             expFormula { this * this - this / 2 }
@@ -82,12 +80,13 @@ class App : JavaPlugin() {
                     uuid,
                     0,
                     values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
+                    values().associateWith { Research(it, 1) }.toMutableMap(),
                     SwordType.NONE,
                     Tower(
                         null,
                         5.0,
                         5.0,
-                        UpgradeType.values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }
+                        values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }
                             .toMutableMap()
                     ),
                     0,
@@ -144,8 +143,15 @@ class App : JavaPlugin() {
             // Нужно для проверки кто нанёс урон, башня или игрок
             val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
             getUser(player)?.let {
+                val session = it.session!!
                 findMob(it, pair[0].encodeToByteArray())?.let { mob ->
-                    mob.hp -= if (pair[1].toBoolean()) it.sword.damage else it.session!!.upgrade[DAMAGE]!!.getValue()
+                    val damage = session.upgrade[DAMAGE]!!.getValue()
+                    mob.hp -= if (pair[1].toBoolean())
+                        it.sword.damage
+                    else if (Math.random() < it.tower.upgrades[CRITICAL_STRIKE_CHANCE]!!.getValue())
+                        damage + it.tower.upgrades[CRITICAL_HIT_RATIO]!!.getValue()
+                    else
+                        damage
 
                     if (mob.hp <= 0) {
                         val token = it.upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
