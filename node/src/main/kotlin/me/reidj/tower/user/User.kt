@@ -5,6 +5,8 @@ import me.func.mod.Glow
 import me.func.mod.conversation.ModTransfer
 import me.func.protocol.GlowColor
 import me.reidj.tower.app
+import me.reidj.tower.laboratory.Research
+import me.reidj.tower.laboratory.ResearchType
 import me.reidj.tower.tournament.Tournament
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
@@ -25,6 +27,7 @@ class User(
     private var id: UUID,
     var maxWavePassed: Int,
     var upgradeTypes: MutableMap<UpgradeType, Upgrade>,
+    var researchTypes: MutableMap<ResearchType, Research>,
     var sword: SwordType,
     val tower: Tower,
     var day: Int,

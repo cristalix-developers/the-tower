@@ -1,14 +1,13 @@
 package me.reidj.tower.upgrade
 
 import me.func.mod.Anime
+import me.func.mod.Glow
 import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
-import me.reidj.tower.app
-import me.reidj.tower.barrier
-import me.reidj.tower.item
-import me.reidj.tower.text
+import me.func.protocol.GlowColor
+import me.reidj.tower.*
 import me.reidj.tower.user.User
 
 /**
@@ -54,8 +53,8 @@ object UpgradeInventory {
                     if (if (notInGame) user.money >= cost else user.tokens >= cost) {
                         if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
                         value.level++
-                        player.performCommand("workshop")
                         user.tower.updateHealth()
+                        Glow.animate(player, 1.5, GlowColor.GREEN)
                         if (notInGame) {
                             user.update(user)
                             user.sword.update(user)
@@ -71,8 +70,7 @@ object UpgradeInventory {
                             )
                         }
                     } else {
-                        player.closeInventory()
-                        Anime.itemTitle(player, barrier, "Ошибка", "Недостаточно средств", 2.0)
+                        buyFailure(player)
                     }
                 }
             }

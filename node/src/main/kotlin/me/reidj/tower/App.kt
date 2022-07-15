@@ -20,6 +20,7 @@ import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.laboratory.LaboratoryManager
 import me.reidj.tower.laboratory.Research
+import me.reidj.tower.laboratory.ResearchType
 import me.reidj.tower.listener.ConnectionHandler
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
@@ -31,6 +32,7 @@ import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
+import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.upgrade.UpgradeType.*
 import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
@@ -76,11 +78,11 @@ class App : JavaPlugin() {
             expFormula { this * this - this / 2 }
 
             userCreator { uuid ->
-                User(
+                val user = User(
                     uuid,
                     0,
-                    values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
-                    values().associateWith { Research(it, 1) }.toMutableMap(),
+                    UpgradeType.values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
+                    ResearchType.values().associateWith { Research(it, 1) }.toMutableMap(),
                     SwordType.NONE,
                     Tower(
                         null,
@@ -95,6 +97,7 @@ class App : JavaPlugin() {
                     Tournament(RatingType.NONE, 0, mutableListOf()),
                     false
                 )
+                user
             }
         }
 
@@ -180,7 +183,7 @@ class App : JavaPlugin() {
             getUser(player)?.let {
                 findMob(it, pair[0].encodeToByteArray())?.let { mob ->
                     val waveLevel = it.wave!!.level
-                    val reward = formula(waveLevel)
+                    val reward = (waveLevel * waveLevel - waveLevel) / 4
 
                     it.tower.health -= mob.damage - it.session!!.upgrade[PROTECTION]!!.getValue()
                     Glow.animate(player, .5, GlowColor.RED)
@@ -236,16 +239,12 @@ class App : JavaPlugin() {
     private fun findMob(user: User, bytes: ByteArray): Mob? {
         if (user.wave == null)
             return null
-        return user.wave?.let {
-            it.aliveMobs.find { mob ->
-                mob.uuid == UUID.fromString(
-                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
-                )
-            }
+        return user.wave!!.aliveMobs.find { mob ->
+            mob.uuid == UUID.fromString(
+                Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+            )
         }
     }
-
-    private fun formula(number: Int): Int = (number * number - number) / 4
 
     fun getUser(uuid: UUID) = SessionListener.simulator.getUser<User>(uuid)
 

@@ -1,13 +1,11 @@
 package me.reidj.tower
 
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.mob.Mob
 import org.bukkit.Material
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.MemorySection
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.util.NumberConversions
 
 val barrier = item(Material.BARRIER) {}
 
@@ -35,4 +33,10 @@ fun MutableList<Mob>.clear(player: Player) = apply {
     forEach { ModTransfer(it.uuid.toString(), "").send("mob:kill", player) }
     clear()
 }
+
+fun buyFailure(player: Player) = Anime.run {
+    close(player)
+    itemTitle(player, barrier, "Ошибка", "Недостаточно средств", 2.0)
+}
+
 
