@@ -33,12 +33,12 @@ import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
-import me.reidj.tower.upgrade.UpgradeType.*
+import me.reidj.tower.upgrade.UpgradeType.PROTECTION
+import me.reidj.tower.upgrade.UpgradeType.values
 import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
-import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
@@ -79,23 +79,23 @@ class App : JavaPlugin() {
 
             userCreator { uuid ->
                 val user = User(
-                    uuid,
-                    0,
-                    UpgradeType.values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
-                    ResearchType.values().associateWith { Research(it, 1) }.toMutableMap(),
-                    SwordType.NONE,
-                    Tower(
-                        null,
-                        5.0,
-                        5.0,
-                        values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }
-                            .toMutableMap()
-                    ),
-                    0,
-                    0.0,
-                    0.0,
-                    Tournament(RatingType.NONE, 0, mutableListOf()),
-                    false
+                        uuid,
+                        0,
+                        UpgradeType.values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
+                        ResearchType.values().associateWith { Research(it, 1, null) }.toMutableMap(),
+                        SwordType.NONE,
+                        Tower(
+                                null,
+                                5.0,
+                                5.0,
+                                values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }
+                                        .toMutableMap()
+                        ),
+                        0,
+                        0.0,
+                        0.0,
+                        Tournament(RatingType.NONE, 0, mutableListOf()),
+                        false
                 )
                 user
             }
@@ -127,7 +127,6 @@ class App : JavaPlugin() {
         // Создание контента
         UpgradeInventory
         MainGui
-        LaboratoryManager
 
         // Регистрация команд
         PlayerCommands
@@ -139,37 +138,43 @@ class App : JavaPlugin() {
         listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
         // Обработка каждого тика
-        TimerHandler(listOf(WaveManager, NpcManager)).runTaskTimer(this, 0, 1)
+        TimerHandler(listOf(WaveManager, NpcManager, LaboratoryManager)).runTaskTimer(this, 0, 1)
 
         // Если моб есть в списке, то отнимаем его хп
-        Bukkit.getMessenger().registerIncomingPluginChannel(app, "mob:hit") { _, player, bytes ->
+        Anime.createReader("mob:hit") { player, buffer ->
             // Нужно для проверки кто нанёс урон, башня или игрок
-            val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
+            val pair = buffer.toString(Charsets.UTF_8).split(":")
             getUser(player)?.let {
-                val session = it.session!!
+                val session = it.session ?: return@createReader
                 findMob(it, pair[0].encodeToByteArray())?.let { mob ->
-                    val damage = session.upgrade[DAMAGE]!!.getValue()
-                    mob.hp -= if (pair[1].toBoolean())
-                        it.sword.damage
-                    else if (Math.random() < it.tower.upgrades[CRITICAL_STRIKE_CHANCE]!!.getValue())
-                        damage + it.tower.upgrades[CRITICAL_HIT_RATIO]!!.getValue()
-                    else
-                        damage
+                    val damage = session.upgrade[UpgradeType.DAMAGE]!!.getValue()
+                    if (pair[1].toBoolean()) {
+                        val swordDamage = it.sword.damage
+                        mob.hp -= swordDamage
+                        Anime.killboardMessage(player, "Вы нанесли §c§l$swordDamage §fурона")
+                    } else if (Math.random() > it.tower.upgrades[UpgradeType.CRITICAL_STRIKE_CHANCE]!!.getValue()) {
+                        val criticalDamage = damage + it.tower.upgrades[UpgradeType.CRITICAL_HIT_RATIO]!!.getValue()
+                        mob.hp -= criticalDamage
+                        Anime.killboardMessage(player, "Башня нанесла §c§l$criticalDamage §fкритического урона")
+                    } else {
+                        mob.hp -= damage
+                        Anime.killboardMessage(player, "Башня нанесла §c§l$damage §fурона")
+                    }
 
                     if (mob.hp <= 0) {
-                        val token = it.upgradeTypes[CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = it.upgradeTypes[UpgradeType.CASH_BONUS_KILL]!!.getValue().toInt()
 
                         it.giveTokens(token)
 
                         ModTransfer(
-                            mob.uuid.toString(), "§b+$token §f${
-                                Humanize.plurals(
+                                mob.uuid.toString(), "§b+$token §f${
+                            Humanize.plurals(
                                     "жетон",
                                     "жетона",
                                     "жетонов",
                                     token
-                                )
-                            }"
+                            )
+                        }"
                         ).send("mob:kill", player)
 
                         it.wave!!.aliveMobs.remove(mob)
@@ -177,16 +182,19 @@ class App : JavaPlugin() {
                 }
             }
         }
-        Bukkit.getMessenger().registerIncomingPluginChannel(app, "tower:hittower") { _, player, bytes ->
+
+        Anime.createReader("tower:hittower") { player, buffer ->
             // Если моб есть в списке, то отнимаем хп у башни
-            val pair = Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8).split(":")
+            val pair = buffer.toString(Charsets.UTF_8).split(":")
             getUser(player)?.let {
                 findMob(it, pair[0].encodeToByteArray())?.let { mob ->
                     val waveLevel = it.wave!!.level
                     val reward = (waveLevel * waveLevel - waveLevel) / 4
+                    val damage = mob.damage - it.session!!.upgrade[PROTECTION]!!.getValue()
 
-                    it.tower.health -= mob.damage - it.session!!.upgrade[PROTECTION]!!.getValue()
+                    it.tower.health -= damage
                     Glow.animate(player, .5, GlowColor.RED)
+                    Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
 
                     it.tower.updateHealth()
 
@@ -217,11 +225,11 @@ class App : JavaPlugin() {
 
 
                         if (reward == 0)
-                            return@registerIncomingPluginChannel
+                            return@createReader
 
                         Anime.cursorMessage(
-                            player,
-                            "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
+                                player,
+                                "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
                         )
                         it.giveMoney(reward)
                     }
@@ -241,7 +249,7 @@ class App : JavaPlugin() {
             return null
         return user.wave!!.aliveMobs.find { mob ->
             mob.uuid == UUID.fromString(
-                Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
             )
         }
     }
