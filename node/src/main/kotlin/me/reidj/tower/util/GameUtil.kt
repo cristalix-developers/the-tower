@@ -55,65 +55,70 @@ object GameUtil {
     }
 
     fun start(player: Player) {
-        app.getUser(player)?.let {
-            Anime.close(player)
+        val user = app.getUser(player) ?: return
 
-            it.hideFromAll()
+        Anime.close(player)
 
-            it.session = Session(it.tower.upgrades)
+        user.hideFromAll()
 
-            it.session?.upgrade?.values?.forEach { upgrade -> upgrade.level = 1 }
+        user.session = Session(user.tower.upgrades)
 
-            player.apply {
-                inventory.clear()
-                teleport(it.session?.arenaSpawn)
-                inventory.setItem(4, UpgradeInventory.workshop)
-                flying()
-            }
+        user.session?.upgrade?.values?.forEach { upgrade -> upgrade.level = 1 }
 
-            it.sword.giveSword(it)
+        player.run {
+            inventory.clear()
+            teleport(user.session?.arenaSpawn)
+            inventory.setItem(4, UpgradeInventory.workshop)
+            flying()
+        }
 
-            it.tower.health = it.tower.maxHealth
-            it.tower.updateHealth()
-            it.tower.update(
-                it,
-                UpgradeType.BULLET_DELAY,
-                UpgradeType.DAMAGE,
-                UpgradeType.HEALTH,
-                UpgradeType.PROTECTION,
-                UpgradeType.REGEN,
-                UpgradeType.RADIUS
+        user.sword.giveSword(user)
+
+        user.tower.health = user.tower.maxHealth
+        user.tower.updateHealth()
+        user.tower.update(
+            user,
+            UpgradeType.BULLET_DELAY,
+            UpgradeType.DAMAGE,
+            UpgradeType.HEALTH,
+            UpgradeType.PROTECTION,
+            UpgradeType.REGEN,
+            UpgradeType.RADIUS
+        )
+        user.update(
+            user,
+            UpgradeType.CASH_BONUS_KILL,
+            UpgradeType.CASH_BONUS_WAVE_PASS,
+        )
+
+        // Отправляем точки со спавнерами
+        user.session?.generators?.forEach { label ->
+            ModTransfer(label.x, label.y, label.z).send(
+                "mobs:init",
+                player
             )
-            it.update(
-                it,
-                UpgradeType.CASH_BONUS_KILL,
-                UpgradeType.CASH_BONUS_WAVE_PASS,
-            )
+        }
 
-            // Отправляем точки со спавнерами
-            it.session?.generators?.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
+        Anime.counting321(player)
 
-            Anime.counting321(player)
+        // Начинаю волну
+        user.inGame = true
+        user.giveTokens(user.level() * 1000)
+        after(3 * 20) {
+            val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
+            user.wave = current
+            current.start()
 
-            // Начинаю волну
-            it.inGame = true
-            it.giveTokens(it.level() * 1000)
-            after(3 * 20) {
-                val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
-                it.wave = current
-                current.start()
-
-                // Игра началась
-                ModTransfer(
-                    true,
-                    it.session!!.cubeLocation.x,
-                    it.session!!.cubeLocation.y,
-                    it.session!!.cubeLocation.z,
-                    MOVE_SPEED,
-                    TICKS_BEFORE_STRIKE,
-                    CONST_TICKS_BEFORE_STRIKE
-                ).send("tower:update-state", player)
-            }
+            // Игра началась
+            ModTransfer(
+                true,
+                user.session!!.cubeLocation.x,
+                user.session!!.cubeLocation.y,
+                user.session!!.cubeLocation.z,
+                MOVE_SPEED,
+                TICKS_BEFORE_STRIKE,
+                CONST_TICKS_BEFORE_STRIKE
+            ).send("tower:update-state", player)
         }
     }
 

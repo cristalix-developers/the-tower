@@ -21,7 +21,7 @@ enum class ResearchType(
     LABORATORY_SPEED("Скорость лаборатории", item {  }, 40, 24, 1.0, 1.02),
     DAMAGE("Урон", item {}.nbt("other", "custom_sword"), 30, 14, 1.0, 1.02),
     BULLET_DELAY("Перезарядка", item {}.nbt("simulators", "save_crystal"), 30, 14, 1.0, 1.02),
-    CRITICAL_HIT("Коэффицент критического удара", item {  }, 30, 14, 1.0, 1.03),
+    CRITICAL_HIT("Коэффициент крит.удара", item {  }, 30, 14, 1.0, 1.03),
     CASH_BONUS_WAVE_PASS("Бонус за волну", item {}.nbt("other", "bag1"), 40, 19, 1.0, 1.02),
     CASH_BONUS_KILL("Бонус за убийство", item {}.nbt("other", "bank"), 40, 19, 1.0, 1.02),
 }

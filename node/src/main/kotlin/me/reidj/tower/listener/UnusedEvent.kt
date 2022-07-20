@@ -62,7 +62,9 @@ object UnusedEvent : Listener {
     fun InventoryClickEvent.handle() { isCancelled = true }
 
     @EventHandler
-    fun PlayerSwapHandItemsEvent.handle() { isCancelled = true }
+    fun PlayerSwapHandItemsEvent.handle() {
+        isCancelled = true
+    }
 
     @EventHandler
     fun InventoryMoveItemEvent.handle() { isCancelled = true }

@@ -21,7 +21,7 @@ data class Tower(
         ModTransfer(health, maxHealth).send("tower:loseheart", owner)
     }
 
-    override fun update(user: User, vararg type: UpgradeType) {
+    override fun update(user: User, vararg type: UpgradeType) =
         type.forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }
-    }
+
 }

@@ -6,5 +6,5 @@ object Formatter {
 
     private val FORMAT = DecimalFormat("##.#")
 
-    fun toFormat(health: Double): String = FORMAT.format(health)
+    fun toFormat(double: Double): String = FORMAT.format(double)
 }

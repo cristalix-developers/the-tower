@@ -31,7 +31,7 @@ object MainGui {
         description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
         hint("Открыть")
         onClick { player, _, _ -> player.performCommand("workshop") }
-    }.hint("Открыть")
+    }
 
     init {
         command("menu") { opened, _ ->

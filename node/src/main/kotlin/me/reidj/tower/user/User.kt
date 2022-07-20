@@ -64,7 +64,7 @@ class User(
 
     fun level() = SessionListener.simulator.run { return@run getLevel() }
 
-    fun requiredExp() = SessionListener.simulator.run { return@run getNextLevelExp() }
+    private fun requiredExp() = SessionListener.simulator.run { return@run getNextLevelExp() }
 
     fun hideFromAll() {
         Bukkit.getOnlinePlayers().filterNotNull().forEach { current ->
@@ -106,5 +106,7 @@ class User(
     }
 
     override fun update(user: User, vararg type: UpgradeType) =
-        type.forEach { ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", player) }
+        type.forEach {
+            ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", player)
+        }
 }
