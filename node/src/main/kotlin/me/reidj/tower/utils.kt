@@ -43,12 +43,7 @@ fun buyFailure(player: Player) = Anime.run {
     itemTitle(player, barrier, "Ошибка", "Недостаточно средств", 2.0)
 }
 
-fun convertSecond(totalSeconds: Int): String {
-    val hours = totalSeconds / 3600
-    val minutes = (totalSeconds % 3600) / 60
-    val seconds = totalSeconds % 60
-    return "$hours:$minutes:$seconds"
-}
+fun convertSecond(totalSeconds: Int): String = "${totalSeconds / 3600}:${(totalSeconds % 3600) / 60}:${totalSeconds % 60}"
 
 fun toFormat(double: Double): String = FORMAT.format(double)
 

@@ -11,6 +11,7 @@ import me.reidj.tower.app
 import me.reidj.tower.barrier
 import me.reidj.tower.flying
 import me.reidj.tower.item
+import me.reidj.tower.laboratory.ResearchType
 import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
@@ -29,16 +30,16 @@ object GameUtil {
     private val tournament = item {}.nbt("other", "collection")
 
     val buttons = listOf(
-        button {
-            title = "Обычная"
-            item = normal
-            onClick { player, _, _ -> player.performCommand("normal") }
-        },
-        button {
-            title = "Турнир"
-            item = tournament
-            onClick { player, _, _ -> player.performCommand("tournament") }
-        }
+            button {
+                title = "Обычная"
+                item = normal
+                onClick { player, _, _ -> player.performCommand("normal") }
+            },
+            button {
+                title = "Турнир"
+                item = tournament
+                onClick { player, _, _ -> player.performCommand("tournament") }
+            }
     )
 
     fun ratingGameStart(user: User) = user.run {
@@ -77,25 +78,28 @@ object GameUtil {
         user.tower.health = user.tower.maxHealth
         user.tower.updateHealth()
         user.tower.update(
-            user,
-            UpgradeType.BULLET_DELAY,
-            UpgradeType.DAMAGE,
-            UpgradeType.HEALTH,
-            UpgradeType.PROTECTION,
-            UpgradeType.REGEN,
-            UpgradeType.RADIUS
+                user,
+                UpgradeType.BULLET_DELAY,
+                ResearchType.BULLET_DELAY,
+                UpgradeType.DAMAGE,
+                UpgradeType.HEALTH,
+                UpgradeType.PROTECTION,
+                UpgradeType.REGEN,
+                UpgradeType.RADIUS
         )
         user.update(
-            user,
-            UpgradeType.CASH_BONUS_KILL,
-            UpgradeType.CASH_BONUS_WAVE_PASS,
+                user,
+                UpgradeType.CASH_BONUS_KILL,
+                UpgradeType.CASH_BONUS_WAVE_PASS,
+                ResearchType.CASH_BONUS_WAVE_PASS,
+                ResearchType.CASH_BONUS_KILL
         )
 
         // Отправляем точки со спавнерами
         user.session?.generators?.forEach { label ->
             ModTransfer(label.x, label.y, label.z).send(
-                "mobs:init",
-                player
+                    "mobs:init",
+                    player
             )
         }
 
@@ -111,13 +115,13 @@ object GameUtil {
 
             // Игра началась
             ModTransfer(
-                true,
-                user.session!!.cubeLocation.x,
-                user.session!!.cubeLocation.y,
-                user.session!!.cubeLocation.z,
-                MOVE_SPEED,
-                TICKS_BEFORE_STRIKE,
-                CONST_TICKS_BEFORE_STRIKE
+                    true,
+                    user.session!!.cubeLocation.x,
+                    user.session!!.cubeLocation.y,
+                    user.session!!.cubeLocation.z,
+                    MOVE_SPEED,
+                    TICKS_BEFORE_STRIKE,
+                    CONST_TICKS_BEFORE_STRIKE
             ).send("tower:update-state", player)
         }
     }

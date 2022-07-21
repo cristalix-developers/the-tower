@@ -15,7 +15,7 @@ enum class UpgradeType(
     var price: Int,
     val step: Double,
     val isUserUpgrade: Boolean
-) {
+): me.reidj.tower.user.Upgrade {
     DAMAGE("Урон §3+6", item {}.nbt("other", "custom_sword"), -5.0, 10, 6.0, false),
     BULLET_DELAY("Перезарядка §3+0.004", item {}.nbt("simulators", "save_crystal"), .1, 8, -.004, false),
     HEALTH("Здоровье §3+1", item {}.nbt("other", "love"), 4.0, 5, 1.0, false),

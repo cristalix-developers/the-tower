@@ -105,8 +105,8 @@ class User(
         }
     }
 
-    override fun update(user: User, vararg type: UpgradeType) =
-        type.forEach {
-            ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", player)
-        }
+    override fun update(user: User, vararg type: me.reidj.tower.user.Upgrade) {
+        type.filterIsInstance<UpgradeType>().forEach { ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", user.player) }
+        type.filterIsInstance<ResearchType>().forEach { ModTransfer(researchTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", user.player) }
+    }
 }

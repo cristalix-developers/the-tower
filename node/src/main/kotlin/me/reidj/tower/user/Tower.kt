@@ -6,11 +6,11 @@ import me.reidj.tower.upgrade.UpgradeType
 import org.bukkit.entity.Player
 
 data class Tower(
-    @Transient
-    var owner: Player? = null,
-    var health: Double,
-    var maxHealth: Double,
-    var upgrades: MutableMap<UpgradeType, Upgrade>
+        @Transient
+        var owner: Player? = null,
+        var health: Double,
+        var maxHealth: Double,
+        var upgrades: MutableMap<UpgradeType, Upgrade>
 ) : Upgradable {
 
     fun updateHealth() {
@@ -21,7 +21,7 @@ data class Tower(
         ModTransfer(health, maxHealth).send("tower:loseheart", owner)
     }
 
-    override fun update(user: User, vararg type: UpgradeType) =
-        type.forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }
-
+    override fun update(user: User, vararg type: me.reidj.tower.user.Upgrade) {
+        type.filterIsInstance<UpgradeType>().forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }
+    }
 }

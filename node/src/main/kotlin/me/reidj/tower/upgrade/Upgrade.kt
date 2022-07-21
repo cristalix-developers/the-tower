@@ -6,5 +6,5 @@ package me.reidj.tower.upgrade
  */
 class Upgrade(private val upgradeType: UpgradeType, var level: Int) {
 
-    fun getValue(): Double = upgradeType.value + upgradeType.step * level
+    fun getValue() = upgradeType.value + upgradeType.step * level
 }
