@@ -17,7 +17,6 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.time.temporal.ChronoUnit
 import java.util.*
-import java.util.concurrent.TimeUnit
 import kotlin.math.pow
 
 object NpcManager : Ticked {
@@ -56,17 +55,21 @@ object NpcManager : Ticked {
             // Обновляю текст на баннерах
             val size = TournamentManager.getOnlinePlayers().size
             val plurals = Humanize.plurals("игрок", "игрока", "игроков", size)
+            val duration = TournamentManager.getTimeBefore()
+            val days = duration.toDays()
+            val hours = duration.toHours() % 24
+            val minutes = duration.toMinutes() % 60
+            val seconds = duration.seconds % 60
+
+            val total = days.toString().padStart(2, '0') + "д. " + hours.toString().padStart(2, '0') + "ч. " +
+                    minutes.toString().padStart(2, '0') + "м. " + seconds.toString().padStart(2, '0') + "с."
+
             Bukkit.getOnlinePlayers().forEach { player ->
                 Banners.content(
                     player,
                     NpcType.NORMAL.banner!!,
                     "${NpcType.NORMAL.bannerTitle}\n§e${size} $plurals"
                 )
-                val minutesTotal = TournamentManager.getTimeBefore(TimeUnit.MINUTES)
-                val hoursTotal = minutesTotal / 60
-                val daysTotal = (hoursTotal / 24) % 24
-                val hours = hoursTotal - daysTotal * 24
-                val minutes = (hoursTotal - hours) % 60
                 Banners.content(
                     player, NpcType.RATING.banner!!, String.format(
                         "%s\n§e%d $plurals\n${
@@ -75,14 +78,11 @@ object NpcManager : Ticked {
                                     "час", "часа", "часов",
                                     TournamentManager.getTimeAfter(ChronoUnit.HOURS).toInt()
                                 )
-                            }" else "§6До начала %d:%d:%d"
+                            }" else "§6До начала \n%s"
                         }",
                         NpcType.RATING.bannerTitle,
                         TournamentManager.getOnlinePlayers().filter { it.isTournament }.size,
-                        TournamentManager.getTimeAfter(ChronoUnit.HOURS),
-                        daysTotal,
-                        hours,
-                        minutes
+                        if (TournamentManager.isTournamentDay()) TournamentManager.getTimeAfter(ChronoUnit.HOURS) else total
                     )
                 )
                 val user = app.getUser(player)
