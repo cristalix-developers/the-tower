@@ -20,7 +20,7 @@ enum class NpcType(
         "normal",
         "307264a1-2c69-11e8-b5ea-1cb72caa35fd",
         179f,
-        createBanner(app.map.getLabel("normal"), 179.0, 0.62, 5.0, 1.0,false)
+        createBanner(app.map.getLabel("normal"), 179.0, 0.62, 4.7, 1.0,false)
     ),
     RATING(
         "§bТурнир",
@@ -28,7 +28,7 @@ enum class NpcType(
         "tournamentDialog",
         "bf30a1df-85de-11e8-a6de-1cb72caa35fd",
         179f,
-        createBanner(app.map.getLabel("rating"), 179.0, 0.62, 5.0, 1.0,false)
+        createBanner(app.map.getLabel("rating"), 179.0, 0.62, 4.7, 1.0,false)
     ),
     CHARACTER(
         "§6Ваш профиль Tower",
@@ -66,7 +66,7 @@ private fun createBanner(
     watchingOnPlayer: Boolean
 ): Banner = Banners.new {
     height = 40
-    weight = 89
+    weight = 93
     location(location.clone().add(0.5, y, z))
     motionSettings = hashMapOf(
         "yaw" to yaw,

@@ -13,6 +13,9 @@ import me.func.protocol.npc.NpcBehaviour
 import me.reidj.tower.app
 import me.reidj.tower.ticker.Ticked
 import me.reidj.tower.tournament.TournamentManager
+import me.reidj.tower.tournament.TournamentManager.getOnlinePlayers
+import me.reidj.tower.tournament.TournamentManager.getTimeAfter
+import me.reidj.tower.tournament.TournamentManager.isTournamentDay
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.time.temporal.ChronoUnit
@@ -52,7 +55,6 @@ object NpcManager : Ticked {
 
     override fun tick(vararg args: Int) {
         if (args[0] % 20 != 0) {
-            // Обновляю текст на баннерах
             val size = TournamentManager.getOnlinePlayers().size
             val plurals = Humanize.plurals("игрок", "игрока", "игроков", size)
             val duration = TournamentManager.getTimeBefore()
@@ -64,26 +66,24 @@ object NpcManager : Ticked {
             val total = days.toString().padStart(2, '0') + "д. " + hours.toString().padStart(2, '0') + "ч. " +
                     minutes.toString().padStart(2, '0') + "м. " + seconds.toString().padStart(2, '0') + "с."
 
+            // Обновляю текст на баннерах
             Bukkit.getOnlinePlayers().forEach { player ->
                 Banners.content(
                     player,
                     NpcType.NORMAL.banner!!,
                     "${NpcType.NORMAL.bannerTitle}\n§e${size} $plurals"
                 )
+
                 Banners.content(
-                    player, NpcType.RATING.banner!!, String.format(
-                        "%s\n§e%d $plurals\n${
-                            if (TournamentManager.isTournamentDay()) "§6До конца %d ${
-                                Humanize.plurals(
-                                    "час", "часа", "часов",
-                                    TournamentManager.getTimeAfter(ChronoUnit.HOURS).toInt()
-                                )
-                            }" else "§6До начала \n%s"
-                        }",
-                        NpcType.RATING.bannerTitle,
-                        TournamentManager.getOnlinePlayers().filter { it.isTournament }.size,
-                        if (TournamentManager.isTournamentDay()) TournamentManager.getTimeAfter(ChronoUnit.HOURS) else total
-                    )
+                    player,
+                    NpcType.RATING.banner!!,
+                    "${NpcType.RATING.bannerTitle}\n${
+                        if (isTournamentDay()) "§e${getOnlinePlayers().filter { it.isTournament }.size} $plurals\n§6До конца ${
+                            getTimeAfter(
+                                ChronoUnit.HOURS
+                            ).toInt()
+                        } ч." else "§6До начала\n§6$total"
+                    }"
                 )
                 val user = app.getUser(player)
                 Banners.content(
