@@ -14,8 +14,8 @@ import me.reidj.tower.upgrade.UpgradeInventory
  */
 object MainGui {
 
-    private val resourcepack = item { }.nbt("other", "settings")
-    private val statistic = item {}.nbt("other", "quest_week")
+    private val resourcepack = item().nbt("other", "settings")
+    private val statistic = item().nbt("other", "quest_week")
 
     private val menu = selection {
         title = "Tower Simulator"

@@ -11,19 +11,20 @@ import me.func.protocol.alert.NotificationData
 import me.reidj.tower.app
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.npc.NpcManager
+import me.reidj.tower.util.GameUtil.queueLeave
+import me.reidj.tower.util.Images
 import me.reidj.tower.util.LobbyItems
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import ru.cristalix.core.formatting.Formatting
 
 /**
  * @project tower
  * @author Рейдж
  */
-
-private const val NAMESPACE = "http://storage.c7x.ru/reidj/"
 
 object ConnectionHandler : Listener {
 
@@ -71,14 +72,13 @@ object ConnectionHandler : Listener {
                 Indicators.VEHICLE,
                 Indicators.AIR_BAR
             )
+            Anime.loadTextures(this, *Images.values().map { it.path() }.toTypedArray())
 
             user?.giveMoney(-0)
             user?.giveExperience(-0)
 
             if (!user?.isAutoInstallResourcepack!!) Alert.find("resourcepack")
                 .send(this) else performCommand("resourcepack")
-
-            Anime.loadTextures(this, "${NAMESPACE}health_bar.png", "${NAMESPACE}energy.png")
 
             val now = System.currentTimeMillis().toDouble()
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
@@ -96,4 +96,7 @@ object ConnectionHandler : Listener {
             user.lastEnter = now
         }
     }
+
+    @EventHandler
+    fun PlayerQuitEvent.handle() { queueLeave(player) }
 }

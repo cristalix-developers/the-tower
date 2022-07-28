@@ -37,6 +37,7 @@ import me.reidj.tower.upgrade.UpgradeType.PROTECTION
 import me.reidj.tower.upgrade.UpgradeType.values
 import me.reidj.tower.user.Tower
 import me.reidj.tower.user.User
+import me.reidj.tower.util.GameUtil.queueLeave
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.entity.Player
@@ -66,8 +67,6 @@ class App : JavaPlugin() {
     val map = WorldMeta(MapLoader.load("func", "tower"))
     val spawn: Label = map.getLabel("spawn").apply { yaw = 0f }
 
-    private lateinit var laboratoryManager: LaboratoryManager
-
     override fun onEnable() {
         app = this
 
@@ -81,22 +80,22 @@ class App : JavaPlugin() {
 
             userCreator { uuid ->
                 val user = User(
-                        uuid,
-                        0,
-                        UpgradeType.values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
-                        ResearchType.values().associateWith { Research(it, 1, null) }.toMutableMap(),
-                        SwordType.NONE,
-                        Tower(
-                                null,
-                                5.0,
-                                5.0,
-                                values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap()
-                        ),
-                        0,
-                        0.0,
-                        0.0,
-                        Tournament(RatingType.NONE, 0, mutableListOf()),
-                        false
+                    uuid,
+                    0,
+                    UpgradeType.values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
+                    ResearchType.values().associateWith { Research(it, 1, null) }.toMutableMap(),
+                    SwordType.NONE,
+                    Tower(
+                        null,
+                        5.0,
+                        5.0,
+                        values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap()
+                    ),
+                    0,
+                    0.0,
+                    0.0,
+                    Tournament(RatingType.NONE, 0, mutableListOf()),
+                    false,
                 )
                 user
             }
@@ -135,13 +134,11 @@ class App : JavaPlugin() {
         // Регистрация админ команд
         AdminCommands
 
-        laboratoryManager = LaboratoryManager()
-
         // Регистрация обработчиков событий
-        listener(ConnectionHandler, UnusedEvent, InteractEvent, laboratoryManager)
+        listener(ConnectionHandler, UnusedEvent, InteractEvent)
 
         // Обработка каждого тика
-        TimerHandler(listOf(WaveManager, NpcManager, laboratoryManager)).runTaskTimer(this, 0, 1)
+        TimerHandler(listOf(WaveManager, NpcManager, LaboratoryManager)).runTaskTimer(this, 0, 1)
 
         // Если моб есть в списке, то отнимаем его хп
         Anime.createReader("mob:hit") { player, buffer ->
@@ -150,13 +147,15 @@ class App : JavaPlugin() {
             getUser(player)?.let {
                 val session = it.session ?: return@createReader
                 findMob(it, pair[0].encodeToByteArray())?.let { mob ->
-                    val damage = session.upgrade[UpgradeType.DAMAGE]!!.getValue() + it.researchTypes[ResearchType.DAMAGE]!!.getValue()
+                    val damage =
+                        session.upgrade[UpgradeType.DAMAGE]!!.getValue() + it.researchTypes[ResearchType.DAMAGE]!!.getValue()
                     if (pair[1].toBoolean()) {
                         val swordDamage = it.sword.damage
                         mob.hp -= swordDamage
                         Anime.killboardMessage(player, "Вы нанесли §c§l$swordDamage §fурона")
                     } else if (Math.random() > it.tower.upgrades[UpgradeType.CRITICAL_STRIKE_CHANCE]!!.getValue()) {
-                        val criticalDamage = damage + it.tower.upgrades[UpgradeType.CRITICAL_HIT_RATIO]!!.getValue() + it.researchTypes[ResearchType.CRITICAL_HIT]!!.getValue()
+                        val criticalDamage =
+                            damage + it.tower.upgrades[UpgradeType.CRITICAL_HIT_RATIO]!!.getValue() + it.researchTypes[ResearchType.CRITICAL_HIT]!!.getValue()
                         mob.hp -= criticalDamage
                         Anime.killboardMessage(player, "Башня нанесла §c§l$criticalDamage §fкритического урона")
                     } else {
@@ -165,19 +164,20 @@ class App : JavaPlugin() {
                     }
 
                     if (mob.hp <= 0) {
-                        val token = it.upgradeTypes[UpgradeType.CASH_BONUS_KILL]!!.getValue().toInt() + it.researchTypes[ResearchType.CASH_BONUS_KILL]!!.getValue().toInt()
+                        val token = it.upgradeTypes[UpgradeType.CASH_BONUS_KILL]!!.getValue()
+                            .toInt() + it.researchTypes[ResearchType.CASH_BONUS_KILL]!!.getValue().toInt()
 
                         it.giveTokens(token)
 
                         ModTransfer(
-                                mob.uuid.toString(), "§b+$token §f${
-                            Humanize.plurals(
+                            mob.uuid.toString(), "§b+$token §f${
+                                Humanize.plurals(
                                     "жетон",
                                     "жетона",
                                     "жетонов",
                                     token
-                            )
-                        }"
+                                )
+                            }"
                         ).send("mob:kill", player)
 
                         it.wave!!.aliveMobs.remove(mob)
@@ -231,14 +231,16 @@ class App : JavaPlugin() {
                             return@createReader
 
                         Anime.cursorMessage(
-                                player,
-                                "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
+                            player,
+                            "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
                         )
                         it.giveMoney(reward)
                     }
                 }
             }
         }
+
+        Anime.createReader("queue:leave") { player, _ -> queueLeave(player) }
 
         Runtime.getRuntime().addShutdownHook(Thread {
             SessionListener.simulator.disable()
@@ -252,7 +254,7 @@ class App : JavaPlugin() {
             return null
         return user.wave!!.aliveMobs.find { mob ->
             mob.uuid == UUID.fromString(
-                    Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
+                Unpooled.wrappedBuffer(bytes).toString(Charsets.UTF_8)
             )
         }
     }

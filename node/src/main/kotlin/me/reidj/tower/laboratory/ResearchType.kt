@@ -17,11 +17,12 @@ enum class ResearchType(
     var value: Double,
     val step: Double,
 ): Upgrade {
-    DISCOUNT("Скидка на монеты лаборатории", item {  }, 40, 19, 0.0, 0.30),
-    LABORATORY_SPEED("Скорость лаборатории", item {  }, 40, 24, 1.0, 1.02),
-    DAMAGE("Урон", item {}.nbt("other", "custom_sword"), 30, 14, 1.0, 1.02),
-    BULLET_DELAY("Перезарядка", item {}.nbt("simulators", "save_crystal"), 30, 14, 1.0, 1.02),
-    CRITICAL_HIT("Коэффициент крит.удара", item {  }, 30, 14, 1.0, 1.03),
-    CASH_BONUS_WAVE_PASS("Бонус за волну", item {}.nbt("other", "bag1"), 40, 19, 1.0, 1.02),
-    CASH_BONUS_KILL("Бонус за убийство", item {}.nbt("other", "bank"), 40, 19, 1.0, 1.02),
+    DISCOUNT("Скидка на монеты лаборатории", item(), 40, 19, 0.0, 0.30),
+    LABORATORY_SPEED("Скорость лаборатории", item(), 40, 24, 1.0, 1.02),
+    DAMAGE("Урон", item().nbt("other", "custom_sword"), 30, 14, 1.0, 1.02),
+    BULLET_DELAY("Перезарядка", item().nbt("simulators", "save_crystal"), 30, 14, 1.0, 1.02),
+    CRITICAL_HIT("Коэффициент крит.удара", item(), 30, 14, 1.0, 1.03),
+    CASH_BONUS_WAVE_PASS("Бонус токенов за волну", item().nbt("other", "bag1"), 40, 19, 1.0, 1.02),
+    CASH_BONUS_KILL("Бонус токенов за убийство", item().nbt("other", "bank"), 40, 19, 1.0, 1.02),
+    MONEY_BONUS_WAVE_PASS("Денежный бонус за волну", item(), 40, 19, 0.0, 1.02)
 }

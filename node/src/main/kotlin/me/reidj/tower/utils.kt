@@ -8,7 +8,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.text.DecimalFormat
 
-val barrier = item(Material.BARRIER) {}
+val barrier = item(Material.BARRIER)
 
 private val FORMAT = DecimalFormat("##.##")
 
@@ -27,11 +27,9 @@ fun ItemStack.text(value: String) = apply {
 }
 
 fun ItemStack.data(value: Short) = apply { durability = value }
-fun item(material: Material, apply: ItemStack.() -> Unit): ItemStack =
-    ItemStack(material).apply { apply.invoke(this) }
-
-fun item(itemStack: ItemStack, apply: ItemStack.() -> Unit): Unit = apply.invoke(itemStack)
-fun item(apply: ItemStack.() -> Unit): ItemStack = ItemStack(Material.CLAY_BALL).apply { apply.invoke(this) }
+fun item(material: Material) = ItemStack(material)
+fun item(itemStack: ItemStack, apply: ItemStack.() -> Unit) = apply.invoke(itemStack)
+fun item() = ItemStack(Material.CLAY_BALL)
 
 fun MutableList<Mob>.clear(player: Player) = apply {
     forEach { ModTransfer(it.uuid.toString(), "").send("mob:kill", player) }
@@ -43,7 +41,8 @@ fun buyFailure(player: Player) = Anime.run {
     itemTitle(player, barrier, "Ошибка", "Недостаточно средств", 2.0)
 }
 
-fun convertSecond(totalSeconds: Int): String = "${totalSeconds / 3600}:${(totalSeconds % 3600) / 60}:${totalSeconds % 60}"
+fun convertSecond(totalSeconds: Int): String =
+    "${totalSeconds / 3600}:${(totalSeconds % 3600) / 60}:${totalSeconds % 60}"
 
 fun toFormat(double: Double): String = FORMAT.format(double)
 

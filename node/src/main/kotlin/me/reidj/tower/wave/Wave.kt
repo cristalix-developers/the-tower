@@ -18,12 +18,12 @@ import org.bukkit.entity.Player
  * @author Рейдж
  */
 class Wave(
-        var isStarting: Boolean,
-        var startTime: Long,
-        var level: Int,
-        val aliveMobs: MutableList<Mob>,
-        val mobs: MutableList<Mob>,
-        private val player: Player
+    var isStarting: Boolean,
+    var startTime: Long,
+    var level: Int,
+    val aliveMobs: MutableList<Mob>,
+    val mobs: MutableList<Mob>,
+    private val player: Player
 ) {
 
     fun start() {
@@ -46,8 +46,8 @@ class Wave(
     private fun drawMob(location: Location) {
         val has = level % 10 == 0 && mobs.none { it.isBoss }
         (if (has) MobType.values()
-                .filter { it.wave.any { wave -> level % wave == 0 && it.isBoss } } else MobType.values()
-                .filter { it.wave.any { wave -> level % wave == 0 && !it.isBoss } }).forEach {
+            .filter { it.wave.any { wave -> level % wave == 0 && it.isBoss } } else MobType.values()
+            .filter { it.wave.any { wave -> level % wave == 0 && !it.isBoss } }).forEach {
             val mob = Mob {
                 hp = it.hp + hpStatus
                 damage = it.damage + damageStatus
@@ -64,7 +64,10 @@ class Wave(
         isStarting = false
         level++
         mobs.clear()
-        user?.giveTokens(user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt() + user.researchTypes[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt())
+        user?.giveTokens(
+            user.upgradeTypes[UpgradeType.CASH_BONUS_WAVE_PASS]!!.getValue()
+                .toInt() + user.researchTypes[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue().toInt()
+        )
         if (level % 10 == 0) {
             Anime.cursorMessage(player, "§e+10 §fмонет")
             user?.giveMoney(10)

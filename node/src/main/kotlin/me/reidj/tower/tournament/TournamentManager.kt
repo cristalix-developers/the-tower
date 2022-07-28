@@ -12,7 +12,7 @@ object TournamentManager {
 
     private const val COUNTDOWN_DAYS = 3L
 
-    private val startDate = LocalDate.of(2022, 7, 2)
+    private val startDate = LocalDate.of(2022, 7, 25)
 
     fun end(user: User) = user.run {
         tournament.wavePassed.add(user.wave!!.level)

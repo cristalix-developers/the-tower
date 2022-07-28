@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled
 import mob.MobManager
 import player.Indicator
 import player.Statistic
+import queue.QueueStatus
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
@@ -37,6 +38,7 @@ class App : KotlinMod() {
         TowerManager
         Cube
         Indicator
+        QueueStatus()
 
         registerHandler<PlayerListRender> { isCancelled = gameActive }
 
