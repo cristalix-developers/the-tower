@@ -24,11 +24,13 @@ class Wave(
     var startTime: Long,
     var level: Int,
     val aliveMobs: MutableList<Mob>,
-    val mobs: MutableList<Mob>,
+    private val mobs: MutableList<Mob>,
     private val player: Player
 ) {
 
     fun start() {
+        aliveMobs.clear()
+        startTime = System.currentTimeMillis()
         isStarting = true
         ModTransfer("$level волна", 40).send("tower:timebar", player)
         repeat(6 + level * 2) {
@@ -79,7 +81,6 @@ class Wave(
                     Anime.cursorMessage(this.cachedPlayer!!, "§e+10 §fмонет")
                     giveMoney(10)
                 }
-                startTime = System.currentTimeMillis()
                 Anime.counting321(cachedPlayer!!)
                 after(3 * 20) { start() }
             }

@@ -3,7 +3,6 @@ package me.reidj.tower.content
 import me.func.mod.selection.Button
 import me.func.mod.selection.button
 import me.func.mod.selection.selection
-import me.func.mod.util.after
 import me.func.mod.util.command
 import me.func.mod.util.nbt
 import me.reidj.tower.coroutine
@@ -19,6 +18,7 @@ object MainGui {
 
     private val resourcePackIcon = item().nbt("other", "settings")
     private val statisticIcon = item().nbt("other", "quest_week")
+    private val laboratoryIcon = item().nbt("skyblock", "glowing_redstone")
 
     private val menu = selection {
         title = "Tower Simulator"
@@ -52,10 +52,18 @@ object MainGui {
         }
     }
 
+    private val laboratory = button {
+        item = laboratoryIcon
+        title = "Лаборатория"
+        description = "§7Это место, где вы можете улучшить свои навыки."
+        hint("Исследовать")
+        onClick { player, _, _ -> player.performCommand("laboratory") }
+    }
+
+    private lateinit var buttons: MutableList<Button>
+
     init {
         command("menu") { opened, _ ->
-            menu.storage.clear()
-            val buttons = mutableListOf<Button>()
             coroutine {
                 withUser(opened) {
                     statistic.description = """
@@ -63,15 +71,10 @@ object MainGui {
                             §7    Волн пройдено: §b${maxWavePassed}
                         """.trimIndent()
                     resourcePack.hint(if (isAutoInstallResourcepack) "Не устанавливать" else "Устанавливать автоматически")
-                    buttons.add(statistic)
-                    buttons.add(workshop)
-                    buttons.add(resourcePack)
                 }
             }
-            after(2) {
-                menu.storage = buttons
-                menu.open(opened)
-            }
+            menu.storage = mutableListOf(statistic, workshop, laboratory, resourcePack)
+            menu.open(opened)
         }
     }
 }

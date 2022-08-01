@@ -10,8 +10,8 @@ import me.func.protocol.Tricolor
 import me.func.protocol.alert.NotificationData
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.coroutine
+import me.reidj.tower.game.RatingGame
 import me.reidj.tower.npc.NpcManager
-import me.reidj.tower.util.GameUtil.queueLeave
 import me.reidj.tower.util.Images
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.withUser
@@ -103,6 +103,6 @@ object ConnectionHandler : Listener {
 
     @EventHandler
     fun PlayerQuitEvent.handle() {
-        queueLeave(player)
+        RatingGame.queueLeave(player)
     }
 }

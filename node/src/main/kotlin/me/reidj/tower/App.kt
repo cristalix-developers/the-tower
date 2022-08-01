@@ -32,7 +32,6 @@ import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.upgrade.UpgradeType.PROTECTION
 import me.reidj.tower.user.User
-import me.reidj.tower.util.GameUtil.queueLeave
 import me.reidj.tower.util.LobbyItems
 import me.reidj.tower.wave.WaveManager
 import org.bukkit.plugin.java.JavaPlugin
@@ -79,7 +78,6 @@ class App : JavaPlugin() {
 
             userCreator { uuid -> User(uuid) }
         }
-
 
         map.getLabel("top").run {
             y += 4.5
@@ -227,8 +225,6 @@ class App : JavaPlugin() {
                 }
             }
         }
-
-        Anime.createReader("queue:leave") { player, _ -> queueLeave(player) }
     }
 
     override fun onDisable() {

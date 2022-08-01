@@ -7,7 +7,6 @@ import me.func.mod.selection.Button
 import me.func.mod.selection.Confirmation
 import me.func.mod.selection.button
 import me.func.mod.selection.selection
-import me.func.mod.util.after
 import me.func.mod.util.command
 import me.func.protocol.GlowColor
 import me.reidj.tower.*
@@ -71,10 +70,8 @@ object LaboratoryManager : Ticked {
                     }.toMutableList()
                 }
             }
-            after(2) {
-                menu.storage = buttons
-                menu.open(sender)
-            }
+            menu.storage = buttons
+            menu.open(sender)
         }
     }
 
