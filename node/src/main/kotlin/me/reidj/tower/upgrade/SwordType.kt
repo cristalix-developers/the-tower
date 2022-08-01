@@ -23,7 +23,7 @@ enum class SwordType(private val title: String, private val material: Material, 
 
     fun giveSword(user: User) = user.apply {
         if (sword.material != Material.AIR)
-            player!!.inventory.setItem(0, item(sword.material).text(sword.title))
+            cachedPlayer!!.inventory.setItem(0, item(sword.material).text(sword.title))
     }
 
     fun update(user: User) = update(user, UpgradeType.SWORD)

@@ -8,12 +8,13 @@ import me.func.mod.util.after
 import me.func.protocol.Indicators
 import me.func.protocol.Tricolor
 import me.func.protocol.alert.NotificationData
-import me.reidj.tower.app
 import me.reidj.tower.content.DailyRewardType
+import me.reidj.tower.coroutine
 import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.util.GameUtil.queueLeave
 import me.reidj.tower.util.Images
 import me.reidj.tower.util.LobbyItems
+import me.reidj.tower.withUser
 import org.bukkit.GameMode
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -51,52 +52,57 @@ object ConnectionHandler : Listener {
     }
 
     @EventHandler
-    fun PlayerJoinEvent.handle() = player.apply {
-        val user = app.getUser(player)
+    fun PlayerJoinEvent.handle() {
+        ModLoader.send("mod-bundle-1.0-SNAPSHOT.jar", player)
 
-        user?.player = this
-        gameMode = GameMode.ADVENTURE
-        LobbyItems.initialActionsWithPlayer(this)
+        player.inventory.clear()
 
-        NpcManager.createNpcWithPlayerSkin(uniqueId)
+        player.gameMode = GameMode.ADVENTURE
+        LobbyItems.initialActionsWithPlayer(player)
 
-        // Отправляем наш мод
-        after(5) {
-            ModLoader.send("mod-bundle-1.0-SNAPSHOT.jar", this)
-            Anime.hideIndicator(
-                this,
-                Indicators.EXP,
-                Indicators.ARMOR,
-                Indicators.HUNGER,
-                Indicators.HEALTH,
-                Indicators.VEHICLE,
-                Indicators.AIR_BAR
-            )
-            Anime.loadTextures(this, *Images.values().map { it.path() }.toTypedArray())
+        NpcManager.createNpcWithPlayerSkin(player.uniqueId)
 
-            user?.giveMoney(-0)
-            user?.giveExperience(-0)
+        coroutine {
+            withUser(player) {
+                cachedPlayer = player
+                after {
+                    giveExperience(0)
+                    giveMoney(-0)
+                    Anime.hideIndicator(
+                        player,
+                        Indicators.EXP,
+                        Indicators.ARMOR,
+                        Indicators.HUNGER,
+                        Indicators.HEALTH,
+                        Indicators.VEHICLE,
+                        Indicators.AIR_BAR
+                    )
+                    Anime.loadTextures(player, *Images.values().map { it.path() }.toTypedArray())
 
-            if (!user?.isAutoInstallResourcepack!!) Alert.find("resourcepack")
-                .send(this) else performCommand("resourcepack")
+                    if (!isAutoInstallResourcepack) Alert.find("resourcepack")
+                        .send(player) else player.performCommand("resourcepack")
 
-            val now = System.currentTimeMillis().toDouble()
-            // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
-            if ((user.day > 0 && now - user.lastEnter > 24 * 60 * 60 * 1000) || user.day > 6)
-                user.day = 0
-            if (now - user.dailyClaimTimestamp > 12 * 60 * 60 * 1000) {
-                user.dailyClaimTimestamp = now
-                Anime.openDailyRewardMenu(this, user.day, *DailyRewardType.values().map { it.reward }.toTypedArray())
-                val dailyReward = DailyRewardType.values()[user.day]
-                sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
-                performCommand("lootboxsound")
-                dailyReward.give.accept(user)
-                user.day++
+                    val now = System.currentTimeMillis().toDouble()
+                    // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
+                    if ((day > 0 && now - lastEnter > 24 * 60 * 60 * 1000) || day > 6)
+                        day = 0
+                    if (now - dailyClaimTimestamp > 12 * 60 * 60 * 1000) {
+                        dailyClaimTimestamp = now
+                        Anime.openDailyRewardMenu(player, day, *DailyRewardType.values().map { it.reward }.toTypedArray())
+                        val dailyReward = DailyRewardType.values()[day]
+                        player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
+                        player.performCommand("lootboxsound")
+                        dailyReward.give.accept(this)
+                        day++
+                    }
+                    lastEnter = now
+                }
             }
-            user.lastEnter = now
         }
     }
 
     @EventHandler
-    fun PlayerQuitEvent.handle() { queueLeave(player) }
+    fun PlayerQuitEvent.handle() {
+        queueLeave(player)
+    }
 }

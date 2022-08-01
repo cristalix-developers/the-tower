@@ -1,13 +1,18 @@
 package me.reidj.tower.user
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import me.func.mod.Anime
 import me.func.mod.Glow
 import me.func.mod.conversation.ModTransfer
-import me.func.mod.selection.Button
 import me.func.protocol.GlowColor
 import me.reidj.tower.app
+import me.reidj.tower.coroutine
+import me.reidj.tower.getUser
 import me.reidj.tower.laboratory.Research
 import me.reidj.tower.laboratory.ResearchType
+import me.reidj.tower.tournament.RatingType
 import me.reidj.tower.tournament.Tournament
 import me.reidj.tower.upgrade.SwordType
 import me.reidj.tower.upgrade.Upgrade
@@ -15,34 +20,37 @@ import me.reidj.tower.upgrade.UpgradeType
 import me.reidj.tower.wave.Wave
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import ru.kdev.simulatorapi.common.SimulatorUser
-import ru.kdev.simulatorapi.listener.SessionListener
+import ru.cristalix.simulatorapi.common.SimulatorUser
+import ru.cristalix.simulatorapi.listener.SessionListener.simulator
 import java.util.*
 
 /**
  * @project tower
  * @author Рейдж
  */
-class User(
-    @Transient
-    private var id: UUID,
-    var maxWavePassed: Int,
-    var upgradeTypes: MutableMap<UpgradeType, Upgrade>,
-    var researchTypes: MutableMap<ResearchType, Research>,
-    var sword: SwordType,
-    val tower: Tower,
-    var day: Int,
-    var dailyClaimTimestamp: Double,
-    var lastEnter: Double,
-    var tournament: Tournament,
-    var isAutoInstallResourcepack: Boolean,
-) : SimulatorUser(id), Upgradable {
+class User(var id: UUID) : SimulatorUser(id), Upgradable {
+
+    var maxWavePassed: Int = 0
+    var upgradeTypes = UpgradeType.values().filter { it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap()
+    var researchTypes = ResearchType.values().associateWith { Research(it, 1, null) }.toMutableMap()
+    var sword: SwordType = SwordType.NONE
+    val tower = Tower(
+        null,
+        5.0,
+        5.0,
+        UpgradeType.values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap()
+    )
+    var day = 0
+    var dailyClaimTimestamp = 0.0
+    var lastEnter = 0.0
+    var tournament = Tournament(RatingType.NONE, 0, mutableListOf())
+    var isAutoInstallResourcepack = false
 
     @Transient
     var wave: Wave? = null
 
     @Transient
-    var player: Player? = null
+    var cachedPlayer: Player? = null
         set(current) {
             tower.owner = current
             field = current
@@ -63,33 +71,34 @@ class User(
     @Transient
     var tokens = 0
 
-    fun level() = SessionListener.simulator.run { return@run getLevel() }
+    suspend fun level() = simulator.getLevel(id)
 
-    private fun requiredExp() = SessionListener.simulator.run { return@run getNextLevelExp() }
+    private suspend fun requiredExp() = simulator.getNextLevelExp(id)
 
     fun hideFromAll() {
         Bukkit.getOnlinePlayers().filterNotNull().forEach { current ->
-            player!!.hidePlayer(app, current)
-            current.hidePlayer(app, player)
+            cachedPlayer!!.hidePlayer(app, current)
+            current.hidePlayer(app, cachedPlayer)
         }
     }
-    fun showToAll() {
-        Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }
+
+    suspend fun showToAll() {
+        Bukkit.getOnlinePlayers().mapNotNull { getUser(it) }
             .filter { !it.inGame }
             .forEach {
-                it.player!!.showPlayer(app, player)
-                player!!.showPlayer(app, it.player)
+                it.cachedPlayer!!.showPlayer(app, cachedPlayer)
+                cachedPlayer!!.showPlayer(app, it.cachedPlayer)
             }
     }
 
     fun giveTokens(tokens: Int) {
         this.tokens += tokens
-        ModTransfer(this.tokens).send("tower:tokens", player)
+        ModTransfer(this.tokens).send("tower:tokens", cachedPlayer)
     }
 
     fun giveMoney(money: Int) {
         this.money += money
-        ModTransfer(this.money).send("tower:money", player)
+        ModTransfer(this.money).send("tower:money", cachedPlayer)
     }
 
     fun giveRebirth(rebirth: Int) {
@@ -97,17 +106,25 @@ class User(
     }
 
     fun giveExperience(exp: Int) {
-        val prevLevel = level()
-        this.exp += exp
-        ModTransfer(level(), this.exp, requiredExp()).send("tower:exp", player)
-        if (level() > prevLevel) {
-            Anime.alert(player!!, "§lПоздравляем!", "Ваш уровень был повышен!\n§7$prevLevel §f ➠ §l${level()}")
-            Glow.animate(player!!, .5, GlowColor.BLUE)
+        coroutine {
+            val prevLevel = level()
+            this@User.exp += exp
+            ModTransfer(level(), this@User.exp, requiredExp()).send("tower:exp", cachedPlayer)
+            if (level() > prevLevel) {
+                Anime.alert(
+                    cachedPlayer!!,
+                    "§lПоздравляем!",
+                    "Ваш уровень был повышен!\n§7$prevLevel §f ➠ §l${level()}"
+                )
+                Glow.animate(cachedPlayer!!, .5, GlowColor.BLUE)
+            }
         }
     }
 
     override fun update(user: User, vararg type: me.reidj.tower.user.Upgrade) {
-        type.filterIsInstance<UpgradeType>().forEach { ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", user.player) }
-        type.filterIsInstance<ResearchType>().forEach { ModTransfer(researchTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", user.player) }
+        type.filterIsInstance<UpgradeType>()
+            .forEach { ModTransfer(upgradeTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", user.cachedPlayer) }
+        type.filterIsInstance<ResearchType>()
+            .forEach { ModTransfer(researchTypes[it]!!.getValue()).send("user:${it.name.lowercase()}", user.cachedPlayer) }
     }
 }

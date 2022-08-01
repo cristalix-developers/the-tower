@@ -9,6 +9,6 @@ class TimerHandler(private val ticked: List<Ticked>) : BukkitRunnable() {
 
     override fun run() {
         counter++
-        ticked.forEach { it.tick(counter) }
+        ticked.forEach { coroutine { it.tick(counter) }  }
     }
 }

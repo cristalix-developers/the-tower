@@ -5,15 +5,16 @@ import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.func.mod.util.command
 import me.reidj.tower.HUB
-import me.reidj.tower.app
-import me.reidj.tower.barrier
+import me.reidj.tower.coroutine
+import me.reidj.tower.getUser
+import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.tournament.TournamentManager.isTournamentDay
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.GameUtil
 import me.reidj.tower.util.GameUtil.QUEUE_SLOTS
 import me.reidj.tower.util.GameUtil.error
-import me.reidj.tower.util.GameUtil.menu
 import me.reidj.tower.util.GameUtil.queue
+import me.reidj.tower.withUser
 import ru.cristalix.core.realm.RealmId
 import ru.cristalix.core.transfer.ITransferService
 
@@ -28,6 +29,12 @@ object PlayerCommands {
 
         command("tournament") { player, _ ->
             if (isTournamentDay()) {
+                coroutine {
+                    if (TournamentManager.getTournamentPlayers() != 0) {
+                        Anime.killboardMessage(player, "Турнирная игра уже началась!")
+                        return@coroutine
+                    }
+                }
                 if (queue.size < QUEUE_SLOTS) {
                     Anime.killboardMessage(player, "§aВы добавлены в очередь!")
                     queue.add(player.uniqueId)
@@ -38,23 +45,26 @@ object PlayerCommands {
                         Anime.killboardMessage(player, "Игра начнётся через 2 секунды...")
                         after(2 * 20) {
                             Anime.title(player, "§dНачинаем!")
-                            queue.forEach { uuid -> app.getUser(uuid)?.let { GameUtil.ratingGameStart(it) } }
-                            queue.clear()
+                            queue.forEach { uuid ->
+                                coroutine { getUser(uuid)?.let { GameUtil.ratingGameStart(it) } }
+                                queue.clear()
+                            }
                         }
+                    } else {
+                        error(player!!, "Турнир ещё не начался!")
                     }
-                } else {
-                    Anime.itemTitle(player, barrier, "Ошибка!", "Игра уже началась", 2.0)
                 }
-            } else {
-                error(player!!, "Турнир ещё не начался!")
             }
         }
 
         command("play") { player, _ ->
-            val user = app.getUser(player) ?: return@command
-            if (user.inGame)
-                return@command
-            menu.open(player)
+            coroutine {
+                withUser(player) {
+                    if (inGame)
+                        return@withUser
+                    GameUtil.menu.open(player)
+                }
+            }
         }
 
         command("tournamentDialog") { player, _ ->

@@ -22,6 +22,6 @@ data class Tower(
     }
 
     override fun update(user: User, vararg type: me.reidj.tower.user.Upgrade) {
-        type.filterIsInstance<UpgradeType>().forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.player) }
+        type.filterIsInstance<UpgradeType>().forEach { ModTransfer(upgrades[it]!!.getValue()).send("tower:${it.name.lowercase()}", user.cachedPlayer) }
     }
 }

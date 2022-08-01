@@ -16,7 +16,7 @@ object LobbyItems {
     private var backItem = item().nbt("other", "cancel").nbt("click", "leave").text("§cВыйти")
     private var settingsItem = item().nbt("other", "clothes").nbt("click", "menu").text("§aПерсонаж")
 
-    fun initialActionsWithPlayer(player: Player) = player.apply {
+    fun initialActionsWithPlayer(player: Player) = player.run {
         teleport(app.spawn)
         inventory.clear()
         inventory.setItem(0, startItem)

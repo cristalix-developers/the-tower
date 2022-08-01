@@ -8,10 +8,7 @@ import me.func.mod.selection.choicer
 import me.func.mod.util.after
 import me.func.mod.util.nbt
 import me.func.protocol.GlowColor
-import me.reidj.tower.app
-import me.reidj.tower.barrier
-import me.reidj.tower.flying
-import me.reidj.tower.item
+import me.reidj.tower.*
 import me.reidj.tower.laboratory.ResearchType
 import me.reidj.tower.upgrade.UpgradeInventory
 import me.reidj.tower.upgrade.UpgradeType
@@ -52,81 +49,85 @@ object GameUtil {
 
     fun ratingGameStart(user: User) = user.run {
         if (tournament.wavePassed.size != 3) {
-            start(player!!)
+            start(cachedPlayer!!)
             isTournament = true
         } else {
-            error(player!!, "У вас закончились попытки!")
+            error(cachedPlayer!!, "У вас закончились попытки!")
         }
     }
 
     fun start(player: Player) {
-        val user = app.getUser(player) ?: return
-
         Anime.close(player)
+        coroutine {
+            withUser(player) {
+                giveTokens(level() * 1000)
+                after {
+                    hideFromAll()
 
-        user.hideFromAll()
+                    session = Session(tower.upgrades)
 
-        user.session = Session(user.tower.upgrades)
+                    session?.upgrade?.values?.forEach { upgrade -> upgrade.level = 1 }
 
-        user.session?.upgrade?.values?.forEach { upgrade -> upgrade.level = 1 }
+                    player.run {
+                        inventory.clear()
+                        teleport(session?.arenaSpawn)
+                        inventory.setItem(4, UpgradeInventory.workshop)
+                        flying()
+                    }
 
-        player.run {
-            inventory.clear()
-            teleport(user.session?.arenaSpawn)
-            inventory.setItem(4, UpgradeInventory.workshop)
-            flying()
-        }
+                    sword.giveSword(this)
 
-        user.sword.giveSword(user)
+                    tower.health = tower.maxHealth
+                    tower.updateHealth()
+                    tower.update(
+                        this,
+                        UpgradeType.BULLET_DELAY,
+                        ResearchType.BULLET_DELAY,
+                        UpgradeType.DAMAGE,
+                        UpgradeType.HEALTH,
+                        UpgradeType.PROTECTION,
+                        UpgradeType.REGEN,
+                        UpgradeType.RADIUS
+                    )
+                    update(
+                        this,
+                        UpgradeType.CASH_BONUS_KILL,
+                        UpgradeType.CASH_BONUS_WAVE_PASS,
+                        ResearchType.CASH_BONUS_WAVE_PASS,
+                        ResearchType.CASH_BONUS_KILL
+                    )
 
-        user.tower.health = user.tower.maxHealth
-        user.tower.updateHealth()
-        user.tower.update(
-            user,
-            UpgradeType.BULLET_DELAY,
-            ResearchType.BULLET_DELAY,
-            UpgradeType.DAMAGE,
-            UpgradeType.HEALTH,
-            UpgradeType.PROTECTION,
-            UpgradeType.REGEN,
-            UpgradeType.RADIUS
-        )
-        user.update(
-            user,
-            UpgradeType.CASH_BONUS_KILL,
-            UpgradeType.CASH_BONUS_WAVE_PASS,
-            ResearchType.CASH_BONUS_WAVE_PASS,
-            ResearchType.CASH_BONUS_KILL
-        )
+                    // Отправляем точки со спавнерами
+                    session?.generators?.forEach { label ->
+                        ModTransfer(label.x, label.y, label.z).send(
+                            "mobs:init",
+                            player
+                        )
+                    }
 
-        // Отправляем точки со спавнерами
-        user.session?.generators?.forEach { label ->
-            ModTransfer(label.x, label.y, label.z).send(
-                "mobs:init",
-                player
-            )
-        }
+                    Anime.counting321(player)
 
-        Anime.counting321(player)
+                    // Начинаю волну
+                    inGame = true
+                }
+                after(3 * 20) {
+                    val current =
+                        Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
+                    wave = current
+                    current.start()
 
-        // Начинаю волну
-        user.inGame = true
-        user.giveTokens(user.level() * 1000)
-        after(3 * 20) {
-            val current = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
-            user.wave = current
-            current.start()
-
-            // Игра началась
-            ModTransfer(
-                true,
-                user.session!!.cubeLocation.x,
-                user.session!!.cubeLocation.y,
-                user.session!!.cubeLocation.z,
-                MOVE_SPEED,
-                TICKS_BEFORE_STRIKE,
-                CONST_TICKS_BEFORE_STRIKE
-            ).send("tower:update-state", player)
+                    // Игра началась
+                    ModTransfer(
+                        true,
+                        session!!.cubeLocation.x,
+                        session!!.cubeLocation.y,
+                        session!!.cubeLocation.z,
+                        MOVE_SPEED,
+                        TICKS_BEFORE_STRIKE,
+                        CONST_TICKS_BEFORE_STRIKE
+                    ).send("tower:update-state", player)
+                }
+            }
         }
     }
 

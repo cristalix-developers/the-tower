@@ -6,10 +6,7 @@ import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.mod.util.nbt
 import me.func.protocol.GlowColor
-import me.reidj.tower.app
-import me.reidj.tower.buyFailure
-import me.reidj.tower.item
-import me.reidj.tower.text
+import me.reidj.tower.*
 import me.reidj.tower.user.User
 
 /**
@@ -22,11 +19,8 @@ object UpgradeInventory {
         .text("§bМастерская\n\n§7Улучшайте навыки, чтобы проходить\n§7волны было ещё легче!")
 
     init {
-        // Команда для открытия меню
         command("workshop") { player, _ ->
-            app.getUser(player)?.let {
-                icon(it, if (!it.inGame) it.upgradeTypes else it.session!!.upgrade)
-            }
+            coroutine { withUser(player) { icon(this, if (!inGame) upgradeTypes else session!!.upgrade) } }
         }
     }
 
@@ -57,6 +51,7 @@ object UpgradeInventory {
                         value.level++
                         user.tower.updateHealth()
                         Glow.animate(player, 1.5, GlowColor.GREEN)
+                        player.performCommand("workshop")
                         if (notInGame) {
                             user.update(user)
                             user.sword.update(user)
@@ -77,6 +72,6 @@ object UpgradeInventory {
                 }
             }
         }.toMutableList()
-        menu.open(user.player!!)
+        menu.open(user.cachedPlayer!!)
     }
 }

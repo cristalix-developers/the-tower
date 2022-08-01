@@ -11,11 +11,13 @@ import me.func.mod.emotion.Emotions
 import me.func.mod.util.after
 import me.func.protocol.npc.NpcBehaviour
 import me.reidj.tower.app
+import me.reidj.tower.coroutine
 import me.reidj.tower.ticker.Ticked
 import me.reidj.tower.tournament.TournamentManager
-import me.reidj.tower.tournament.TournamentManager.getOnlinePlayers
 import me.reidj.tower.tournament.TournamentManager.getTimeAfter
+import me.reidj.tower.tournament.TournamentManager.getTournamentPlayers
 import me.reidj.tower.tournament.TournamentManager.isTournamentDay
+import me.reidj.tower.withUser
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.time.temporal.ChronoUnit
@@ -44,16 +46,20 @@ object NpcManager : Ticked {
     fun createNpcWithPlayerSkin(uuid: UUID) = npcs[NpcType.CHARACTER.name]!!.data.skin(uuid)
 
     private fun performCommand(player: Player, command: String) {
-        app.getUser(player)?.run {
-            if (isArmLocked)
-                return@run
-            isArmLocked = true
-            player.performCommand(command)
-            after(5) { isArmLocked = false }
+        coroutine {
+            withUser(player) {
+                if (isArmLocked)
+                    return@withUser
+                isArmLocked = true
+                after {
+                    player.performCommand(command)
+                    isArmLocked = false
+                }
+            }
         }
     }
 
-    override fun tick(vararg args: Int) {
+    override suspend fun tick(vararg args: Int) {
         if (args[0] % 20 != 0) {
             val size = TournamentManager.getOnlinePlayers().size
             val plurals = Humanize.plurals("игрок", "игрока", "игроков", size)
@@ -78,19 +84,22 @@ object NpcManager : Ticked {
                     player,
                     NpcType.RATING.banner!!,
                     "${NpcType.RATING.bannerTitle}\n${
-                        if (isTournamentDay()) "§e${getOnlinePlayers().filter { it.isTournament }.size} $plurals\n§6До конца ${
+                        if (isTournamentDay()) "§e${getTournamentPlayers()} $plurals\n§6До конца ${
                             getTimeAfter(
                                 ChronoUnit.HOURS
                             ).toInt()
                         } ч." else "§6До начала\n§6$total"
                     }"
                 )
-                val user = app.getUser(player)
-                Banners.content(
-                    player,
-                    NpcType.CHARACTER.banner!!,
-                    "${NpcType.CHARACTER.bannerTitle}\n\n§fМонет: §3${user?.money}\n§fВолн пройдено: §3${user?.maxWavePassed}"
-                )
+                coroutine {
+                    withUser(player) {
+                        Banners.content(
+                            player,
+                            NpcType.CHARACTER.banner!!,
+                            "${NpcType.CHARACTER.bannerTitle}\n\n§fМонет: §3${money}\n§fВолн пройдено: §3${maxWavePassed}"
+                        )
+                    }
+                }
             }
         }
         // Анимация нпс

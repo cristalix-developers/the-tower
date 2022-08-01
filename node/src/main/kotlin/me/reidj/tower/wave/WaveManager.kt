@@ -1,7 +1,7 @@
 package me.reidj.tower.wave
 
-import me.reidj.tower.app
 import me.reidj.tower.clear
+import me.reidj.tower.getUser
 import me.reidj.tower.ticker.Ticked
 import me.reidj.tower.upgrade.UpgradeType
 import org.bukkit.Bukkit
@@ -12,13 +12,13 @@ import org.bukkit.Bukkit
  */
 object WaveManager : Ticked {
 
-    override fun tick(vararg args: Int) {
-        Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }
+    override suspend fun tick(vararg args: Int) {
+        Bukkit.getOnlinePlayers().mapNotNull { getUser(it) }
             .filter { it.wave != null && it.session != null }
             .forEach {
                 if (it.wave!!.isStarting) {
                     if (((System.currentTimeMillis() - it.wave!!.startTime) / 1000 == 40.toLong() || it.wave!!.aliveMobs.isEmpty())) {
-                        it.wave!!.aliveMobs.clear(it.player!!)
+                        it.wave!!.aliveMobs.clear(it.cachedPlayer!!)
                         it.wave!!.end()
                     }
                     if (args[0] % 20 == 0 && it.tower.health < it.tower.maxHealth && it.session!!.upgrade[UpgradeType.REGEN]!!.getValue() > 0.0) {

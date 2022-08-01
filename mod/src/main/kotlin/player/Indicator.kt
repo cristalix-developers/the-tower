@@ -44,7 +44,7 @@ object Indicator {
 
         mod.registerHandler<GameLoop> {
             val currentScreen = UIEngine.clientApi.minecraft().currentScreen()
-            levelBar.enabled = currentScreen == null || currentScreen::class.java.simpleName != "aV"
+            levelBar.enabled = (currentScreen == null || currentScreen::class.java.simpleName != "aV") && !mod.gameActive
         }
 
         mod.registerChannel("tower:exp") {

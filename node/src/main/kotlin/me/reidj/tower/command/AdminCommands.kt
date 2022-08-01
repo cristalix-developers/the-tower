@@ -1,8 +1,9 @@
 package me.reidj.tower.command
 
 import me.func.mod.util.command
-import me.reidj.tower.app
+import me.reidj.tower.coroutine
 import me.reidj.tower.user.User
+import me.reidj.tower.withUser
 import ru.cristalix.core.formatting.Formatting
 
 object AdminCommands {
@@ -13,22 +14,22 @@ object AdminCommands {
     )
 
     init {
-        command("money") { player, args -> app.getUser(player)?.giveMoney(args[0].toInt()) }
+        command("money") { player, args -> coroutine { withUser(player) { giveMoney(args[0].toInt()) } } }
 
-        command("tokens") { player, args -> app.getUser(player)?.giveTokens(args[0].toInt()) }
+        command("tokens") { player, args -> coroutine { withUser(player) { giveTokens(args[0].toInt()) } } }
 
-        command("exp") { player, args -> app.getUser(player)?.giveExperience(args[0].toInt()) }
+        command("exp") { player, args -> coroutine { withUser(player) { giveExperience(args[0].toInt()) } } }
 
-        adminConsume("rebirth") { user, args -> user?.giveRebirth(args[0].toInt()) }
+        adminConsume("rebirth") { user, args -> user.giveRebirth(args[0].toInt()) }
     }
 
-    private fun adminConsume(name: String, consumer: (user: User?, args: Array<out String>) -> Unit) {
+    private fun adminConsume(name: String, consumer: (user: User, args: Array<out String>) -> Unit) {
         command(name) { player, args ->
             if (player.isOp || gods.contains(player.uniqueId.toString())) {
-                consumer(app.getUser(player), args)
-                Formatting.fine("Успешно.")
+                coroutine { withUser(player) { consumer(this, args) } }
+                player.sendMessage(Formatting.fine("Успешно."))
             } else {
-                Formatting.error("Нет прав.")
+                player.sendMessage(Formatting.error("Нет прав."))
             }
         }
     }
