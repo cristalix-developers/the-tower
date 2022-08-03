@@ -33,7 +33,7 @@ object LaboratoryManager : Ticked {
                     menu.money = "Монет $money"
                     buttons = researchTypes.map { entry ->
                         val key = entry.key
-                        val cost = key.price
+                        val cost = key.price * entry.value.level - researchTypes[ResearchType.DISCOUNT]!!.getValue().toInt()
                         button {
                             title = "${key.title} §3${entry.value.level} LVL"
                             description =
@@ -59,8 +59,7 @@ object LaboratoryManager : Ticked {
                                         giveMoney(-cost)
                                         Glow.animate(player, 1.0, GlowColor.GREEN)
                                         Anime.title(click, "§dУспешно!")
-                                        entry.value.whenBought =
-                                            System.currentTimeMillis().toInt() / 1000 + entry.key.duration
+                                        entry.value.whenBought = System.currentTimeMillis().toInt() / 1000 + entry.key.duration - researchTypes[ResearchType.LABORATORY_SPEED]!!.getValue()
                                     }.open(click)
                                 } else {
                                     buyFailure(click)

@@ -180,7 +180,8 @@ class App : JavaPlugin() {
             coroutine {
                 withUser(player) {
                     findMob(this, pair[0].encodeToByteArray())?.let { mob ->
-                        val damage = mob.damage - session!!.upgrade[PROTECTION]!!.getValue()
+                        val damage =
+                            mob.damage - session!!.upgrade[PROTECTION]!!.getValue() - researchTypes[ResearchType.PROTECTION]!!.getValue()
                         tower.health -= damage
                         Glow.animate(player, .5, GlowColor.RED)
                         Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
@@ -189,7 +190,9 @@ class App : JavaPlugin() {
                     after {
                         val wave = wave ?: return@after
                         val waveLevel = wave.level
-                        val reward = (waveLevel * waveLevel - waveLevel) / 4
+                        val reward =
+                            (waveLevel * waveLevel - waveLevel) / 4 + researchTypes[ResearchType.MONEY_BONUS_WAVE_PASS]!!.getValue()
+                                .toInt()
 
                         // Провожу действия с игроком если он проигрывает
                         if (tower.health <= 0) {

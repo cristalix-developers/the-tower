@@ -23,10 +23,11 @@ object WaveManager : Ticked {
                         it.wave!!.aliveMobs.clear(it.cachedPlayer!!)
                         it.wave!!.end()
                     }
-                    if (args[0] % 20 == 0 && it.tower.health < it.tower.maxHealth && it.session!!.upgrade[UpgradeType.REGEN]!!.getValue() > 0.0) {
+                    val session = it.session!!
+                    if (it.tower.health < (it.tower.maxHealth) && session.upgrade[UpgradeType.REGEN]!!.getValue() > 0.0) {
                         it.tower.health = it.tower.maxHealth - maxOf(
                             0.0,
-                            it.tower.maxHealth - it.tower.health - it.session!!.upgrade[UpgradeType.REGEN]!!.getValue()
+                            it.tower.maxHealth - it.tower.health - session.upgrade[UpgradeType.REGEN]!!.getValue()
                         )
                         it.tower.updateHealth()
                     }

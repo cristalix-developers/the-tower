@@ -52,7 +52,7 @@ abstract class Game {
         Anime.close(player)
         coroutine {
             withUser(player) {
-                giveTokens(level() * 1000)
+                giveTokens(level() + researchTypes[ResearchType.INITIAL_MONEY]!!.getValue().toInt())
                 after {
                     hideFromAll()
 
@@ -77,7 +77,9 @@ abstract class Game {
                         ResearchType.BULLET_DELAY,
                         UpgradeType.DAMAGE,
                         UpgradeType.HEALTH,
+                        ResearchType.HEALTH,
                         UpgradeType.PROTECTION,
+                        ResearchType.PROTECTION,
                         UpgradeType.REGEN,
                         UpgradeType.RADIUS
                     )

@@ -1,8 +1,5 @@
 package me.reidj.tower.user
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import me.func.mod.Anime
 import me.func.mod.Glow
 import me.func.mod.conversation.ModTransfer
@@ -38,7 +35,8 @@ class User(var id: UUID) : SimulatorUser(id), Upgradable {
         null,
         5.0,
         5.0,
-        UpgradeType.values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap()
+        UpgradeType.values().filter { !it.isUserUpgrade }.associateWith { Upgrade(it, 1) }.toMutableMap(),
+        ResearchType.values().associateWith { Research(it, 1, null) }.toMutableMap(),
     )
     var day = 0
     var dailyClaimTimestamp = 0.0
@@ -96,6 +94,7 @@ class User(var id: UUID) : SimulatorUser(id), Upgradable {
         ModTransfer(this.tokens).send("tower:tokens", cachedPlayer)
     }
 
+    // TODO Буду ждать когда сделают double
     fun giveMoney(money: Int) {
         this.money += money
         ModTransfer(this.money).send("tower:money", cachedPlayer)
