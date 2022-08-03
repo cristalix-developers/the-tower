@@ -13,6 +13,8 @@ import org.bukkit.Bukkit
 object WaveManager : Ticked {
 
     override suspend fun tick(vararg args: Int) {
+        if (args[0] % 20 != 0)
+            return
         Bukkit.getOnlinePlayers().mapNotNull { getUser(it) }
             .filter { it.wave != null && it.session != null }
             .forEach {

@@ -30,8 +30,6 @@ class Wave(
 
     fun start() {
         aliveMobs.clear()
-        startTime = System.currentTimeMillis()
-        isStarting = true
         ModTransfer("$level волна", 40).send("tower:timebar", player)
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
@@ -46,6 +44,8 @@ class Wave(
                 }
             }, minOf(it.toLong() * 12, 400))
         }
+        startTime = System.currentTimeMillis()
+        isStarting = true
     }
 
     private val hpStatus = level * 0.3

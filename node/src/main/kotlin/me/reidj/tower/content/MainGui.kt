@@ -1,6 +1,5 @@
 package me.reidj.tower.content
 
-import me.func.mod.selection.Button
 import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
@@ -44,11 +43,13 @@ object MainGui {
     private val resourcePack = button {
         item = resourcePackIcon
         title = "Ресурспак"
-        onClick { player, _, _ ->
+        onClick { player, _, button ->
             coroutine {
-                withUser(player) { isAutoInstallResourcepack = !isAutoInstallResourcepack }
+                withUser(player) {
+                    isAutoInstallResourcepack = !isAutoInstallResourcepack
+                    button.hint(if (isAutoInstallResourcepack) "Не устанавливать" else "Устанавливать автоматически")
+                }
             }
-            player.performCommand("menu")
         }
     }
 
@@ -59,8 +60,6 @@ object MainGui {
         hint("Исследовать")
         onClick { player, _, _ -> player.performCommand("laboratory") }
     }
-
-    private lateinit var buttons: MutableList<Button>
 
     init {
         command("menu") { opened, _ ->

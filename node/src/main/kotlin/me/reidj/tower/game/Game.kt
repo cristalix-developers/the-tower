@@ -32,7 +32,7 @@ private val tournament = item().nbt("other", "collection")
 val menu = choicer {
     title = "Tower Simulator"
     description = "Выберите под-режим"
-    storage = mutableListOf(
+    buttons(
         button {
             title = "Обычная"
             item = normal
@@ -103,10 +103,8 @@ abstract class Game {
                     inGame = true
                 }
                 after(3 * 20) {
-                    val current =
-                        Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
-                    wave = current
-                    current.start()
+                    wave = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
+                    wave!!.start()
 
                     // Игра началась
                     ModTransfer(

@@ -22,7 +22,7 @@ object BarManager {
     var healthIndicator: HealthIndicator? = null
     var protectionIndicator: ProtectionIndicator? = null
 
-    val parent = rectangle {
+    private val parent = rectangle {
         origin = Relative.BOTTOM
         align = Relative.BOTTOM
         offset.y = -14.0
@@ -56,7 +56,7 @@ object BarManager {
         init {
             enabled = false
             color = Color(0, 0, 0, 0.68)
-            offset = V3(-1.0, -30.0)
+            offset = V3(-1.0, -15.0)
             align = Relative.CENTER
             origin = Relative.RIGHT
             size = V3(99.0, 10.0)
@@ -93,7 +93,7 @@ object BarManager {
         init {
             enabled = false
             color = Color(0, 0, 0, 0.68)
-            offset = V3(1.0, -30.0)
+            offset = V3(1.0, -15.0)
             align = Relative.CENTER
             origin = Relative.LEFT
             size = V3(99.0, 10.0)

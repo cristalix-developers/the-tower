@@ -20,6 +20,8 @@ import me.func.protocol.GlowColor
 import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
+import me.reidj.tower.game.NormalGame
+import me.reidj.tower.game.RatingGame
 import me.reidj.tower.laboratory.LaboratoryManager
 import me.reidj.tower.laboratory.ResearchType
 import me.reidj.tower.listener.ConnectionHandler
@@ -115,6 +117,9 @@ class App : JavaPlugin() {
         // Регистрация команд
         PlayerCommands
 
+        RatingGame
+        NormalGame
+
         // Регистрация админ команд
         AdminCommands
 
@@ -175,51 +180,51 @@ class App : JavaPlugin() {
             coroutine {
                 withUser(player) {
                     findMob(this, pair[0].encodeToByteArray())?.let { mob ->
-                        val waveLevel = wave!!.level
-                        val reward = (waveLevel * waveLevel - waveLevel) / 4
                         val damage = mob.damage - session!!.upgrade[PROTECTION]!!.getValue()
-                        after {
-                            tower.health -= damage
-                            Glow.animate(player, .5, GlowColor.RED)
-                            Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
+                        tower.health -= damage
+                        Glow.animate(player, .5, GlowColor.RED)
+                        Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
+                        tower.updateHealth()
+                    }
+                    after {
+                        val wave = wave ?: return@after
+                        val waveLevel = wave.level
+                        val reward = (waveLevel * waveLevel - waveLevel) / 4
 
-                            tower.updateHealth()
+                        // Провожу действия с игроком если он проигрывает
+                        if (tower.health <= 0) {
+                            if (maxWavePassed > waveLevel)
+                                maxWavePassed = waveLevel
 
-                            // Провожу действия с игроком если он проигрывает
-                            if (tower.health <= 0) {
-                                if (maxWavePassed > waveLevel)
-                                    maxWavePassed = waveLevel
-
-                                if (isTournament) {
-                                    TournamentManager.end(this)
-                                    isTournament = false
-                                }
-
-                                LobbyItems.initialActionsWithPlayer(player)
-                                player.flying(false)
-                                coroutine { showToAll() }
-
-                                // Игра закончилась
-                                ModTransfer(false).send("tower:update-state", player)
-
-                                Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                                wave?.aliveMobs?.clear(player)
-                                inGame = false
-                                session = null
-                                giveTokens(-tokens)
-                                giveExperience(waveLevel * 3)
-                                wave = null
-
-
-                                if (reward == 0)
-                                    return@after
-
-                                Anime.cursorMessage(
-                                    player,
-                                    "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
-                                )
-                                giveMoney(reward)
+                            if (isTournament) {
+                                TournamentManager.end(this)
+                                isTournament = false
                             }
+
+                            LobbyItems.initialActionsWithPlayer(player)
+                            player.flying(false)
+                            coroutine { showToAll() }
+
+                            // Игра закончилась
+                            ModTransfer(false).send("tower:update-state", player)
+
+                            Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
+                            wave.aliveMobs.clear(player)
+                            wave.aliveMobs.clear()
+                            inGame = false
+                            session = null
+                            giveTokens(-tokens)
+                            giveExperience(waveLevel * 3)
+                            this.wave = null
+
+                            if (reward == 0)
+                                return@after
+
+                            Anime.cursorMessage(
+                                player,
+                                "§e+$reward §f${Humanize.plurals("монета", "монеты", "монет", reward)}"
+                            )
+                            giveMoney(reward)
                         }
                     }
                 }
