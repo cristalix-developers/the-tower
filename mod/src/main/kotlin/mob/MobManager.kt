@@ -1,6 +1,5 @@
 package mob
 
-import TimeBar
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop

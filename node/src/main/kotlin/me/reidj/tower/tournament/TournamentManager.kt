@@ -1,6 +1,6 @@
 package me.reidj.tower.tournament
 
-import me.reidj.tower.getUser
+import me.reidj.tower.app
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import java.time.*
@@ -15,13 +15,13 @@ object TournamentManager {
     private val startDate = LocalDate.of(2022, 7, 25)
 
     fun end(user: User) = user.run {
-        tournament.wavePassed.add(user.wave!!.level)
-        tournament.maxWavePassed = Collections.max(tournament.wavePassed)
+        stat.tournament.passedWaves.add(user.wave!!.level)
+        stat.tournament.maximumWavePassed = Collections.max(stat.tournament.passedWaves)
     }
 
-    suspend fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { getUser(it) }.filter { it.inGame }
+    fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter { it.inGame }
 
-    suspend fun getTournamentPlayers() = getOnlinePlayers().filter { it.isTournament }.size
+    fun getTournamentPlayers() = getOnlinePlayers().filter { it.isTournament }.size
 
     fun isTournamentDay() =
         TimeUnit.DAYS.convert(

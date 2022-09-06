@@ -1,4 +1,3 @@
-
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
@@ -14,11 +13,12 @@ import ru.cristalix.uiengine.utility.V3
 import tower.BarManager
 import tower.Cube
 import tower.TowerManager
+import util.Formatter
 import java.util.*
 
+const val NAMESPACE = "cache/animation"
 
 lateinit var mod: App
-const val NAMESPACE = "cache/animation"
 
 class App : KotlinMod() {
 
@@ -62,15 +62,13 @@ class App : KotlinMod() {
                     mod.cube.x,
                     mod.cube.y - 1.25,
                     mod.cube.z,
-                    "",
+                    "§4${Formatter.toFormat(TowerManager.health)} ❤",
                     2.0,
                     true
                 )
                 mod.inited = true
 
                 MobManager
-
-                UIEngine.schedule(1.0) { TowerManager.updateHealth(TowerManager.health, TowerManager.maxHealth) }
             } else {
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 inited = false
@@ -89,8 +87,8 @@ class App : KotlinMod() {
                 )
                 if (MobManager.mobs.contains(entity))
                     (entity as EntityLivingBase).updateHealth()
+                UIEngine.schedule(3) { isArmsLock = false }
             }
-            UIEngine.schedule(3) { isArmsLock = false }
         }
     }
 }

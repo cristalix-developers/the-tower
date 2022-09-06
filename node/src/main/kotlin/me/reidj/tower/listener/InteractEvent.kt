@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerInteractEvent
  * @project tower
  * @author Рейдж
  */
-object InteractEvent : Listener {
+class InteractEvent : Listener {
 
     @EventHandler
     fun PlayerInteractEvent.handle() {

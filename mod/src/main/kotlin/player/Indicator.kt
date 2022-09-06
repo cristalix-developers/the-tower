@@ -1,6 +1,5 @@
 package player
 
-import dev.xdark.clientapi.event.lifecycle.GameLoop
 import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
@@ -14,7 +13,7 @@ import ru.cristalix.uiengine.utility.*
  */
 object Indicator {
 
-    val levelBar = rectangle {
+    val levelBar = carved {
         enabled = true
         offset = V3(0.0, -27.0)
         origin = BOTTOM
@@ -22,7 +21,7 @@ object Indicator {
         size = V3(180.0, 5.0, 0.0)
         color = Color(0, 0, 0, 0.62)
         addChild(
-            rectangle {
+            carved {
                 origin = LEFT
                 align = LEFT
                 size = V3(0.0, 5.0, 0.0)
@@ -42,20 +41,15 @@ object Indicator {
     init {
         UIEngine.overlayContext.addChild(levelBar)
 
-        mod.registerHandler<GameLoop> {
-            val currentScreen = UIEngine.clientApi.minecraft().currentScreen()
-            levelBar.enabled = (currentScreen == null || currentScreen::class.java.simpleName != "aV") && !mod.gameActive
-        }
-
         mod.registerChannel("tower:exp") {
             val level = readInt()
-            val experience = readInt()
+            val experience = readDouble()
             val requiredExperience = readInt()
 
-            (levelBar.children[0] as RectangleElement).animate(1) {
+            (levelBar.children[3] as RectangleElement).animate(1) {
                 size.x = 180.0 / requiredExperience * experience
             }
-            (levelBar.children[1] as TextElement).content = "Уровень §b${level} §7$experience из $requiredExperience"
+            (levelBar.children[4] as TextElement).content = "Уровень §b${level} §7${experience.toInt()} из $requiredExperience"
         }
     }
 }

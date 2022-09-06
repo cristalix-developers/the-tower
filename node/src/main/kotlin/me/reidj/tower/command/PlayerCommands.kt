@@ -1,44 +1,37 @@
 package me.reidj.tower.command
 
-import me.func.mod.Anime
+import me.func.mod.dialog.Dialog
 import me.func.mod.util.command
-import me.reidj.tower.HUB
-import me.reidj.tower.coroutine
-import me.reidj.tower.game.menu
+import me.reidj.tower.app
+import me.reidj.tower.game.Game
 import me.reidj.tower.util.DialogUtil
-import me.reidj.tower.withUser
-import ru.cristalix.core.realm.RealmId
-import ru.cristalix.core.transfer.ITransferService
+import me.reidj.tower.util.transfer
 
-object PlayerCommands {
+/**
+ * @project : tower-simulator
+ * @author : Рейдж
+ **/
+class PlayerCommands {
 
     init {
         command("resourcepack") { player, _ -> player.setResourcePack(System.getenv("RESOURCE_PACK"), "000") }
-
-        command("leave") { player, _ -> ITransferService.get().transfer(player.uniqueId, RealmId.of(HUB)) }
-
+        command("leave") { player, _ -> player.transfer() }
         command("play") { player, _ ->
-            coroutine {
-                withUser(player) {
-                    if (inGame)
-                        return@withUser
-                    menu.open(player)
-                }
-            }
+            val user = app.getUser(player) ?: return@command
+            if (user.inGame)
+                return@command
+            Game.menu.open(player)
         }
-
         command("tournamentDialog") { player, _ ->
-            Anime.dialog(
+            Dialog.dialog(
                 player,
                 DialogUtil.tournamentDialog,
                 "tournamentPageOne"
             )
         }
-
-        command("tournamentInfo") { player, _ -> Anime.openDialog(player, "tournamentPageTwo") }
-
+        command("tournamentInfo") { player, _ -> Dialog.openDialog(player, "tournamentPageTwo") }
         command("guide") { player, _ ->
-            Anime.dialog(
+            Dialog.dialog(
                 player,
                 DialogUtil.guideDialog,
                 "guidePageOne"

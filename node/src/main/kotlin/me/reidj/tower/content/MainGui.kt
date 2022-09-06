@@ -3,77 +3,64 @@ package me.reidj.tower.content
 import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
-import me.func.mod.util.nbt
-import me.reidj.tower.coroutine
-import me.reidj.tower.item
-import me.reidj.tower.upgrade.UpgradeInventory
-import me.reidj.tower.withUser
+import me.reidj.tower.app
+import me.reidj.tower.util.Formatter
+import me.reidj.tower.util.PATH
 
 /**
- * @project tower
- * @author Рейдж
- */
-object MainGui {
-
-    private val resourcePackIcon = item().nbt("other", "settings")
-    private val statisticIcon = item().nbt("other", "quest_week")
-    private val laboratoryIcon = item().nbt("skyblock", "glowing_redstone")
+ * @project : tower-simulator
+ * @author : Рейдж
+ **/
+class MainGui {
 
     private val menu = selection {
         title = "Tower Simulator"
-        rows = 2
+        rows = 4
         columns = 1
         money = ""
         hint = ""
     }
 
-    private val statistic = button {
-        item = statisticIcon
-        title = "§f§l > §bСтатистика"
-    }
-
-    private val workshop = button {
-        item = UpgradeInventory.workshop
-        title = "Мастерская"
-        description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
-        hint("Открыть")
-        onClick { player, _, _ -> player.performCommand("workshop") }
-    }
-
-    private val resourcePack = button {
-        item = resourcePackIcon
-        title = "Ресурспак"
-        onClick { player, _, button ->
-            coroutine {
-                withUser(player) {
-                    isAutoInstallResourcepack = !isAutoInstallResourcepack
-                    button.hint(if (isAutoInstallResourcepack) "Не устанавливать" else "Устанавливать автоматически")
+    private val buttons = mutableListOf(
+        button {
+            texture = "${PATH}statistic.png"
+            title = "§6Статистика"
+            description = "§7Наведите, чтобы посмотреть"
+        }, button {
+            texture = "${PATH}workshop.png"
+            title = "Мастерская"
+            description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
+            hint("Открыть")
+            onClick { player, _, _ -> player.performCommand("workshop") }
+        }, button {
+            texture = "${PATH}laboratory.png"
+            title = "Лаборатория"
+            description = "§7Это место, где вы можете улучшить свои навыки."
+            hint("Исследовать")
+            onClick { player, _, _ -> player.performCommand("laboratory") }
+        }, button {
+            texture = "${PATH}settings.png"
+            title = "Ресурспак"
+            hint("Переключить")
+            onClick { player, _, button ->
+                (app.getUser(player) ?: return@onClick).run {
+                    stat.isAutoInstallResourcepack = !stat.isAutoInstallResourcepack
+                    button.hint(if (stat.isAutoInstallResourcepack) "Не устанавливать" else "Устанавливать автоматически")
                 }
             }
         }
-    }
-
-    private val laboratory = button {
-        item = laboratoryIcon
-        title = "Лаборатория"
-        description = "§7Это место, где вы можете улучшить свои навыки."
-        hint("Исследовать")
-        onClick { player, _, _ -> player.performCommand("laboratory") }
-    }
+    )
 
     init {
-        command("menu") { opened, _ ->
-            coroutine {
-                withUser(opened) {
-                    statistic.description = """
-                            §7    Монет: §e${money}
-                            §7    Волн пройдено: §b${maxWavePassed}
-                        """.trimIndent()
-                    resourcePack.hint(if (isAutoInstallResourcepack) "Не устанавливать" else "Устанавливать автоматически")
-                }
+        command("menu") { player, _ ->
+            (app.getUser(player) ?: return@command).stat.run {
+                buttons[0].hover = """
+                         §7Монет: §3${Formatter.toFormat(money)}
+                         §7Волн пройдено: §3${maximumWavePassed}
+                """.trimIndent()
             }
-            menu.storage = mutableListOf(statistic, workshop, laboratory, resourcePack)
-            menu.open(opened)
+            menu.storage = buttons
+            menu.open(player)
         }
     }
 }

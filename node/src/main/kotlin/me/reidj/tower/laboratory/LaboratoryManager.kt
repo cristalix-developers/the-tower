@@ -1,104 +1,86 @@
 package me.reidj.tower.laboratory
 
-import implario.humanize.Humanize
 import me.func.mod.Anime
 import me.func.mod.Glow
-import me.func.mod.selection.Button
 import me.func.mod.selection.Confirmation
 import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.func.protocol.GlowColor
-import me.reidj.tower.*
-import me.reidj.tower.ticker.Ticked
+import me.reidj.tower.app
+import me.reidj.tower.clock.ClockInject
+import me.reidj.tower.data.ResearchType
+import me.reidj.tower.util.Formatter.toFormat
+import me.reidj.tower.util.error
+import me.reidj.tower.util.plural
 import org.bukkit.Bukkit
 
 /**
- * @project tower
- * @author Рейдж
- */
-object LaboratoryManager : Ticked {
+ * @project : tower-simulator
+ * @author : Рейдж
+ **/
+class LaboratoryManager : ClockInject {
 
     private val menu = selection {
         title = "Лаборатория"
-        columns = 2
+        rows = 3
+        columns = 1
     }
-
-    private lateinit var buttons: MutableList<Button>
 
     init {
         command("laboratory") { sender, _ ->
-            coroutine {
-                withUser(sender) {
-                    menu.money = "Монет $money"
-                    buttons = researchTypes.map { entry ->
-                        val key = entry.key
-                        val cost = key.price * entry.value.level - researchTypes[ResearchType.DISCOUNT]!!.getValue().toInt()
-                        button {
-                            title = "${key.title} §3${entry.value.level} LVL"
-                            description =
-                                "${key.value} §f➠ §l${toFormat(key.value + key.step)}\nВремя улучшения ${key.duration} секунд"
-                            item = key.item
-                            price = cost.toLong()
-                            hint(if (entry.value.whenBought == null) "Изучить" else "В процессе")
-                            onClick { click, _, _ ->
-                                if (entry.value.whenBought != null)
-                                    return@onClick
-                                if (money >= cost) {
-                                    Confirmation(
-                                        "Купить §a'${key.title}'",
-                                        "§fза §b${key.price} ${
-                                            Humanize.plurals(
-                                                "монету",
-                                                "монеты",
-                                                "монет",
-                                                key.price
-                                            )
-                                        }"
-                                    ) { player ->
-                                        giveMoney(-cost)
-                                        Glow.animate(player, 1.0, GlowColor.GREEN)
-                                        Anime.title(click, "§dУспешно!")
-                                        entry.value.whenBought = System.currentTimeMillis().toInt() / 1000 + entry.key.duration - researchTypes[ResearchType.LABORATORY_SPEED]!!.getValue()
-                                    }.open(click)
-                                } else {
-                                    buyFailure(click)
-                                }
+            (app.getUser(sender) ?: return@command).run {
+                menu.money = "Монет ${toFormat(stat.money)}"
+                menu.storage = stat.researchType.map { (key, value) ->
+                    val cost = key.price * value.level - stat.researchType[ResearchType.DISCOUNT]!!.getValue()
+                    button {
+                        title = "${key.title} §3${value.level} LVL"
+                        texture = key.texture
+                        description =
+                            "${toFormat(key.value + key.step)} §f➠ §l${key.value + key.step}\n" + "Время улучшения ${key.duration} секунд"
+                        price = cost.toLong()
+                        hint(if (value.whenBought == null) "Изучить" else "В процессе")
+                        onClick { player, _, _ ->
+                            if (value.whenBought != null)
+                                return@onClick
+                            if (stat.money >= cost) {
+                                Confirmation(
+                                    "Купить §a'${key.title}'",
+                                    "§fза §b$cost ${cost.plural("монету", "монеты", "монет")}"
+                                ) { accepter ->
+                                    giveMoney(-cost)
+                                    Glow.animate(player, 1.0, GlowColor.GREEN)
+                                    Anime.title(accepter, "§dУспешно!")
+                                    value.whenBought =
+                                        System.currentTimeMillis()
+                                            .toInt() / 1000 + key.duration - stat.researchType[ResearchType.LABORATORY_SPEED]!!.getValue()
+                                }.open(player)
+                            } else {
+                                player.error("Недостаточно средств")
                             }
                         }
-                    }.toMutableList()
-                }
+                    }
+                }.toMutableList()
             }
-            menu.storage = buttons
             menu.open(sender)
         }
     }
 
-    override suspend fun tick(vararg args: Int) {
-        if (args[0] % 20 != 0)
+    override fun run(tick: Int) {
+        if (tick % 20 != 0)
             return
-        Bukkit.getOnlinePlayers().mapNotNull { getUser(it) }.forEach { user ->
-            user.researchTypes.filter { it.value.whenBought != null }.forEach { (type, research) ->
-                if (System.currentTimeMillis().toInt() / 1000 >= research.whenBought!!) {
-                    user.cachedPlayer?.let {
-                        Anime.killboardMessage(it, "Завершено исследование: §a${type.title}")
+        Bukkit.getOnlinePlayers()
+            .mapNotNull { app.getUser(it) }
+            .forEach { user ->
+                user.stat.researchType
+                    .filter { it.value.whenBought != null }
+                    .forEach { (key, value) ->
+                        if (System.currentTimeMillis().toInt() / 1000 >= value.whenBought!!) {
+                            Anime.killboardMessage(user.player, "Завершено исследование: §a${key.title}")
+                            value.level++
+                            value.whenBought = null
+                        }
                     }
-                    research.level++
-                    research.whenBought = null
-                } else {
-                    user.cachedPlayer?.let { player ->
-                        /*Banners.content(
-                            player,
-                            progressBanner,
-                            "§bВ процессе\n§f${type.title} §3${
-                                convertSecond(
-                                    research.whenBought!! - System.currentTimeMillis().toInt() / 1000
-                                )
-                            }\n"
-                        )*/
-                    }
-                }
             }
-        }
     }
 }

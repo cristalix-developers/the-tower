@@ -5,120 +5,106 @@ import me.func.mod.conversation.ModTransfer
 import me.func.mod.selection.button
 import me.func.mod.selection.choicer
 import me.func.mod.util.after
-import me.func.mod.util.nbt
-import me.reidj.tower.coroutine
-import me.reidj.tower.flying
-import me.reidj.tower.item
-import me.reidj.tower.laboratory.ResearchType
-import me.reidj.tower.upgrade.UpgradeInventory
-import me.reidj.tower.upgrade.UpgradeType
+import me.reidj.tower.app
+import me.reidj.tower.data.ImprovementType
+import me.reidj.tower.data.ResearchType
+import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.user.Session
-import me.reidj.tower.wave.Wave
-import me.reidj.tower.withUser
+import me.reidj.tower.util.PATH
+import me.reidj.tower.util.flying
 import org.bukkit.entity.Player
 
 /**
- * @project : tower
+ * @project : tower-simulator
  * @author : Рейдж
  **/
+interface Game {
 
-private const val MOVE_SPEED: Double = .01
-private const val CONST_TICKS_BEFORE_STRIKE = 20
-private const val TICKS_BEFORE_STRIKE = 40
+    companion object {
+        private const val MOVE_SPEED: Double = .01
+        private const val CONST_TICKS_BEFORE_STRIKE = 20
+        private const val TICKS_BEFORE_STRIKE = 40
 
-private val normal = item().nbt("other", "villager")
-private val tournament = item().nbt("other", "collection")
-
-val menu = choicer {
-    title = "Tower Simulator"
-    description = "Выберите под-режим"
-    buttons(
-        button {
-            title = "Обычная"
-            item = normal
-            onClick { player, _, _ -> player.performCommand("normal") }
-        },
-        button {
-            title = "Турнир"
-            item = tournament
-            onClick { player, _, _ -> player.performCommand("tournament") }
+        val menu = choicer {
+            title = "Tower Simulator"
+            description = "Выберите под-режим"
+            buttons(
+                button {
+                    title = "Обычный"
+                    texture = "${PATH}default.png"
+                    hint("Играть")
+                    onClick { player, _, _ -> player.performCommand("default") }
+                },
+                button {
+                    title = "Турнир"
+                    texture = "${PATH}rating.png"
+                    hint("Играть")
+                    onClick { player, _, _ -> player.performCommand("tournament") }
+                }
+            )
         }
-    )
-}
+    }
 
-abstract class Game {
-
-    open fun start(player: Player) {
+    fun start(player: Player) {
         Anime.close(player)
-        coroutine {
-            withUser(player) {
-                giveTokens(level() + researchTypes[ResearchType.INITIAL_MONEY]!!.getValue().toInt())
-                after {
-                    hideFromAll()
+        (app.getUser(player) ?: return).run {
+            session = Session(tower!!.upgrades)
 
-                    session = Session(tower.upgrades)
+            val session = session!!
 
-                    session?.upgrade?.values?.forEach { upgrade -> upgrade.level = 1 }
+            session.towerImprovement.values.forEach { it.level = 1 }
 
-                    player.run {
-                        inventory.clear()
-                        teleport(session?.arenaSpawn)
-                        inventory.setItem(4, UpgradeInventory.workshop)
-                        flying()
-                    }
+            hideFromAll()
 
-                    sword.giveSword(this)
+            player.run {
+                inventory.clear()
+                teleport(session.arenaSpawn)
+                flying()
+            }
 
-                    tower.health = tower.maxHealth
-                    tower.updateHealth()
-                    tower.update(
-                        this,
-                        UpgradeType.BULLET_DELAY,
-                        ResearchType.BULLET_DELAY,
-                        UpgradeType.DAMAGE,
-                        UpgradeType.HEALTH,
-                        ResearchType.HEALTH,
-                        UpgradeType.PROTECTION,
-                        ResearchType.PROTECTION,
-                        UpgradeType.REGEN,
-                        UpgradeType.RADIUS
-                    )
-                    update(
-                        this,
-                        UpgradeType.CASH_BONUS_KILL,
-                        UpgradeType.CASH_BONUS_WAVE_PASS,
-                        ResearchType.CASH_BONUS_WAVE_PASS,
-                        ResearchType.CASH_BONUS_KILL
-                    )
+            giveTokens(getLevel() + 1.0)
 
-                    // Отправляем точки со спавнерами
-                    session?.generators?.forEach { label ->
-                        ModTransfer(label.x, label.y, label.z).send(
-                            "mobs:init",
-                            player
-                        )
-                    }
+            tower!!.run tower@{
+                health = maxHealth
+                updateHealth()
+                updateBulletDelay()
+                updateDamage()
+                updateProtection()
+                update(
+                    this@run,
+                    ImprovementType.REGEN,
+                    ImprovementType.RADIUS,
+                )
+            }
 
-                    Anime.counting321(player)
+            update(
+                this,
+                ImprovementType.CASH_BONUS_KILL,
+                ImprovementType.CASH_BONUS_WAVE_PASS,
+                ResearchType.CASH_BONUS_WAVE_PASS,
+                ResearchType.CASH_BONUS_KILL
+            )
 
-                    // Начинаю волну
-                    inGame = true
-                }
-                after(3 * 20) {
-                    wave = Wave(true, System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
-                    wave!!.start()
+            // Отправляем точки со спавнерами
+            session.generators.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
 
-                    // Игра началась
-                    ModTransfer(
-                        true,
-                        session!!.cubeLocation.x,
-                        session!!.cubeLocation.y,
-                        session!!.cubeLocation.z,
-                        MOVE_SPEED,
-                        TICKS_BEFORE_STRIKE,
-                        CONST_TICKS_BEFORE_STRIKE
-                    ).send("tower:update-state", player)
-                }
+            Anime.counting321(player)
+
+            inGame = true
+            after(3 * 20) {
+                wave = Wave(System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
+                wave!!.start()
+
+                // Игра началась
+                ModTransfer(
+                    true,
+                    session.cubeLocation.x,
+                    session.cubeLocation.y,
+                    session.cubeLocation.z,
+                    MOVE_SPEED,
+                    TICKS_BEFORE_STRIKE,
+                    CONST_TICKS_BEFORE_STRIKE
+                ).send("tower:update-state", player)
             }
         }
     }

@@ -1,11 +1,10 @@
 package player
 
-import dev.xdark.clientapi.event.lifecycle.GameLoop
-import implario.humanize.Humanize
 import mod
-import ru.cristalix.clientapi.registerHandler
+import plural
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
+import util.Formatter
 
 /**
  * @project tower
@@ -20,6 +19,7 @@ object Statistic {
         shadow = true
         content = ""
     }
+
     init {
         val moneyBox = text {
             offset = V3(-3.0, -14.0)
@@ -40,28 +40,13 @@ object Statistic {
         repeat(2) { box.children.add(rectangle { color = TRANSPARENT }) }
 
         mod.registerChannel("tower:money") {
-            val money = readInt()
-            moneyBox.content = "${
-                Humanize.plurals(
-                    "Монета",
-                    "Монеты",
-                    "Монет",
-                    money
-                )
-            } §e$money"
+            val money = readDouble()
+            moneyBox.content = "${money.plural("Монета", "Монеты", "Монет")} §e${Formatter.toFormat(money)}"
         }
 
         mod.registerChannel("tower:tokens") {
-            val tokens = readInt()
-
-            tokensBox.content = "${
-                Humanize.plurals(
-                    "Жетон",
-                    "Жетона",
-                    "Жетонов",
-                    tokens
-                )
-            } §b$tokens"
+            val tokens = readDouble()
+            tokensBox.content = "§f${tokens.plural("Жетон", "Жетона", "Жетонов")} §b${Formatter.toFormat(tokens)}"
         }
     }
 }

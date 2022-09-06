@@ -9,7 +9,6 @@ import mob.MobManager
 import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.Context3D
-import ru.cristalix.uiengine.element.SphereElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
@@ -104,7 +103,6 @@ object TowerManager {
             }
             if (now - lastTickHit > 1 * 1000) {
                 lastTickHit = now
-                // TODO тут пиздец надо переехать на сервер
                 MobManager.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 8.0 }.forEach {
                     UIEngine.clientApi.clientConnection()
                         .sendPayload("tower:hittower", Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8))
@@ -124,10 +122,6 @@ object TowerManager {
             updateHealth(readDouble(), readDouble())
         }
 
-        mod.registerChannel("tower:health") {
-            updateHealth(health, readDouble())
-        }
-
         mod.registerChannel("tower:protection") {
             val protect = readDouble()
             if (protect != protection) {
@@ -141,12 +135,17 @@ object TowerManager {
         }
     }
 
-    fun updateHealth(healthUpdate: Double, maxHealthUpdate: Double) {
+    private fun updateHealth(healthUpdate: Double, maxHealthUpdate: Double) {
+        if (health == healthUpdate)
+            return
+
         health = healthUpdate
         maxHealth = maxHealthUpdate
+
         BarManager.healthIndicator?.updatePercentage(health, maxHealth)
 
-        if (mod.gameActive)
-            Banners.text("§4${health.toInt()} ❤", healthBanner!!, Banners.banners[healthBanner!!.uuid]!!.second)
+        if (mod.gameActive) {
+            Banners.text("§4${util.Formatter.toFormat(health)} ❤", healthBanner!!, Banners.banners[healthBanner!!.uuid]!!.second)
+        }
     }
 }

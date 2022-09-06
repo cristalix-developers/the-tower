@@ -20,10 +20,10 @@ import org.bukkit.event.player.PlayerSwapHandItemsEvent
  * @project tower
  * @author Рейдж
  */
-object UnusedEvent : Listener {
+class UnusedEvent : Listener {
 
     @EventHandler
-    fun PlayerMoveEvent.handle() { if (player.location.y <= 80) player.teleport(app.spawn) }
+    fun PlayerMoveEvent.handle() { if (player.location.y <= 80) player.teleport(app.playerDataManager.spawn) }
 
     @EventHandler
     fun BlockPlaceEvent.handle() { isCancelled = true }
