@@ -24,13 +24,14 @@ import kotlin.math.pow
  */
 object TowerManager {
 
-    private val activeAmmo = mutableListOf<Bullet>()
 
     private var lastTickMove = System.currentTimeMillis()
     private var lastTickHit = System.currentTimeMillis()
+    private var speedAttack = 0.05 // BULLET_DELAY
+
+    val activeAmmo = mutableListOf<Bullet>()
     var ticksBeforeStrike = 30
     var ticksStrike = 30
-    private var speedAttack = 0.05 // BULLET_DELAY
     var damage = 0.0
     var health = 5.0
     var maxHealth = 5.0
@@ -83,7 +84,6 @@ object TowerManager {
                         Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
                     )
                     activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
-
                     it.target.updateHealth()
                     it.remove()
                     activeAmmo.remove(it)

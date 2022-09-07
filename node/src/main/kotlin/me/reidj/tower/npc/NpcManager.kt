@@ -15,6 +15,7 @@ import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.tournament.TournamentManager.getTimeAfter
 import me.reidj.tower.tournament.TournamentManager.getTournamentPlayers
 import me.reidj.tower.tournament.TournamentManager.isTournamentDay
+import me.reidj.tower.util.CategoryMenu
 import me.reidj.tower.util.Formatter
 import org.bukkit.Bukkit
 import java.time.temporal.ChronoUnit
@@ -37,7 +38,7 @@ class NpcManager : ClockInject {
                     if (user.isArmLock)
                         return@onClick
                     user.isArmLock = true
-                    player.performCommand(it.command)
+                    CategoryMenu.open(it.command, player)
                     after { user.isArmLock = false }
                 }
                 location(app.worldMeta.getLabel(it.name.lowercase()).clone().add(.5, .0, .5))
@@ -83,7 +84,7 @@ class NpcManager : ClockInject {
                 Banners.content(
                     player,
                     NpcType.CHARACTER.banner!!,
-                    "${NpcType.CHARACTER.bannerTitle}\n\n§fМонет: §3${Formatter.toFormat(stat.money)}\n§fВолн пройдено: §3${stat.maximumWavePassed}"
+                    "${NpcType.CHARACTER.bannerTitle}\n§fМонет: §3${Formatter.toFormat(stat.money)}\n§fВолн пройдено: §3${stat.maximumWavePassed}"
                 )
             }
         }

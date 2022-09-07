@@ -8,6 +8,9 @@ import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.mob.Mob
 import me.reidj.tower.game.wave.mob.MobType
+import me.reidj.tower.sword.SwordType
+import me.reidj.tower.util.Formatter.toFormat
+import me.reidj.tower.util.plural
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.entity.EntityType
@@ -24,6 +27,53 @@ data class Wave(
     private val mobs: MutableList<Mob>,
     private val player: Player
 ) {
+
+    init {
+        Anime.createReader("mob:hit") { player, buffer ->
+            // Нужно для проверки кто нанёс урон, башня или игрок
+            val pair = buffer.toString(Charsets.UTF_8).split(":")
+            (app.getUser(player) ?: return@createReader).run {
+                val session = session ?: return@createReader
+                app.findMob(this, pair[0].encodeToByteArray())?.let { mob ->
+                    val damage =
+                        session.towerImprovement[ImprovementType.DAMAGE]!!.getValue() + stat.researchType[ResearchType.DAMAGE]!!.getValue()
+                    val damageFormat = damage.plural("урон", "урона", "урона")
+                    if (pair[1].toBoolean()) {
+                        val swordDamage = SwordType.valueOf(stat.sword).damage
+                        mob.hp -= swordDamage
+                        Anime.killboardMessage(player, "Вы нанесли §c§l${toFormat(swordDamage)} §f$damageFormat")
+                    } else if (Math.random() > tower!!.upgrades[ImprovementType.CRITICAL_STRIKE_CHANCE]!!.getValue()) {
+                        val criticalDamage =
+                            damage + tower!!.upgrades[ImprovementType.CRITICAL_HIT_RATIO]!!.getValue() + stat.researchType[ResearchType.CRITICAL_HIT]!!.getValue()
+                        mob.hp -= criticalDamage
+                        Anime.killboardMessage(player, "Башня нанесла §c§l${toFormat(criticalDamage)} §fкритического $damageFormat")
+                    } else {
+                        mob.hp -= damage
+                        Anime.killboardMessage(player, "Башня нанесла §c§l${toFormat(damage)} §f$damageFormat")
+                    }
+
+                    if (mob.hp <= 0) {
+                        val token =
+                            stat.userImprovementType[ImprovementType.CASH_BONUS_KILL]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_KILL]!!.getValue()
+
+                        giveTokens(token)
+
+                        ModTransfer(
+                            mob.uuid.toString(), "§b+${toFormat(token)} §f${
+                                token.plural(
+                                    "жетон",
+                                    "жетона",
+                                    "жетонов"
+                                )
+                            }"
+                        ).send("mob:kill", player)
+
+                        wave!!.aliveMobs.remove(mob)
+                    }
+                }
+            }
+        }
+    }
 
     fun start() {
         aliveMobs.clear()

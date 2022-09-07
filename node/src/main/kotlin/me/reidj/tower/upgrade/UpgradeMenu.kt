@@ -4,6 +4,7 @@ import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.reidj.tower.app
+import me.reidj.tower.data.Category
 import me.reidj.tower.data.Improvement
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.sword.SwordType
@@ -18,9 +19,13 @@ import me.reidj.tower.util.error
 class UpgradeMenu {
 
     init {
-        command("workshop") { player, _ ->
+        command("workshop") { player, args ->
             val user = app.getUser(player) ?: return@command
-            open(user, if (!user.inGame) user.stat.userImprovementType else user.session!!.towerImprovement)
+            open(
+                user,
+                if (!user.inGame) user.stat.userImprovementType else user.session!!.towerImprovement,
+                Category.valueOf(args[0])
+            )
         }
     }
 
@@ -29,7 +34,7 @@ class UpgradeMenu {
         hint = "Купить"
     }
 
-    private fun open(user: User, type: MutableMap<ImprovementType, Improvement>) {
+    private fun open(user: User, type: MutableMap<ImprovementType, Improvement>, category: Category) {
         val notInGame = !user.inGame
         val stat = user.stat
         menu.money =
@@ -37,7 +42,7 @@ class UpgradeMenu {
         menu.rows = 3
         menu.columns = 3
         menu.vault = if (notInGame) "coin" else "ruby"
-        menu.storage = type.map { (key, value) ->
+        menu.storage = type.filter { it.key.category == category }.map { (key, value) ->
             val level = value.level
             val cost = key.price + level
             button {

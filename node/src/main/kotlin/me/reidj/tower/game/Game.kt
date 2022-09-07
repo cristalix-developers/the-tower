@@ -9,6 +9,7 @@ import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.Wave
+import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.user.Session
 import me.reidj.tower.util.PATH
 import me.reidj.tower.util.flying
@@ -32,12 +33,14 @@ interface Game {
                 button {
                     title = "Обычный"
                     texture = "${PATH}default.png"
+                    description = "Игроков: §3${TournamentManager.getOnlinePlayers().size}"
                     hint("Играть")
                     onClick { player, _, _ -> player.performCommand("default") }
                 },
                 button {
                     title = "Турнир"
                     texture = "${PATH}rating.png"
+                    description = "Игроков: §3${TournamentManager.getTournamentPlayers()}"
                     hint("Играть")
                     onClick { player, _, _ -> player.performCommand("tournament") }
                 }

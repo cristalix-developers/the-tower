@@ -6,19 +6,12 @@ import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import io.netty.buffer.Unpooled
 import kotlinx.coroutines.runBlocking
 import me.func.mod.Anime
-import me.func.mod.Glow
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
-import me.func.mod.conversation.ModTransfer
-import me.func.mod.util.after
 import me.func.mod.util.listener
-import me.func.protocol.EndStatus
-import me.func.protocol.GlowColor
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
-import me.reidj.tower.data.ImprovementType
-import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.Default
 import me.reidj.tower.game.Rating
 import me.reidj.tower.game.wave.WaveManager
@@ -27,13 +20,11 @@ import me.reidj.tower.laboratory.LaboratoryManager
 import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.npc.NpcManager
-import me.reidj.tower.sword.SwordType
 import me.reidj.tower.top.TopManager
 import me.reidj.tower.upgrade.UpgradeMenu
 import me.reidj.tower.user.PlayerDataManager
 import me.reidj.tower.user.User
-import me.reidj.tower.util.*
-import me.reidj.tower.util.Formatter
+import me.reidj.tower.util.MapLoader
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -101,114 +92,6 @@ class App : JavaPlugin() {
                 0,
                 1
             )
-
-        Anime.createReader("mob:hit") { player, buffer ->
-            // Нужно для проверки кто нанёс урон, башня или игрок
-            val pair = buffer.toString(Charsets.UTF_8).split(":")
-            (app.getUser(player) ?: return@createReader).run {
-                val session = session ?: return@createReader
-                findMob(this, pair[0].encodeToByteArray())?.let { mob ->
-                    val damage =
-                        session.towerImprovement[ImprovementType.DAMAGE]!!.getValue() + stat.researchType[ResearchType.DAMAGE]!!.getValue()
-                    if (pair[1].toBoolean()) {
-                        val swordDamage = SwordType.valueOf(stat.sword).damage
-                        mob.hp -= swordDamage
-                        Anime.killboardMessage(player, "Вы нанесли §c§l$swordDamage §fурона")
-                    } else if (Math.random() > tower!!.upgrades[ImprovementType.CRITICAL_STRIKE_CHANCE]!!.getValue()) {
-                        val criticalDamage =
-                            damage + tower!!.upgrades[ImprovementType.CRITICAL_HIT_RATIO]!!.getValue() + stat.researchType[ResearchType.CRITICAL_HIT]!!.getValue()
-                        mob.hp -= criticalDamage
-                        Anime.killboardMessage(player, "Башня нанесла §c§l$criticalDamage §fкритического урона")
-                    } else {
-                        mob.hp -= damage
-                        Anime.killboardMessage(player, "Башня нанесла §c§l$damage §fурона")
-                    }
-
-                    if (mob.hp <= 0) {
-                        val token =
-                            stat.userImprovementType[ImprovementType.CASH_BONUS_KILL]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_KILL]!!.getValue()
-
-                        giveTokens(token)
-
-                        ModTransfer(
-                            mob.uuid.toString(), "§b+${Formatter.toFormat(token)} §f${
-                                token.plural(
-                                    "жетон",
-                                    "жетона",
-                                    "жетонов"
-                                )
-                            }"
-                        ).send("mob:kill", player)
-
-                        wave!!.aliveMobs.remove(mob)
-                    }
-                }
-            }
-        }
-
-        Anime.createReader("tower:hittower") { player, buffer ->
-            val user = getUser(player) ?: return@createReader
-            val session = user.session ?: return@createReader
-            val tower = user.tower ?: return@createReader
-            // Если моб есть в списке, то отнимаем хп у башни
-            val pair = buffer.toString(Charsets.UTF_8).split(":")
-            findMob(user, pair[0].encodeToByteArray())?.let { mob ->
-                user.run {
-                    val damage =
-                        mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
-                    tower.health -= damage
-                    println(tower.health)
-                    Glow.animate(player, .5, GlowColor.RED)
-                    Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
-                    tower.updateHealth()
-                    after {
-                        val wave = wave ?: return@after
-                        val waveLevel = wave.level
-                        val reward =
-                            (waveLevel * waveLevel - waveLevel) / 4 + stat.researchType[ResearchType.MONEY_BONUS_WAVE_PASS]!!.getValue()
-
-                        // Провожу действия с игроком если он проигрывает
-                        if (tower.health <= 0) {
-                            //if (session.maxWavePassed > waveLevel)
-                            //  session.maxWavePassed = waveLevel
-
-                            /*if (isTournament) {
-                                TournamentManager.end(this)
-                                isTournament = false
-                            }*/
-
-                            player.giveDefaultItems()
-                            player.flying(false)
-                            showToAll()
-
-                            // Игра закончилась
-                            ModTransfer(false).send("tower:update-state", player)
-
-                            Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                            wave.aliveMobs.clear(player)
-
-                            inGame = false
-
-                            giveTokens(-tokens)
-                            giveExperience(waveLevel * 3)
-
-                            this.session = null
-                            this.wave = null
-
-                            if (reward == 0.0)
-                                return@after
-
-                            Anime.cursorMessage(
-                                player,
-                                "§e+${Formatter.toFormat(reward)} §f${reward.plural("монета", "монеты", "монет")}"
-                            )
-
-                            giveMoney(reward)
-                        }
-                    }
-                }
-            }
-        }
     }
 
     override fun onDisable() {
@@ -222,7 +105,7 @@ class App : JavaPlugin() {
 
     fun getHub(): RealmId = RealmId.of("HUB-2")
 
-    private fun findMob(user: User, bytes: ByteArray): Mob? {
+    fun findMob(user: User, bytes: ByteArray): Mob? {
         if (user.wave == null)
             return null
         return user.wave!!.aliveMobs.find { mob ->

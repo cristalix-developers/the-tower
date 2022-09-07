@@ -1,6 +1,7 @@
 package me.reidj.tower.command
 
-import me.func.mod.dialog.Dialog
+import me.func.mod.Anime
+import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.game.Game
@@ -16,6 +17,7 @@ class PlayerCommands {
     init {
         command("resourcepack") { player, _ -> player.setResourcePack(System.getenv("RESOURCE_PACK"), "000") }
         command("leave") { player, _ -> player.transfer() }
+        command("navigator") { player, _ -> ModTransfer().send("func:navigator", player) }
         command("play") { player, _ ->
             val user = app.getUser(player) ?: return@command
             if (user.inGame)
@@ -23,15 +25,15 @@ class PlayerCommands {
             Game.menu.open(player)
         }
         command("tournamentDialog") { player, _ ->
-            Dialog.dialog(
+            Anime.dialog(
                 player,
                 DialogUtil.tournamentDialog,
                 "tournamentPageOne"
             )
         }
-        command("tournamentInfo") { player, _ -> Dialog.openDialog(player, "tournamentPageTwo") }
+        command("tournamentInfo") { player, _ -> Anime.openDialog(player, "tournamentPageTwo") }
         command("guide") { player, _ ->
-            Dialog.dialog(
+            Anime.dialog(
                 player,
                 DialogUtil.guideDialog,
                 "guidePageOne"

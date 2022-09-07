@@ -4,6 +4,7 @@ import me.func.mod.selection.button
 import me.func.mod.selection.selection
 import me.func.mod.util.command
 import me.reidj.tower.app
+import me.reidj.tower.util.CategoryMenu
 import me.reidj.tower.util.Formatter
 import me.reidj.tower.util.PATH
 
@@ -31,13 +32,13 @@ class MainGui {
             title = "Мастерская"
             description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
             hint("Открыть")
-            onClick { player, _, _ -> player.performCommand("workshop") }
+            onClick { player, _, _ -> CategoryMenu.open("workshop", player) }
         }, button {
             texture = "${PATH}laboratory.png"
             title = "Лаборатория"
             description = "§7Это место, где вы можете улучшить свои навыки."
             hint("Исследовать")
-            onClick { player, _, _ -> player.performCommand("laboratory") }
+            onClick { player, _, _ -> CategoryMenu.open("laboratory", player) }
         }, button {
             texture = "${PATH}settings.png"
             title = "Ресурспак"

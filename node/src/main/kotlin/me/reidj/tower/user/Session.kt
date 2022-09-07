@@ -15,7 +15,11 @@ import me.reidj.tower.upgrade.Upgradable
  **/
 data class Session(var towerImprovement: MutableMap<ImprovementType, Improvement>) : Upgradable {
 
-    val arenaSpawn: Label = app.worldMeta.getLabel("start").apply { yaw = -90f }
+    val arenaSpawn: Label = app.worldMeta.getLabel("start").apply {
+        yaw = -90f
+        x += 0.5
+        z += 0.5
+    }
     val cubeLocation = app.worldMeta.getLabel("tower").clone().apply {
         x += 0.5
         z += 0.5

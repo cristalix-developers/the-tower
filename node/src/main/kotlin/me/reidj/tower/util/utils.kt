@@ -7,6 +7,7 @@ import me.func.mod.conversation.ModTransfer
 import me.func.protocol.GlowColor
 import me.reidj.tower.app
 import me.reidj.tower.game.wave.mob.Mob
+import org.bukkit.Color
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -19,23 +20,35 @@ import kotlin.math.abs
  **/
 
 private val barrier = ItemStack(Material.BARRIER)
-private val startItem = item {
-    type(Material.CLAY_BALL)
-    text("§bИграть")
-    nbt("other", "guild_members")
+
+val navigationItem = item {
+    type = Material.COMPASS
+    text("&2Навигатор")
+    nbt("click", "navigator")
+}
+val startGameItem = item {
+    type = Material.COMPASS
+    nbt("color", Color(255, 215, 0).asRGB())
+    text("&bНачать играть")
     nbt("click", "play")
 }
-private var backItem = item {
-    type(Material.CLAY_BALL)
-    text("§cВыйти")
-    nbt("other", "cancel")
-    nbt("click", "leave")
+val donateItem = item {
+    type = Material.CLAY_BALL
+    nbt("skyblock", "donate")
+    nbt("click", "donate")
+    text("&eДонат")
 }
-private var settingsItem = item {
-    type(Material.CLAY_BALL)
-    text("§aПерсонаж")
-    nbt("other", "clothes")
+val profileItem = item {
+    type = Material.CLAY_BALL
+    nbt("skyblock", "info")
     nbt("click", "menu")
+    text("&2Профиль")
+}
+val hubItem = item {
+    type = Material.CLAY_BALL
+    text("&4Обратно в хаб")
+    nbt("other", "arrow_back")
+    nbt("click", "leave")
 }
 
 fun Player.flying(state: Boolean = true) = run {
@@ -47,9 +60,11 @@ fun Player.giveDefaultItems() = kotlin.run {
     teleport(app.playerDataManager.spawn)
     inventory.run {
         clear()
-        setItem(0, startItem)
-        setItem(4, settingsItem)
-        setItem(8, backItem)
+        setItem(0, navigationItem)
+        setItem(1, startGameItem)
+        setItem(2, donateItem)
+        setItem(4, profileItem)
+        setItem(8, hubItem)
     }
 }
 

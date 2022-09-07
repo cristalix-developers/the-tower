@@ -9,6 +9,7 @@ import me.func.mod.util.command
 import me.func.protocol.GlowColor
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
+import me.reidj.tower.data.Category
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.util.Formatter.toFormat
 import me.reidj.tower.util.error
@@ -28,16 +29,16 @@ class LaboratoryManager : ClockInject {
     }
 
     init {
-        command("laboratory") { sender, _ ->
+        command("laboratory") { sender, args ->
             (app.getUser(sender) ?: return@command).run {
                 menu.money = "Монет ${toFormat(stat.money)}"
-                menu.storage = stat.researchType.map { (key, value) ->
+                menu.storage = stat.researchType.filter { it.key.category == Category.valueOf(args[0]) }.map { (key, value) ->
                     val cost = key.price * value.level - stat.researchType[ResearchType.DISCOUNT]!!.getValue()
                     button {
                         title = "${key.title} §3${value.level} LVL"
                         texture = key.texture
                         description =
-                            "${toFormat(key.value + key.step)} §f➠ §l${key.value + key.step}\n" + "Время улучшения ${key.duration} секунд"
+                            "${toFormat(value.getValue())} §f➠ §l${toFormat(key.value + key.step * (value.level + 1))}\n" + "Время улучшения ${key.duration} секунд"
                         price = cost.toLong()
                         hint(if (value.whenBought == null) "Изучить" else "В процессе")
                         onClick { player, _, _ ->
@@ -46,7 +47,7 @@ class LaboratoryManager : ClockInject {
                             if (stat.money >= cost) {
                                 Confirmation(
                                     "Купить §a'${key.title}'",
-                                    "§fза §b$cost ${cost.plural("монету", "монеты", "монет")}"
+                                    "§fза §b${toFormat(cost)} ${cost.plural("монету", "монеты", "монет")}"
                                 ) { accepter ->
                                     giveMoney(-cost)
                                     Glow.animate(player, 1.0, GlowColor.GREEN)
