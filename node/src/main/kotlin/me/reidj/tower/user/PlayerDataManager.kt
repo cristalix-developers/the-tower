@@ -7,6 +7,7 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
+import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.func.protocol.Indicators
 import me.reidj.tower.app
@@ -16,6 +17,7 @@ import me.reidj.tower.game.Rating
 import me.reidj.tower.protocol.BulkSaveUserPackage
 import me.reidj.tower.protocol.LoadUserPackage
 import me.reidj.tower.protocol.SaveUserPackage
+import me.reidj.tower.rank.RankManager
 import me.reidj.tower.util.Images
 import me.reidj.tower.util.giveDefaultItems
 import me.reidj.tower.util.transfer
@@ -65,11 +67,11 @@ class PlayerDataManager : Listener {
         user.player = player
         user.tower = Tower(player, user.health, stat.maxHealth, stat.towerImprovementType, stat.researchType)
 
-        player.inventory.clear()
-        player.gameMode = GameMode.ADVENTURE
-        player.giveDefaultItems()
-
         after(3) {
+            player.inventory.clear()
+            player.gameMode = GameMode.ADVENTURE
+            player.giveDefaultItems()
+
             Anime.hideIndicator(
                 player,
                 Indicators.EXP,
@@ -85,6 +87,9 @@ class PlayerDataManager : Listener {
 
             user.giveExperience(0)
             user.giveMoney(0.0)
+
+            RankManager.createRank(user)
+            RankManager.showAll(user)
 
             val now = System.currentTimeMillis().toDouble()
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
@@ -112,6 +117,7 @@ class PlayerDataManager : Listener {
         val uuid = player.uniqueId
         val user = userMap.remove(uuid) ?: return
         Rating.queueLeave(player)
+        RankManager.remove(uuid)
         clientSocket.write(SaveUserPackage(uuid, user.stat))
     }
 

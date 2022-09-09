@@ -7,6 +7,7 @@ import mob.MobManager
 import player.Indicator
 import player.Statistic
 import queue.QueueStatus
+import rank.Rank
 import ru.cristalix.clientapi.KotlinMod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
@@ -33,12 +34,13 @@ class App : KotlinMod() {
 
         TimeBar
         Statistic
-
+        Banners
         BarManager
         TowerManager
         Cube
         Indicator
         QueueStatus()
+        Rank()
 
         registerHandler<PlayerListRender> { isCancelled = gameActive }
 

@@ -44,7 +44,7 @@ enum class NpcType(
         "self",
         "self",
         160f,
-        createBanner(app.worldMeta.getLabel("character"), 150.0, 0.0, 6.0, 0.5,true)
+        createBanner(app.worldMeta.getLabel("character"), 150.0, 0.0, 5.0, 0.5,true)
     ),
     GUIDE(
         "",

@@ -55,11 +55,11 @@ object MobManager {
         }
 
         mod.registerChannel("mob:kill") {
-            val uuid = UUID.fromString(NetUtil.readUtf8(this))
-            val text = NetUtil.readUtf8(this)
-
             if (mobs.isEmpty())
                 return@registerChannel
+
+            val uuid = UUID.fromString(NetUtil.readUtf8(this))
+            val text = NetUtil.readUtf8(this)
 
             val mob = mobs.filter { it.uniqueID == uuid }[0]
 

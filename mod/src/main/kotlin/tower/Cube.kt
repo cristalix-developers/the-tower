@@ -9,10 +9,6 @@ import ru.cristalix.uiengine.UIEngine
 import java.lang.Math.cos
 import java.lang.Math.sin
 
-/**
- * @project tower
- * @author Рейдж
- */
 object Cube {
 
     init {

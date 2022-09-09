@@ -21,5 +21,6 @@ data class Stat(
     var researchType: MutableMap<ResearchType, Research>,
     var tournament: Tournament,
     var sword: String,
+    var rank: RankType,
     var isAutoInstallResourcepack: Boolean,
 )

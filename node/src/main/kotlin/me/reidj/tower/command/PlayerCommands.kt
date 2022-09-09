@@ -4,7 +4,9 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.command
 import me.reidj.tower.app
+import me.reidj.tower.data.RankType
 import me.reidj.tower.game.Game
+import me.reidj.tower.rank.RankManager
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.transfer
 
@@ -38,6 +40,11 @@ class PlayerCommands {
                 DialogUtil.guideDialog,
                 "guidePageOne"
             )
+        }
+        command("test") { player, args ->
+            val user = app.getUser(player) ?: return@command
+            user.stat.rank = RankType.valueOf(args[0])
+            RankManager.giveRank(user)
         }
     }
 }
