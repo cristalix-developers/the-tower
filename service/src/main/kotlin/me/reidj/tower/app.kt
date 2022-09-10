@@ -2,12 +2,10 @@ package me.reidj.tower
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import me.reidj.tower.protocol.BulkSaveUserPackage
-import me.reidj.tower.protocol.LoadUserPackage
-import me.reidj.tower.protocol.SaveUserPackage
-import me.reidj.tower.protocol.TopPackage
+import me.reidj.tower.protocol.*
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.microservice.MicroServicePlatform
 import ru.cristalix.core.microservice.MicroserviceBootstrap
@@ -25,7 +23,8 @@ fun main() {
             LoadUserPackage::class,
             BulkSaveUserPackage::class,
             SaveUserPackage::class,
-            TopPackage::class
+            TopPackage::class,
+            ChangeRankPackage::class
         )
 
         CoreApi.get().registerService(IPermissionService::class.java, PermissionService(this))
@@ -38,21 +37,27 @@ fun main() {
             }
         }
         listen<SaveUserPackage> { realmId, pckg ->
-            mongoAdapter.save(pckg.userInfo)
+            mongoAdapter.save(pckg.stat)
             println("Received SaveUserPackage from ${realmId.realmName} for ${pckg.uuid}")
 
         }
         listen<BulkSaveUserPackage> { realmId, pckg ->
-            mongoAdapter.save(pckg.packages.map { it.userInfo })
+            mongoAdapter.save(pckg.packages.map { it.stat })
             println("Received BulkSaveUserPackage from ${realmId.realmName}")
         }
         listen<TopPackage> { realmId, pckg ->
             CoroutineScope(Dispatchers.IO).launch {
-                val top = mongoAdapter.getTop(pckg.topType, pckg.limit)
+                val top = mongoAdapter.getTop(pckg.topType, pckg.limit, pckg.isSortAscending)
                 pckg.entries = top
                 forward(realmId, pckg)
-                println("Top generated for ${realmId.realmName}")
+                println("Top generated from ${realmId.realmName}")
             }
+        }
+        listen<ChangeRankPackage> { _, pckg ->
+            val stat = mongoAdapter.find(pckg.uuid).await() ?: return@listen
+            stat.rank =
+                if (pckg.isSortAscending) stat.rank.downgradeRank() ?: return@listen else stat.rank.upgradeRank() ?: return@listen
+            mongoAdapter.save(stat)
         }
     }
 }

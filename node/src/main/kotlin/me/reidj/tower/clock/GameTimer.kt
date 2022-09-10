@@ -5,6 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import me.reidj.tower.app
+import me.reidj.tower.clientSocket
 
 /**
  * @project : tower-simulator
@@ -17,10 +19,12 @@ interface ClockInject {
     fun run(tick: Int)
 }
 
+// Осторожно, если оно будет маленьким, счетчик не дойдет до Incomeble
+private const val AUTO_SAVE_PERIOD = 20 * 60L * 10
+
 class GameTimer(private val injects: List<ClockInject>) : () -> Unit {
 
     private var tick = 0
-    private val maxTick = 1000000000
 
     private val scope = CoroutineScope(Dispatchers.Default)
     private val mutex = Mutex()
@@ -29,13 +33,18 @@ class GameTimer(private val injects: List<ClockInject>) : () -> Unit {
         if (mutex.isLocked) return
         scope.launch {
             mutex.withLock {
-                tick++
-
-                if (tick > maxTick)
-                    tick = 0
-
+                savePlayers()
                 injects.forEach { it.run(tick) }
             }
+        }
+    }
+
+    private fun savePlayers() {
+        if (tick % AUTO_SAVE_PERIOD == 0L) {
+            tick = 1
+            clientSocket.write(app.playerDataManager.bulkSave(false))
+        } else {
+            tick++
         }
     }
 }

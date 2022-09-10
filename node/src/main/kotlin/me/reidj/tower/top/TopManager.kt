@@ -50,7 +50,8 @@ class TopManager : ClockInject {
                 val topPackageResponse = clientSocket.writeAndAwaitResponse<TopPackage>(
                     TopPackage(
                         field,
-                        DATA_COUNT
+                        DATA_COUNT,
+                        false
                     )
                 ).await()
                 tops[field] = topPackageResponse.entries.map {

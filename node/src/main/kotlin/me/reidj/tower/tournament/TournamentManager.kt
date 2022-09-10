@@ -12,11 +12,11 @@ object TournamentManager {
 
     private const val COUNTDOWN_DAYS = 3L
 
-    private val startDate = LocalDate.of(2022, 7, 25)
+    private val startDate = LocalDate.of(2022, 7, 24)
 
     fun end(user: User) = user.run {
         stat.tournament.passedWaves.add(user.wave!!.level)
-        stat.tournament.maximumWavePassed = Collections.max(stat.tournament.passedWaves)
+        stat.tournamentMaximumWavePassed = Collections.max(stat.tournament.passedWaves)
     }
 
     fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter { it.inGame }

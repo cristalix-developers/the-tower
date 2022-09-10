@@ -42,7 +42,7 @@ interface Game {
                     texture = "${PATH}rating.png"
                     description = "Игроков: §3${TournamentManager.getTournamentPlayers()}"
                     hint("Играть")
-                    onClick { player, _, _ -> player.performCommand("tournamentDialog") }
+                    onClick { player, _, _ -> player.performCommand("tournament") }
                 }
             )
         }

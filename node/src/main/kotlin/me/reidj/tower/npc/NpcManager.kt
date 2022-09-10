@@ -15,7 +15,6 @@ import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.tournament.TournamentManager.getTimeAfter
 import me.reidj.tower.tournament.TournamentManager.getTournamentPlayers
 import me.reidj.tower.tournament.TournamentManager.isTournamentDay
-import me.reidj.tower.util.CategoryMenu
 import me.reidj.tower.util.Formatter
 import org.bukkit.Bukkit
 import java.time.temporal.ChronoUnit
@@ -62,6 +61,11 @@ class NpcManager : ClockInject {
             val hours = duration.toHours() % 24
             val minutes = duration.toMinutes() % 60
             val seconds = duration.seconds % 60
+
+            if (isTournamentDay() && getTimeAfter(ChronoUnit.HOURS).toInt() == 0)
+                println("hi")
+            if (getTimeAfter(ChronoUnit.HOURS).toInt() == 0)
+                println("uwu")
 
             val total = days.toString().padStart(2, '0') + "д. " + hours.toString().padStart(2, '0') + "ч. " +
                     minutes.toString().padStart(2, '0') + "м. " + seconds.toString().padStart(2, '0') + "с."

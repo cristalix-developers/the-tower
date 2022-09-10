@@ -1,11 +1,16 @@
 package me.reidj.tower.command
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.command
 import me.reidj.tower.app
-import me.reidj.tower.data.RankType
+import me.reidj.tower.clientSocket
 import me.reidj.tower.game.Game
+import me.reidj.tower.protocol.TopPackage
 import me.reidj.tower.rank.RankManager
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.transfer
@@ -41,10 +46,18 @@ class PlayerCommands {
                 "guidePageOne"
             )
         }
-        command("test") { player, args ->
-            val user = app.getUser(player) ?: return@command
-            user.stat.rank = RankType.valueOf(args[0])
-            RankManager.giveRank(user)
+        command("test") { _, args ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val isSortAscending = args[0].toBoolean()
+                val test = clientSocket.writeAndAwaitResponse<TopPackage>(
+                    TopPackage(
+                        "tournamentMaximumWavePassed",
+                        if (isSortAscending) 8 else 4,
+                        isSortAscending
+                    )
+                ).await()
+                RankManager.changeRank(isSortAscending, *test.entries.map { it.key.uuid }.toTypedArray())
+            }
         }
     }
 }

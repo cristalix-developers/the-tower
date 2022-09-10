@@ -93,7 +93,7 @@ open class MongoAdapter(dbUrl: String, dbName: String, collection: String) {
 
     private fun handle(throwable: Throwable?) = throwable?.printStackTrace()
 
-    open fun <V> makeRatingByField(fieldName: String, limit: Int): List<TopEntry<Stat, V>> {
+    open fun <V> makeRatingByField(fieldName: String, limit: Int, isSortAscending: Boolean): List<TopEntry<Stat, V>> {
         val entries = ArrayList<TopEntry<Stat, V>>()
         val future: CompletableFuture<List<TopEntry<Stat, V>>> = CompletableFuture<List<TopEntry<Stat, V>>>()
 
@@ -108,7 +108,7 @@ open class MongoAdapter(dbUrl: String, dbName: String, collection: String) {
                     Projections.include("uuid"),
                     Projections.exclude("_id")
                 )
-            ), sort(Sorts.descending(fieldName)),
+            ), sort(if (isSortAscending) Sorts.ascending(fieldName) else Sorts.descending(fieldName)),
             limit(limit)
         )).forEach({ document: Document ->
             if (readDocument(document) == null) {
@@ -125,8 +125,8 @@ open class MongoAdapter(dbUrl: String, dbName: String, collection: String) {
         return future.get()
     }
 
-    suspend fun getTop(topType: String, limit: Int): List<PlayerTopEntry<Any>> {
-        val entries = makeRatingByField<String>(topType, limit)
+    suspend fun getTop(topType: String, limit: Int, isSortAscending: Boolean): List<PlayerTopEntry<Any>> {
+        val entries = makeRatingByField<String>(topType, limit, isSortAscending)
         val playerEntries = mutableListOf<PlayerTopEntry<Any>>()
 
         entries.forEach { it.key.let { stat -> playerEntries.add(PlayerTopEntry(stat, it.value)) } }

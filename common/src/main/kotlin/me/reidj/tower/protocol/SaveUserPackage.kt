@@ -10,5 +10,5 @@ import java.util.*
  **/
 data class SaveUserPackage(
     val uuid: UUID,
-    val userInfo: Stat
+    val stat: Stat
 ): CorePackage()

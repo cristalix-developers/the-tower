@@ -52,10 +52,10 @@ class Rating : Game {
                             queue.clear()
                         }
                     }
-                } else {
-                    player.error("Турнир ещё не начался!")
                 }
             }
+        } else {
+            player.error("Турнир ещё не начался!")
         }
     }
 

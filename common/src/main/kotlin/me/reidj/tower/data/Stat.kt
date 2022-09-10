@@ -14,6 +14,7 @@ data class Stat(
     var dailyClaimTimestamp: Double,
     var lastEnter: Double,
     var maximumWavePassed: Int,
+    var tournamentMaximumWavePassed: Int,
     var rebirth: Int,
     var rewardStreak: Int,
     var userImprovementType: MutableMap<ImprovementType, Improvement>,
