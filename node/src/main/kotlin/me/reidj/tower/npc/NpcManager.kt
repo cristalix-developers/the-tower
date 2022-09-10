@@ -37,7 +37,7 @@ class NpcManager : ClockInject {
                     if (user.isArmLock)
                         return@onClick
                     user.isArmLock = true
-                    player.performCommand(it.command)
+                    it.command(player)
                     after { user.isArmLock = false }
                 }
                 location(app.worldMeta.getLabel(it.name.lowercase()).clone().add(.5, .0, .5))
@@ -55,20 +55,19 @@ class NpcManager : ClockInject {
     override fun run(tick: Int) {
         if (tick % 20 == 0) {
             val size = TournamentManager.getOnlinePlayers().size
-            val plurals = Humanize.plurals("игрок", "игрока", "игроков", size)
             val duration = TournamentManager.getTimeBefore()
             val days = duration.toDays()
             val hours = duration.toHours() % 24
             val minutes = duration.toMinutes() % 60
             val seconds = duration.seconds % 60
+            val plurals = Humanize.plurals("игрок", "игрока", "игроков", size)
+            val total = days.toString().padStart(2, '0') + "д. " + hours.toString().padStart(2, '0') + "ч. " +
+                    minutes.toString().padStart(2, '0') + "м. " + seconds.toString().padStart(2, '0') + "с."
 
             if (isTournamentDay() && getTimeAfter(ChronoUnit.HOURS).toInt() == 0)
                 println("hi")
             if (getTimeAfter(ChronoUnit.HOURS).toInt() == 0)
                 println("uwu")
-
-            val total = days.toString().padStart(2, '0') + "д. " + hours.toString().padStart(2, '0') + "ч. " +
-                    minutes.toString().padStart(2, '0') + "м. " + seconds.toString().padStart(2, '0') + "с."
 
             Bukkit.getOnlinePlayers().forEach { player ->
                 Banners.content(player, NpcType.NORMAL.banner!!, "${NpcType.NORMAL.bannerTitle}\n§e${size} $plurals")
@@ -88,7 +87,7 @@ class NpcManager : ClockInject {
                 Banners.content(
                     player,
                     NpcType.CHARACTER.banner!!,
-                    "${NpcType.CHARACTER.bannerTitle}\n§fМонет: §3${Formatter.toFormat(stat.money)}\n§fВолн пройдено: §3${stat.maximumWavePassed}"
+                    "${NpcType.CHARACTER.bannerTitle}\n§fМонет: §3${Formatter.toFormat(stat.money)}\n§fВолн пройдено: §3${stat.maximumWavePassed}\n§fРанг: §3${stat.rank.title}"
                 )
             }
         }

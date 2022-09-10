@@ -26,6 +26,5 @@ object DefaultElements {
         Tournament(RankType.NONE,  mutableListOf()),
         "NONE",
         RankType.NONE,
-        true
     )
 }

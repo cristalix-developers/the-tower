@@ -1,7 +1,8 @@
 package me.reidj.tower.content
 
-import me.func.mod.selection.button
-import me.func.mod.selection.selection
+import me.func.mod.menu.button
+import me.func.mod.menu.selection
+import me.func.mod.util.after
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.util.CategoryMenu
@@ -39,26 +40,19 @@ class MainGui {
             description = "§7Это место, где вы можете улучшить свои навыки."
             hint("Исследовать")
             onClick { player, _, _ -> CategoryMenu.open("laboratory", player) }
-        }, button {
-            texture = "${PATH}settings.png"
-            title = "Ресурспак"
-            hint("Переключить")
-            onClick { player, _, button ->
-                (app.getUser(player) ?: return@onClick).run {
-                    stat.isAutoInstallResourcepack = !stat.isAutoInstallResourcepack
-                    button.hint(if (stat.isAutoInstallResourcepack) "Не устанавливать" else "Устанавливать автоматически")
-                }
-            }
         }
     )
 
     init {
         command("menu") { player, _ ->
             (app.getUser(player) ?: return@command).stat.run {
-                buttons[0].hover = """
+                after {
+                    buttons[0].hover = """
                          §7Монет: §3${Formatter.toFormat(money)}
                          §7Волн пройдено: §3${maximumWavePassed}
+                         §7Ранг: §3${rank.title}
                 """.trimIndent()
+                }
             }
             menu.storage = buttons
             menu.open(player)

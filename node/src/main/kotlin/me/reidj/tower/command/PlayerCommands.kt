@@ -4,8 +4,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
-import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.dialog.Dialog
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.clientSocket
@@ -14,12 +14,15 @@ import me.reidj.tower.protocol.TopPackage
 import me.reidj.tower.rank.RankManager
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.transfer
+import java.util.*
 
 /**
  * @project : tower-simulator
  * @author : Рейдж
  **/
 class PlayerCommands {
+
+    private val opened = hashMapOf<UUID, me.func.protocol.dialog.Dialog>()
 
     init {
         command("resourcepack") { player, _ -> player.setResourcePack(System.getenv("RESOURCE_PACK"), "000") }
@@ -32,15 +35,15 @@ class PlayerCommands {
             Game.menu.open(player)
         }
         command("tournamentDialog") { player, _ ->
-            Anime.dialog(
+            Dialog.dialog(
                 player,
                 DialogUtil.tournamentDialog,
                 "tournamentPageOne"
             )
         }
-        command("tournamentInfo") { player, _ -> Anime.openDialog(player, "tournamentPageTwo") }
+        command("tournamentInfo") { player, _ -> Dialog.openDialog(player, "tournamentPageTwo") }
         command("guide") { player, _ ->
-            Anime.dialog(
+            Dialog.dialog(
                 player,
                 DialogUtil.guideDialog,
                 "guidePageOne"

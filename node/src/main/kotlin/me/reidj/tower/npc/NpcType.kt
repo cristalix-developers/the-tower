@@ -4,7 +4,9 @@ import me.func.mod.Banners
 import me.func.mod.Banners.location
 import me.func.protocol.element.Banner
 import me.reidj.tower.app
+import me.reidj.tower.util.CategoryMenu
 import org.bukkit.Location
+import org.bukkit.entity.Player
 
 /**
  * @project : tower-simulator
@@ -13,7 +15,7 @@ import org.bukkit.Location
 enum class NpcType(
     val bannerTitle: String,
     val npcName: String,
-    val command: String,
+    val command: (Player) -> Any,
     var skinUrl: String,
     var skinDigest: String,
     val pitch: Float,
@@ -22,7 +24,7 @@ enum class NpcType(
     NORMAL(
         "§bОбычная",
         "",
-        "normal",
+        { it.performCommand("normal") },
         "https://webdata.c7x.dev/textures/skin/307264a1-2c69-11e8-b5ea-1cb72caa35fd",
         "307264a1-2c69-11e8-b5ea-1cb72caa35fd",
         179f,
@@ -31,7 +33,7 @@ enum class NpcType(
     RATING(
         "§bТурнир",
         "",
-        "tournamentDialog",
+        { it.performCommand("tournamentDialog") },
         "https://webdata.c7x.dev/textures/skin/bf30a1df-85de-11e8-a6de-1cb72caa35fd",
         "bf30a1df-85de-11e8-a6de-1cb72caa35fd",
         179f,
@@ -40,16 +42,16 @@ enum class NpcType(
     CHARACTER(
         "§6Ваш профиль Tower",
         "§eНАЖМИТЕ ДЛЯ ПРОСМОТРА",
-        "menu",
+        { it.performCommand("menu") },
         "self",
         "self",
         160f,
-        createBanner(app.worldMeta.getLabel("character"), 150.0, 0.0, 5.0, 0.5,true)
+        createBanner(app.worldMeta.getLabel("character"), 150.0, 0.0, 6.0, 0.5,true)
     ),
     GUIDE(
         "",
         "§aОБУЧЕНИЕ",
-        "guide",
+        { it.performCommand("guide") },
         "https://webdata.c7x.dev/textures/skin/d5c6967a-2fd9-11eb-acca-1cb72caa35fd",
         "d5c6967a-2fd9-11eb-acca-1cb72caa35fd",
         -156.5f,
@@ -58,7 +60,7 @@ enum class NpcType(
     LABORATORY(
         "",
         "§6РАБОТНИК ЛАБОРАТОРИИ",
-        "laboratory",
+        { CategoryMenu.open("laboratory", it) },
         "https://webdata.c7x.dev/textures/skin/c87bbbbf-c7a4-11eb-acca-1cb72caa35fd",
         "c87bbbbf-c7a4-11eb-acca-1cb72caa35fd",
         131.5f,

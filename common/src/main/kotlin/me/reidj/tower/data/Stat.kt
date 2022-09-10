@@ -23,5 +23,4 @@ data class Stat(
     var tournament: Tournament,
     var sword: String,
     var rank: RankType,
-    var isAutoInstallResourcepack: Boolean,
 )

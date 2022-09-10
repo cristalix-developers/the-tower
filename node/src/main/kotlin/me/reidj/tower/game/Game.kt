@@ -2,8 +2,8 @@ package me.reidj.tower.game
 
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.func.mod.selection.button
-import me.func.mod.selection.choicer
+import me.func.mod.menu.button
+import me.func.mod.menu.choicer
 import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType

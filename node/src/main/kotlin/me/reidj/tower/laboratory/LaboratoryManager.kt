@@ -2,9 +2,9 @@ package me.reidj.tower.laboratory
 
 import me.func.mod.Anime
 import me.func.mod.Glow
-import me.func.mod.selection.Confirmation
-import me.func.mod.selection.button
-import me.func.mod.selection.selection
+import me.func.mod.menu.button
+import me.func.mod.menu.confirmation.Confirmation
+import me.func.mod.menu.selection
 import me.func.mod.util.command
 import me.func.protocol.GlowColor
 import me.reidj.tower.app

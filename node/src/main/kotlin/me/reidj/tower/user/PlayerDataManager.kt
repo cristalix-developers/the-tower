@@ -7,7 +7,6 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
-import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.func.protocol.Indicators
 import me.reidj.tower.app
@@ -70,6 +69,7 @@ class PlayerDataManager : Listener {
         after(3) {
             player.inventory.clear()
             player.gameMode = GameMode.ADVENTURE
+            player.performCommand("resourcepack")
             player.giveDefaultItems()
 
             Anime.hideIndicator(
