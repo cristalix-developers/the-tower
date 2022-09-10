@@ -5,6 +5,7 @@ import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
 import mod
+import ru.cristalix.clientapi.readUtf8
 import ru.cristalix.uiengine.UIEngine
 import util.Vector
 import java.util.*
@@ -26,32 +27,32 @@ object MobManager {
             if (mobs.isEmpty())
                 return@registerHandler
             val now = System.currentTimeMillis()
-            if (now - lastTick > .01 * 1000) {
-                lastTick = now
-                mobs.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 6.5 }.forEach { entity ->
-                    val dX = mod.cube.x - entity.x
-                    val dZ = mod.cube.z - entity.z
-                    val rotation =
-                        Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
-                    entity.rotationYawHead = rotation
-                    entity.setYaw(rotation)
-                    val vector = Vector(dX, 0.0, dZ).normalize().multiply(moveSpeed)
-                    entity.teleport(entity.x + vector.x, entity.y, entity.z + vector.z)
+            mobs.forEach { mob ->
+                if (now - lastTick > mob.aiMoveSpeed * 1000) {
+                    lastTick = now
+                    mobs.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 6.5 }.forEach { entity ->
+                        val dX = mod.cube.x - entity.x
+                        val dZ = mod.cube.z - entity.z
+                        val rotation =
+                            Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
+                        entity.rotationYawHead = rotation
+                        entity.setYaw(rotation)
+                        val vector = Vector(dX, 0.0, dZ).normalize().multiply(moveSpeed)
+                        entity.teleport(entity.x + vector.x, entity.y, entity.z + vector.z)
+                    }
                 }
             }
         }
 
         mod.registerChannel("mob:init") {
-            mobs.add(
-                Mob(
-                    UUID.fromString(NetUtil.readUtf8(this)),
-                    readInt(),
-                    readDouble(),
-                    readDouble(),
-                    readDouble(),
-                    readDouble()
-                ).create()
-            )
+            val uuid = UUID.fromString(readUtf8())
+            val id = readInt()
+            val x = readDouble()
+            val y = readDouble()
+            val z = readDouble()
+            val hp = readDouble()
+            val moveSpeed = readDouble()
+            mobs.add(Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat()).create())
         }
 
         mod.registerChannel("mob:kill") {

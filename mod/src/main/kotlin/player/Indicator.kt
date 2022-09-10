@@ -15,7 +15,7 @@ import screenCheck
  */
 object Indicator {
 
-    val levelBar = carved {
+    private val levelBar = carved {
         enabled = true
         offset = V3(0.0, -27.0)
         origin = BOTTOM
@@ -44,7 +44,7 @@ object Indicator {
         UIEngine.overlayContext.addChild(levelBar)
 
         mod.registerHandler<GameLoop> {
-            levelBar.enabled = levelBar.enabled.screenCheck()
+            levelBar.enabled = if (mod.gameActive) false else screenCheck()
         }
 
         mod.registerChannel("tower:exp") {

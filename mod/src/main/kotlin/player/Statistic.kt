@@ -14,7 +14,7 @@ import util.Formatter
  */
 object Statistic {
 
-    val tokensBox = text {
+    private val tokensBox = text {
         enabled = false
         offset = V3(-3.0, -24.0)
         origin = BOTTOM_RIGHT
@@ -52,8 +52,8 @@ object Statistic {
         }
 
         mod.registerHandler<GameLoop> {
-            moneyBox.enabled = moneyBox.enabled.screenCheck()
-            tokensBox.enabled = tokensBox.enabled.screenCheck()
+            moneyBox.enabled = if (mod.gameActive) true else screenCheck()
+            tokensBox.enabled = mod.gameActive
         }
     }
 }

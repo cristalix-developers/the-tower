@@ -60,12 +60,13 @@ data class Wave(
         MobType.values()
             .filter { it.wave.any { wave -> level % wave == 0 } }
             .forEach {
-                if (hasBoss) {
+                if (hasBoss && it.isBoss) {
                     Mob {
                         hp = it.hp + level * 0.3
                         damage = it.damage + level * 0.05
                         type = EntityType.valueOf(it.name)
                         isBoss = true
+                        moveSpeed = it.moveSpeed
                     }.location(location).create(player).run {
                         aliveMobs.add(this)
                         mobs.add(this)

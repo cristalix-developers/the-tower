@@ -28,7 +28,7 @@ fun Double.plural(one: String, two: String, five: String): String {
     return five
 }
 
-fun Boolean.screenCheck(): Boolean {
+fun screenCheck(): Boolean {
     val currentScreen = UIEngine.clientApi.minecraft().currentScreen()
     return currentScreen == null || currentScreen::class.java.simpleName != "aV"
 }

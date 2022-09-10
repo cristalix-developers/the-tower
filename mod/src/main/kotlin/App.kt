@@ -48,8 +48,6 @@ class App : KotlinMod() {
             gameActive = readBoolean()
             BarManager.healthIndicator!!.enabled = gameActive
             BarManager.protectionIndicator!!.enabled = gameActive
-            Indicator.levelBar.enabled = !gameActive
-            Statistic.tokensBox.enabled = gameActive
             if (gameActive) {
                 mod.cube = V3(
                     readDouble(),

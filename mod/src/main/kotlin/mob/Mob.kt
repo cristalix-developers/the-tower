@@ -11,7 +11,8 @@ class Mob(
     private val x: Double,
     private val y: Double,
     private val z: Double,
-    private var hp: Double
+    private var hp: Double,
+    private val moveSpeed: Float,
 ) {
 
     fun create(): EntityLivingBase {
@@ -21,6 +22,7 @@ class Mob(
         mob.teleport(x, y, z)
         mob.health = hp.toFloat()
         mob.alwaysRenderNameTag = true
+        mob.aiMoveSpeed = moveSpeed
         UIEngine.clientApi.minecraft().world.spawnEntity(mob)
         mob.updateNameHealth()
         return mob

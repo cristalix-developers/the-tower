@@ -7,6 +7,9 @@ enum class RankType(val title: String) {
     GOLD("Золото"),
     PLATINUM("Платина"),
     DIAMOND("Алмаз"),
+    MASTER("Мастер"),
+    GRANDMASTER("Грандмастер"),
+    CHALLENGER("Претендент"),
     ;
 
     fun upgradeRank() = if (ordinal >= RankType.values().size - 1) null else RankType.values()[ordinal + 1]

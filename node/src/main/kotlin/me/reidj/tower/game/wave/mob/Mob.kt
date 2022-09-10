@@ -17,6 +17,7 @@ data class Mob(
     var y: Double = 0.0,
     var z: Double = 0.0,
     var damage: Double = 1.0,
+    var moveSpeed: Float = 0.01f,
     var type: EntityType = EntityType.ZOMBIE,
     var isBoss: Boolean = false
 ) {
@@ -39,7 +40,8 @@ data class Mob(
             x,
             y,
             z,
-            hp
+            hp,
+            moveSpeed.toDouble()
         ).send("mob:init", player)
     }
 }
