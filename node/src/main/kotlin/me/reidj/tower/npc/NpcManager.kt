@@ -38,7 +38,7 @@ class NpcManager : ClockInject {
                     if (user.isArmLock)
                         return@onClick
                     user.isArmLock = true
-                    CategoryMenu.open(it.command, player)
+                    player.performCommand(it.command)
                     after { user.isArmLock = false }
                 }
                 location(app.worldMeta.getLabel(it.name.lowercase()).clone().add(.5, .0, .5))

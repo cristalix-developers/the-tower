@@ -1,9 +1,11 @@
 package player
 
+import dev.xdark.clientapi.event.lifecycle.GameLoop
 import mod
 import plural
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.*
+import screenCheck
 import util.Formatter
 
 /**
@@ -47,6 +49,11 @@ object Statistic {
         mod.registerChannel("tower:tokens") {
             val tokens = readDouble()
             tokensBox.content = "§f${tokens.plural("Жетон", "Жетона", "Жетонов")} §b${Formatter.toFormat(tokens)}"
+        }
+
+        mod.registerHandler<GameLoop> {
+            moneyBox.enabled = moneyBox.enabled.screenCheck()
+            tokensBox.enabled = tokensBox.enabled.screenCheck()
         }
     }
 }

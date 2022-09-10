@@ -1,4 +1,5 @@
 import dev.xdark.clientapi.entity.EntityLivingBase
+import ru.cristalix.uiengine.UIEngine
 import tower.TowerManager
 import util.Formatter
 import kotlin.math.abs
@@ -25,4 +26,9 @@ fun Double.plural(one: String, two: String, five: String): String {
     else if (n1 == 1.0)
         return one
     return five
+}
+
+fun Boolean.screenCheck(): Boolean {
+    val currentScreen = UIEngine.clientApi.minecraft().currentScreen()
+    return currentScreen == null || currentScreen::class.java.simpleName != "aV"
 }

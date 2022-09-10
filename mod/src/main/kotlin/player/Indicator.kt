@@ -1,11 +1,13 @@
 package player
 
+import dev.xdark.clientapi.event.lifecycle.GameLoop
 import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
+import screenCheck
 
 /**
  * @project tower
@@ -40,6 +42,10 @@ object Indicator {
 
     init {
         UIEngine.overlayContext.addChild(levelBar)
+
+        mod.registerHandler<GameLoop> {
+            levelBar.enabled = levelBar.enabled.screenCheck()
+        }
 
         mod.registerChannel("tower:exp") {
             val level = readInt()
