@@ -7,6 +7,7 @@ import me.reidj.tower.clientSocket
 import me.reidj.tower.data.RankType
 import me.reidj.tower.protocol.ChangeRankPackage
 import me.reidj.tower.protocol.SaveUserPackage
+import me.reidj.tower.protocol.TopPackage
 import me.reidj.tower.user.User
 import org.bukkit.Bukkit
 import java.util.*
@@ -52,16 +53,19 @@ object RankManager {
         }
     }
 
-    fun changeRank(isSortAscending: Boolean, vararg uuids: UUID) = uuids.forEach { uuid ->
-        val user = app.getUser(uuid)
-        if (user == null) {
-            clientSocket.write(ChangeRankPackage(uuid, isSortAscending))
-        } else {
-            user.stat.run {
-                remove(uuid)
-                rank = if (isSortAscending) rank.downgradeRank() ?: return@forEach else rank.upgradeRank() ?: return@forEach
-                createRank(user)
-                after { clientSocket.write(SaveUserPackage(uuid, this)) }
+    fun changeRank(vararg topPackage: TopPackage) = topPackage.forEach top@{ pckg ->
+        pckg.entries.forEach {
+            val uuid = it.key.uuid
+            val user = app.getUser(uuid)
+            if (user == null) {
+                clientSocket.write(ChangeRankPackage(uuid, pckg.isSortAscending))
+            } else {
+                user.stat.run {
+                    rank = if (pckg.isSortAscending) rank.downgradeRank() ?: return@top else rank.upgradeRank()
+                        ?: return@top
+                    createRank(user)
+                    after { clientSocket.write(SaveUserPackage(uuid, this)) }
+                }
             }
         }
     }

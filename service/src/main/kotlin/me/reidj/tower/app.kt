@@ -24,7 +24,7 @@ fun main() {
             BulkSaveUserPackage::class,
             SaveUserPackage::class,
             TopPackage::class,
-            ChangeRankPackage::class
+            ChangeRankPackage::class,
         )
 
         CoreApi.get().registerService(IPermissionService::class.java, PermissionService(this))

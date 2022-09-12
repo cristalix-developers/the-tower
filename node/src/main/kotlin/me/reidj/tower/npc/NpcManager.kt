@@ -64,11 +64,6 @@ class NpcManager : ClockInject {
             val total = days.toString().padStart(2, '0') + "д. " + hours.toString().padStart(2, '0') + "ч. " +
                     minutes.toString().padStart(2, '0') + "м. " + seconds.toString().padStart(2, '0') + "с."
 
-            if (isTournamentDay() && getTimeAfter(ChronoUnit.HOURS).toInt() == 0)
-                println("hi")
-            if (getTimeAfter(ChronoUnit.HOURS).toInt() == 0)
-                println("uwu")
-
             Bukkit.getOnlinePlayers().forEach { player ->
                 Banners.content(player, NpcType.NORMAL.banner!!, "${NpcType.NORMAL.bannerTitle}\n§e${size} $plurals")
 

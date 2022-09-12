@@ -1,5 +1,6 @@
 package me.reidj.tower.game
 
+import dev.implario.bukkit.item.item
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.menu.button
@@ -13,6 +14,7 @@ import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.user.Session
 import me.reidj.tower.util.PATH
 import me.reidj.tower.util.flying
+import org.bukkit.Material
 import org.bukkit.entity.Player
 
 /**
@@ -25,6 +27,13 @@ interface Game {
         private const val MOVE_SPEED: Double = .01
         private const val CONST_TICKS_BEFORE_STRIKE = 20
         private const val TICKS_BEFORE_STRIKE = 40
+
+        val workshop = item {
+            type = Material.CLAY_BALL
+            nbt("other", "friend_add")
+            nbt("click", "workshop")
+            text("§bМастерская")
+        }
 
         val menu = choicer {
             title = "Tower Simulator"
@@ -61,6 +70,7 @@ interface Game {
 
             player.run {
                 inventory.clear()
+                inventory.setItem(4, workshop)
                 teleport(session.arenaSpawn)
                 flying()
             }
