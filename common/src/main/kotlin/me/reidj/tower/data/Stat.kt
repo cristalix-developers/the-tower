@@ -17,6 +17,7 @@ data class Stat(
     var tournamentMaximumWavePassed: Int,
     var rebirth: Int,
     var rewardStreak: Int,
+    var gem: Int,
     var userImprovementType: MutableMap<ImprovementType, Improvement>,
     var towerImprovementType: MutableMap<ImprovementType, Improvement>,
     var researchType: MutableMap<ResearchType, Research>,

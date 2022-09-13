@@ -15,7 +15,6 @@ import me.reidj.tower.clientSocket
 
 @FunctionalInterface
 interface ClockInject {
-
     fun run(tick: Int)
 }
 

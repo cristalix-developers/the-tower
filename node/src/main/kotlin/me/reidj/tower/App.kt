@@ -14,6 +14,7 @@ import me.func.mod.util.listener
 import me.func.protocol.EndStatus
 import me.func.protocol.GlowColor
 import me.reidj.tower.clock.GameTimer
+import me.reidj.tower.clock.detail.DropItem
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.data.ImprovementType
@@ -24,6 +25,7 @@ import me.reidj.tower.game.wave.WaveManager
 import me.reidj.tower.game.wave.mob.Mob
 import me.reidj.tower.laboratory.LaboratoryManager
 import me.reidj.tower.listener.InteractEvent
+import me.reidj.tower.listener.PlayerPickUpEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.sword.SwordType
@@ -92,12 +94,12 @@ class App : JavaPlugin() {
 
         PlayerCommands()
 
-        listener(playerDataManager, InteractEvent(), UnusedEvent())
+        listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerPickUpEvent())
 
         Bukkit.getScheduler()
             .runTaskTimerAsynchronously(
                 this,
-                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager())),
+                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager(), DropItem(), TournamentManager)),
                 0,
                 1
             )
@@ -143,9 +145,9 @@ class App : JavaPlugin() {
                         ModTransfer(
                             mob.uuid.toString(), "§b+${Formatter.toFormat(token)} §f${
                                 token.plural(
-                                    "жетон",
-                                    "жетона",
-                                    "жетонов"
+                                    "Жетон",
+                                    "Жетона",
+                                    "Жетонов"
                                 )
                             }"
                         ).send("mob:kill", player)

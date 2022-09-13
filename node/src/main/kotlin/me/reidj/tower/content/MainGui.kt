@@ -17,7 +17,7 @@ class MainGui {
 
     private val menu = selection {
         title = "Tower Simulator"
-        rows = 4
+        rows = 3
         columns = 1
         money = ""
         hint = ""

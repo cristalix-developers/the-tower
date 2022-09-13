@@ -72,6 +72,10 @@ class User(stat: Stat) : Upgradable {
         ModTransfer(this.tokens).send("tower:tokens", player)
     }
 
+    fun giveGem(gem: Int) {
+        stat.gem += gem
+    }
+
     fun giveExperience(exp: Int) {
         val prevLevel = getLevel()
         stat.experience += exp

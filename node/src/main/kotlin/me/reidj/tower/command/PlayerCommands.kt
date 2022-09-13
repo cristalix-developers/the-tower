@@ -7,15 +7,12 @@ import me.reidj.tower.app
 import me.reidj.tower.game.Game
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.transfer
-import java.util.*
 
 /**
  * @project : tower-simulator
  * @author : Рейдж
  **/
 class PlayerCommands {
-
-    private val opened = hashMapOf<UUID, me.func.protocol.dialog.Dialog>()
 
     init {
         command("resourcepack") { player, _ -> player.setResourcePack(System.getenv("RESOURCE_PACK"), "000") }

@@ -34,7 +34,7 @@ enum class ResearchType(
         Category.USEFUL_IMPROVEMENTS
     ),
     INITIAL_MONEY(
-        "Начальная сумма токенов",
+        "Начальная сумма Токенов",
         "${PATH}initial_money.png",
         30,
         14,
@@ -43,7 +43,7 @@ enum class ResearchType(
         Category.USEFUL_IMPROVEMENTS
     ),
     CASH_BONUS_WAVE_PASS(
-        "Бонус токенов за волну",
+        "Бонус Токенов за волну",
         "${PATH}token_wave.png",
         40,
         19,
@@ -52,7 +52,7 @@ enum class ResearchType(
         Category.USEFUL_IMPROVEMENTS
     ),
     CASH_BONUS_KILL(
-        "Бонус токенов за убийство",
+        "Бонус Токенов за убийство",
         "${PATH}token_bonus.png",
         40,
         19,
