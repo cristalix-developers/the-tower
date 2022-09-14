@@ -12,5 +12,5 @@ enum class Category(
 ) {
     ATTACK_IMPROVEMENTS("Улучшения атаки", "${PATH}slash.png"),
     PROTECTION_IMPROVEMENTS("Улучшения защиты", "${PATH}protection.png"),
-    USEFUL_IMPROVEMENTS("Улучшения полезности", "${PATH}incentive.png"),
+    USEFUL_IMPROVEMENTS("Улучшения пользы", "${PATH}incentive.png"),
 }

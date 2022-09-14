@@ -60,7 +60,7 @@ enum class NpcType(
     LABORATORY(
         "",
         "§6РАБОТНИК ЛАБОРАТОРИИ",
-        { CategoryMenu.open("laboratory", it) },
+        { CategoryMenu.open("laboratory", it, null) },
         "https://webdata.c7x.dev/textures/skin/c87bbbbf-c7a4-11eb-acca-1cb72caa35fd",
         "c87bbbbf-c7a4-11eb-acca-1cb72caa35fd",
         131.5f,

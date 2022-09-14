@@ -22,6 +22,6 @@ class InteractEvent : Listener {
         if (nmsItem.hasTag() && tag.hasKeyOfType("click", 8))
             player.performCommand(tag.getString("click"))
         else if (item == Game.workshop)
-            CategoryMenu.open("workshop", player)
+            CategoryMenu.open("workshop", player, 2)
     }
 }

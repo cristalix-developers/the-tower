@@ -73,7 +73,10 @@ class App : KotlinMod() {
                 inited = false
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 MobManager.clear()
-                with(TowerManager.activeAmmo.iterator()) { forEach { _ -> remove() } }
+                with(TowerManager.activeAmmo.iterator()) { forEach { ammo ->
+                    UIEngine.worldContexts.remove(ammo.sphere)
+                    remove()
+                } }
             }
         }
 

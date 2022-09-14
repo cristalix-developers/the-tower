@@ -33,13 +33,13 @@ class MainGui {
             title = "Мастерская"
             description = "§7Улучшайте навыки, чтобы проходить волны было ещё легче!"
             hint("Открыть")
-            onClick { player, _, _ -> CategoryMenu.open("workshop", player) }
+            onClick { player, _, _ -> CategoryMenu.open("workshop", player, 1) }
         }, button {
             texture = "${PATH}laboratory.png"
             title = "Лаборатория"
             description = "§7Это место, где вы можете улучшить свои навыки."
             hint("Исследовать")
-            onClick { player, _, _ -> CategoryMenu.open("laboratory", player) }
+            onClick { player, _, _ -> CategoryMenu.open("laboratory", player, null) }
         }
     )
 

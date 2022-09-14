@@ -4,6 +4,7 @@ import banner.Banner
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
+import dev.xdark.clientapi.util.EnumHand
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import mod
@@ -73,12 +74,13 @@ object TowerManager {
                 lastTickMove = now
                 if (ticksBeforeStrike < 0) {
                     ticksBeforeStrike = ticksStrike
-                    MobManager.mobs.filter { (it.x - mod.cube.x).pow(2) + (it.z - mod.cube.z).pow(2) <= radius * radius }
+                    MobManager.mobs.keys.filter { (it.x - mod.cube.x).pow(2) + (it.z - mod.cube.z).pow(2) <= radius * radius }
                         .filter { entity -> entity.health - activeAmmo.count { it.target == entity } * damage > 0 }
                         .firstOrNull { activeAmmo.add(Bullet(mod.cube.x, mod.cube.y, mod.cube.z, it)) }
                 }
                 activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { it.remove() }
-                activeAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1 }.forEach {
+                activeAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1.0 }.forEach {
+                    it.target.performHurtAnimation()
                     UIEngine.clientApi.clientConnection().sendPayload(
                         "mob:hit",
                         Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
@@ -103,9 +105,13 @@ object TowerManager {
             }
             if (now - lastTickHit > 1 * 1000) {
                 lastTickHit = now
-                MobManager.mobs.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) <= 8.0 }.forEach {
+                MobManager.mobs.filter { (key, value) -> (key.x - mod.cube.x).pow(2.0) + (key.z - mod.cube.z).pow(2.0) <= value.attackRange }.keys.forEach {
+                    it.swingArm(EnumHand.MAIN_HAND)
                     UIEngine.clientApi.clientConnection()
-                        .sendPayload("tower:hittower", Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8))
+                        .sendPayload(
+                            "tower:hittower",
+                            Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8)
+                        )
                 }
             }
         }
@@ -145,7 +151,11 @@ object TowerManager {
         BarManager.healthIndicator?.updatePercentage(health, maxHealth)
 
         if (mod.gameActive) {
-            Banners.text("§4${util.Formatter.toFormat(health)} ❤", healthBanner!!, Banners.banners[healthBanner!!.uuid]!!.second)
+            Banners.text(
+                "§4${util.Formatter.toFormat(health)} ❤",
+                healthBanner!!,
+                Banners.banners[healthBanner!!.uuid]!!.second
+            )
         }
     }
 }

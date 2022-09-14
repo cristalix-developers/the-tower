@@ -1,7 +1,7 @@
 package me.reidj.tower.util
 
 import me.func.mod.ui.menu.button
-import me.func.mod.ui.menu.selection
+import me.func.mod.ui.menu.choicer
 import me.reidj.tower.data.Category
 import org.bukkit.entity.Player
 
@@ -11,21 +11,24 @@ import org.bukkit.entity.Player
  **/
 object CategoryMenu {
 
-    private val menu = selection {
+    private val menu = choicer {
         title = "Категории"
-        hint = "Перейти"
-        rows = 3
-        columns = 1
+        description = ""
     }
 
-    fun open(command: String, player: Player) {
-        menu.storage = Category.values().map {
+    fun open(command: String, player: Player, index: Int?) {
+        val storage = Category.values().map {
             button {
                 title = it.title
                 texture = it.texture
+                hint("Перейти")
                 onClick { player, _, _ -> player.performCommand("$command ${it.name}") }
             }
         }.toMutableList()
+        if (index != null) {
+            storage.removeAt(index)
+        }
+        menu.storage = storage
         menu.open(player)
     }
 }

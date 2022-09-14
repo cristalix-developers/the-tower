@@ -13,6 +13,8 @@ class Mob(
     private val z: Double,
     private var hp: Double,
     private val moveSpeed: Float,
+    val attackRange: Double,
+    val isShooter: Boolean,
 ) {
 
     fun create(): EntityLivingBase {

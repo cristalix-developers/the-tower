@@ -17,7 +17,7 @@ import kotlin.math.pow
  */
 object MobManager {
 
-    val mobs: MutableList<EntityLivingBase> = mutableListOf()
+    val mobs = mutableMapOf<EntityLivingBase, Mob>()
 
     private var lastTick = System.currentTimeMillis()
     var moveSpeed = 0.0
@@ -27,10 +27,10 @@ object MobManager {
             if (mobs.isEmpty())
                 return@registerHandler
             val now = System.currentTimeMillis()
-            mobs.forEach { mob ->
+            mobs.keys.forEach { mob ->
                 if (now - lastTick > mob.aiMoveSpeed * 1000) {
                     lastTick = now
-                    mobs.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 6.5 }.forEach { entity ->
+                    mobs.keys.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 7.7 }.forEach { entity ->
                         val dX = mod.cube.x - entity.x
                         val dZ = mod.cube.z - entity.z
                         val rotation =
@@ -52,7 +52,10 @@ object MobManager {
             val z = readDouble()
             val hp = readDouble()
             val moveSpeed = readDouble()
-            mobs.add(Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat()).create())
+            val attackRange = readDouble()
+            val isShooter = readBoolean()
+            val mob = Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat(), attackRange, isShooter)
+            mobs[mob.create()] = mob
         }
 
         mod.registerChannel("mob:kill") {
@@ -62,7 +65,7 @@ object MobManager {
             val uuid = UUID.fromString(NetUtil.readUtf8(this))
             val text = NetUtil.readUtf8(this)
 
-            val mob = mobs.filter { it.uniqueID == uuid }[0]
+            val mob = mobs.keys.filter { it.uniqueID == uuid }[0]
 
             if (text.isNotEmpty()) {
                 Banners.create(uuid, mob.x, mob.y + 2, mob.z, text)
@@ -75,5 +78,5 @@ object MobManager {
         }
     }
 
-    fun clear() = mobs.onEach { it.world.removeEntity(it) }.clear()
+    fun clear() = mobs.keys.onEach { it.world.removeEntity(it) }.clear()
 }
