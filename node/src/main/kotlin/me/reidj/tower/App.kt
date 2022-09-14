@@ -1,5 +1,6 @@
 package me.reidj.tower
 
+import clepto.bukkit.B
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
@@ -15,6 +16,7 @@ import me.func.protocol.EndStatus
 import me.func.protocol.GlowColor
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.clock.detail.DropItem
+import me.reidj.tower.clock.detail.TopManager
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.data.ImprovementType
@@ -29,7 +31,6 @@ import me.reidj.tower.listener.PlayerPickUpEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.sword.SwordType
-import me.reidj.tower.top.TopManager
 import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.UpgradeMenu
 import me.reidj.tower.user.PlayerDataManager
@@ -64,6 +65,7 @@ class App : JavaPlugin() {
 
     override fun onEnable() {
         app = this
+        B.plugin = this
 
         Platforms.set(PlatformDarkPaper())
 
@@ -92,6 +94,8 @@ class App : JavaPlugin() {
         MainGui()
         UpgradeMenu()
 
+        DropItem()
+
         PlayerCommands()
 
         listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerPickUpEvent())
@@ -99,7 +103,7 @@ class App : JavaPlugin() {
         Bukkit.getScheduler()
             .runTaskTimerAsynchronously(
                 this,
-                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager(), DropItem(), TournamentManager)),
+                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager(), TournamentManager)),
                 0,
                 1
             )

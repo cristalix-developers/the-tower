@@ -1,4 +1,4 @@
-package me.reidj.tower.top
+package me.reidj.tower.clock.detail
 
 import com.google.common.collect.Maps
 import kotlinx.coroutines.CoroutineScope
@@ -9,6 +9,7 @@ import me.reidj.tower.app
 import me.reidj.tower.clientSocket
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.protocol.TopPackage
+import me.reidj.tower.top.TopEntry
 import org.bukkit.Location
 import ru.cristalix.boards.bukkitapi.Board
 import ru.cristalix.boards.bukkitapi.Boards
