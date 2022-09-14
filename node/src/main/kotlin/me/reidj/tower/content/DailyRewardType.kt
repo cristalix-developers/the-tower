@@ -1,7 +1,7 @@
 package me.reidj.tower.content
 
 import dev.implario.bukkit.item.item
-import me.func.mod.data.DailyReward
+import me.func.mod.conversation.data.DailyReward
 import me.reidj.tower.user.User
 
 enum class DailyRewardType(val reward: DailyReward, val give: (User) -> Any) {

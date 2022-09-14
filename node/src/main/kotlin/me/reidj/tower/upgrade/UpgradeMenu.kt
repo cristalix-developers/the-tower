@@ -1,7 +1,7 @@
 package me.reidj.tower.upgrade
 
-import me.func.mod.menu.button
-import me.func.mod.menu.selection
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.data.Category

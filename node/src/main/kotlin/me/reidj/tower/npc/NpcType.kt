@@ -1,8 +1,8 @@
 package me.reidj.tower.npc
 
-import me.func.mod.Banners
-import me.func.mod.Banners.location
-import me.func.protocol.element.Banner
+import me.func.mod.world.Banners
+import me.func.mod.world.Banners.location
+import me.func.protocol.data.element.Banner
 import me.reidj.tower.app
 import me.reidj.tower.util.CategoryMenu
 import org.bukkit.Location

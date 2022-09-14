@@ -2,13 +2,13 @@ package me.reidj.tower.laboratory
 
 import implario.humanize.Humanize
 import me.func.mod.Anime
-import me.func.mod.Glow
-import me.func.mod.menu.button
-import me.func.mod.menu.confirmation.Confirmation
-import me.func.mod.menu.selection
+import me.func.mod.ui.Glow
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.confirmation.Confirmation
+import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
-import me.func.protocol.GlowColor
-import me.func.protocol.MessageStatus
+import me.func.protocol.data.color.GlowColor
+import me.func.protocol.data.status.MessageStatus
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.data.Category

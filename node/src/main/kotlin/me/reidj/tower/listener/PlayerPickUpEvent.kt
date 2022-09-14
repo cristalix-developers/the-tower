@@ -1,9 +1,8 @@
 package me.reidj.tower.listener
 
-import me.func.mod.Banners
-import me.func.mod.Banners.location
 import me.func.mod.util.after
-import me.func.protocol.element.MotionType
+import me.func.mod.world.Banners
+import me.func.mod.world.Banners.location
 import me.reidj.tower.app
 import org.bukkit.Material
 import org.bukkit.event.EventHandler

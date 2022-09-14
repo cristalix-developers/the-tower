@@ -3,8 +3,8 @@ package me.reidj.tower.game
 import dev.implario.bukkit.item.item
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
-import me.func.mod.menu.button
-import me.func.mod.menu.choicer
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.choicer
 import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
@@ -31,7 +31,6 @@ interface Game {
         val workshop = item {
             type = Material.CLAY_BALL
             nbt("other", "friend_add")
-            nbt("click", "workshop")
             text("§bМастерская")
         }
 

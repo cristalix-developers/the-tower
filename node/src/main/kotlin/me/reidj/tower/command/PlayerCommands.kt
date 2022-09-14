@@ -1,7 +1,7 @@
 package me.reidj.tower.command
 
 import me.func.mod.conversation.ModTransfer
-import me.func.mod.dialog.Dialog
+import me.func.mod.ui.dialog.Dialog
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.game.Game

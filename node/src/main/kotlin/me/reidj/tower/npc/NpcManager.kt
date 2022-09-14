@@ -1,14 +1,14 @@
 package me.reidj.tower.npc
 
 import implario.humanize.Humanize
-import me.func.mod.Banners
-import me.func.mod.Npc
-import me.func.mod.Npc.location
-import me.func.mod.Npc.onClick
-import me.func.mod.data.NpcSmart
+import me.func.mod.conversation.data.NpcSmart
 import me.func.mod.emotion.Emotions
 import me.func.mod.util.after
-import me.func.protocol.npc.NpcBehaviour
+import me.func.mod.world.Banners
+import me.func.mod.world.Npc
+import me.func.mod.world.Npc.location
+import me.func.mod.world.Npc.onClick
+import me.func.protocol.world.npc.NpcBehaviour
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.tournament.TournamentManager

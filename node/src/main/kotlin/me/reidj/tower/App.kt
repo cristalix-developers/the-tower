@@ -7,13 +7,13 @@ import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import io.netty.buffer.Unpooled
 import kotlinx.coroutines.runBlocking
 import me.func.mod.Anime
-import me.func.mod.Glow
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.ui.Glow
 import me.func.mod.util.listener
-import me.func.protocol.EndStatus
-import me.func.protocol.GlowColor
+import me.func.protocol.data.color.GlowColor
+import me.func.protocol.data.status.EndStatus
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.clock.detail.DropItem
 import me.reidj.tower.clock.detail.TopManager
@@ -194,6 +194,7 @@ class App : JavaPlugin() {
                         player.giveDefaultItems()
                         player.flying(false)
                         showToAll()
+                        Anime.close(player)
 
                         // Игра закончилась
                         ModTransfer(false).send("tower:update-state", player)

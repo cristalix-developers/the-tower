@@ -1,9 +1,9 @@
 package me.reidj.tower.user
 
 import me.func.mod.Anime
-import me.func.mod.Glow
 import me.func.mod.conversation.ModTransfer
-import me.func.protocol.GlowColor
+import me.func.mod.ui.Glow
+import me.func.protocol.data.color.GlowColor
 import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.Pumping

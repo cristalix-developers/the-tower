@@ -1,6 +1,6 @@
 package me.reidj.tower.util
 
-import me.func.protocol.dialog.*
+import me.func.protocol.ui.dialog.*
 
 /**
  * @project tower

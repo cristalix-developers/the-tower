@@ -20,8 +20,7 @@ class DropItem {
 
     init {
         B.repeat(20 * 120) {
-            TournamentManager.getOnlinePlayers()
-                .forEach { _ -> app.worldMeta.world.dropItem(locations.random(), gem) }
+            TournamentManager.getOnlinePlayers().forEach { _ -> app.worldMeta.world.dropItem(locations.random(), gem) }
         }
     }
 }
