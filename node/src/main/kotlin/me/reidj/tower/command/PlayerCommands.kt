@@ -5,6 +5,7 @@ import me.func.mod.ui.dialog.Dialog
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.game.Game
+import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.transfer
 
@@ -38,6 +39,10 @@ class PlayerCommands {
                 DialogUtil.guideDialog,
                 "guidePageOne"
             )
+        }
+        command("test") { player, _ ->  TournamentManager.endOfTournament()}
+        command("test2") { player, args ->
+            (app.getUser(player) ?: return@command).giveExperience(args[0].toInt())
         }
     }
 }

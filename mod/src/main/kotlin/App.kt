@@ -1,11 +1,11 @@
+
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.PlayerListRender
 import io.netty.buffer.Unpooled
 import mob.MobManager
-import player.Indicator
-import player.Statistic
+import player.PlayerHud
 import queue.QueueStatus
 import rank.Rank
 import ru.cristalix.clientapi.KotlinMod
@@ -33,12 +33,11 @@ class App : KotlinMod() {
         mod = this
 
         TimeBar
-        Statistic
         Banners
         BarManager
         TowerManager
         Cube
-        Indicator
+        PlayerHud
         QueueStatus()
         Rank()
 
@@ -46,8 +45,9 @@ class App : KotlinMod() {
 
         registerChannel("tower:update-state") {
             gameActive = readBoolean()
-            BarManager.healthIndicator!!.enabled = gameActive
-            BarManager.protectionIndicator!!.enabled = gameActive
+            BarManager.healthBox.enabled = gameActive
+            BarManager.protectionBox.enabled = gameActive
+            BarManager.tokenBox.enabled = gameActive
             if (gameActive) {
                 mod.cube = V3(
                     readDouble(),

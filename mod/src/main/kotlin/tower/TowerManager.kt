@@ -10,11 +10,13 @@ import mob.MobManager
 import mod
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.element.Context3D
+import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.Color
 import ru.cristalix.uiengine.utility.V3
 import ru.cristalix.uiengine.utility.sphere
 import updateHealth
+import util.Formatter
 import util.Vector
 import kotlin.math.max
 import kotlin.math.pow
@@ -132,7 +134,7 @@ object TowerManager {
             val protect = readDouble()
             if (protect != protection) {
                 protection = protect
-                BarManager.protectionIndicator?.updatePercentage(protection)
+                (BarManager.protectionBox.children[4] as TextElement).content = "${100 / protection * 100}%"
             }
         }
 
@@ -142,17 +144,18 @@ object TowerManager {
     }
 
     private fun updateHealth(healthUpdate: Double, maxHealthUpdate: Double) {
-        if (health == healthUpdate)
+        if (health == healthUpdate && maxHealth == maxHealthUpdate)
             return
 
         health = healthUpdate
         maxHealth = maxHealthUpdate
 
-        BarManager.healthIndicator?.updatePercentage(health, maxHealth)
+        (BarManager.healthBox.children[3] as TextElement).content =
+            "${Formatter.toFormat(health)} из ${Formatter.toFormat(maxHealth)}"
 
         if (mod.gameActive) {
             Banners.text(
-                "§4${util.Formatter.toFormat(health)} ❤",
+                "§4${Formatter.toFormat(health)} ❤",
                 healthBanner!!,
                 Banners.banners[healthBanner!!.uuid]!!.second
             )

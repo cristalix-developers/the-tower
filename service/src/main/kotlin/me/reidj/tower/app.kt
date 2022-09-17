@@ -57,6 +57,7 @@ fun main() {
             val stat = mongoAdapter.find(pckg.uuid).await() ?: return@listen
             stat.rank =
                 if (pckg.isSortAscending) stat.rank.downgradeRank() ?: return@listen else stat.rank.upgradeRank() ?: return@listen
+            stat.tournamentMaximumWavePassed = 0
             mongoAdapter.save(stat)
         }
     }

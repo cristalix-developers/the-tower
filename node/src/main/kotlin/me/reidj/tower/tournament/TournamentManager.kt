@@ -56,24 +56,25 @@ object TournamentManager : ClockInject {
     fun getTimeAfter(unit: ChronoUnit) = unit.between(LocalTime.now(), LocalTime.MAX)
     override fun run(tick: Int) {
         val now = LocalTime.now()
-        if (now.hour == 23 && now.minute == 59 && now.second == 59 && getTournamentPlayers() == 0) {
+        if (isTournamentDay() && now.hour == 23 && now.minute == 59 && now.second == 59 && getTournamentPlayers() == 0) {
+            println(12111)
             endOfTournament()
         }
     }
 
-    private fun endOfTournament() {
+    fun endOfTournament() {
         CoroutineScope(Dispatchers.IO).launch {
             val sortAscending = clientSocket.writeAndAwaitResponse<TopPackage>(
                 TopPackage(
                     "tournamentMaximumWavePassed",
-                    8,
+                    1,
                     true
                 )
             ).await()
             val sortDescending = clientSocket.writeAndAwaitResponse<TopPackage>(
                 TopPackage(
                     "tournamentMaximumWavePassed",
-                    4,
+                    1,
                     false
                 )
             ).await()

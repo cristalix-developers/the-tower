@@ -63,6 +63,7 @@ object RankManager {
                 user.stat.run {
                     rank = if (pckg.isSortAscending) rank.downgradeRank() ?: return@top else rank.upgradeRank()
                         ?: return@top
+                    tournamentMaximumWavePassed = 0
                     createRank(user)
                     after { clientSocket.write(SaveUserPackage(uuid, this)) }
                 }

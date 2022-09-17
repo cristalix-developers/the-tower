@@ -10,6 +10,7 @@ import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.user.User
 import me.reidj.tower.util.Formatter
+import me.reidj.tower.util.PATH
 import me.reidj.tower.util.error
 
 /**
@@ -41,7 +42,7 @@ class UpgradeMenu {
             if (notInGame) "Монет ${Formatter.toFormat(stat.money)}" else "Токенов ${Formatter.toFormat(user.tokens)}"
         menu.rows = 3
         menu.columns = 3
-        menu.vault = if (notInGame) "\uE03C" else "\uE03A"
+        menu.vault = if (notInGame) "${PATH}coin.png" else "${PATH}token.png"
         menu.storage = type.filter { it.key.category == category }.map { (key, value) ->
             val level = value.level
             val cost = key.price + level

@@ -14,6 +14,7 @@ import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.data.Category
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.util.Formatter.toFormat
+import me.reidj.tower.util.PATH
 import me.reidj.tower.util.plural
 import org.bukkit.Bukkit
 
@@ -39,6 +40,7 @@ class LaboratoryManager : ClockInject {
                         val gem = 5 * value.level
                         button {
                             title = "${key.title} §3${value.level} LVL"
+                            menu.vault = "${PATH}coin.png"
                             texture = key.texture
                             description =
                                 if (value.whenBought != null) "Нажмите ПКМ, чтобы изучить прямо сейчас" else "${

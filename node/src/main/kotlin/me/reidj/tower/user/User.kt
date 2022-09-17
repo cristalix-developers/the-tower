@@ -74,13 +74,13 @@ class User(stat: Stat) : Upgradable {
 
     fun giveGem(gem: Int) {
         stat.gem += gem
+        ModTransfer(stat.gem).send("tower:gem", player)
     }
 
     fun giveExperience(exp: Int) {
         val prevLevel = getLevel()
         stat.experience += exp
         ModTransfer(
-            getLevel(),
             stat.experience,
             LevelSystem.getRequiredExperience(LevelSystem.getLevel(stat.experience))
         ).send("tower:exp", player)

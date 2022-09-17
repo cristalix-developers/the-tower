@@ -87,6 +87,7 @@ class PlayerDataManager : Listener {
 
             user.giveExperience(0)
             user.giveMoney(0.0)
+            user.giveGem(0)
 
             RankManager.createRank(user)
             RankManager.showAll(user)
