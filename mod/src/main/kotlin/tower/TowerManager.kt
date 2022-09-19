@@ -32,7 +32,7 @@ object TowerManager {
     private var lastTickHit = System.currentTimeMillis()
     private var speedAttack = 0.05 // BULLET_DELAY
 
-    val activeAmmo = mutableListOf<Bullet>()
+    val towerActiveAmmo = mutableListOf<Bullet>()
     var ticksBeforeStrike = 30
     var ticksStrike = 30
     var damage = 0.0
@@ -62,7 +62,7 @@ object TowerManager {
 
         fun remove() {
             UIEngine.worldContexts.remove(sphere)
-            activeAmmo.remove(this)
+            towerActiveAmmo.remove(this)
         }
     }
 
@@ -77,22 +77,22 @@ object TowerManager {
                 if (ticksBeforeStrike < 0) {
                     ticksBeforeStrike = ticksStrike
                     MobManager.mobs.keys.filter { (it.x - mod.cube.x).pow(2) + (it.z - mod.cube.z).pow(2) <= radius * radius }
-                        .filter { entity -> entity.health - activeAmmo.count { it.target == entity } * damage > 0 }
-                        .firstOrNull { activeAmmo.add(Bullet(mod.cube.x, mod.cube.y, mod.cube.z, it)) }
+                        .filter { entity -> entity.health - towerActiveAmmo.count { it.target == entity } * damage > 0 }
+                        .firstOrNull { towerActiveAmmo.add(Bullet(mod.cube.x, mod.cube.y, mod.cube.z, it)) }
                 }
-                activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { it.remove() }
-                activeAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1.0 }.forEach {
+                towerActiveAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { it.remove() }
+                towerActiveAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1.0 }.forEach {
                     it.target.performHurtAnimation()
                     UIEngine.clientApi.clientConnection().sendPayload(
                         "mob:hit",
                         Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
                     )
-                    activeAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
+                    towerActiveAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
                     it.target.updateHealth()
                     it.remove()
-                    activeAmmo.remove(it)
+                    towerActiveAmmo.remove(it)
                 }
-                activeAmmo.forEach {
+                towerActiveAmmo.forEach {
                     val vector = Vector(it.target.x - it.x, it.target.y + 1.5 - it.y, it.target.z - it.z).normalize()
                         .multiply(0.35)
                     it.sphere.animate(max(speedAttack * .99, 0.001)) {
@@ -107,14 +107,18 @@ object TowerManager {
             }
             if (now - lastTickHit > 1 * 1000) {
                 lastTickHit = now
-                MobManager.mobs.filter { (key, value) -> (key.x - mod.cube.x).pow(2.0) + (key.z - mod.cube.z).pow(2.0) <= value.attackRange }.keys.forEach {
-                    it.swingArm(EnumHand.MAIN_HAND)
-                    UIEngine.clientApi.clientConnection()
-                        .sendPayload(
-                            "tower:hittower",
-                            Unpooled.copiedBuffer(it.uniqueID.toString(), Charsets.UTF_8)
-                        )
-                }
+                MobManager.mobs.filter { (key, value) -> (key.x - mod.cube.x).pow(2.0) + (key.z - mod.cube.z).pow(2.0) <= value.attackRange }.forEach { (key, value) ->
+                    if (value.isShooter) {
+
+                    } else {
+                        key.swingArm(EnumHand.MAIN_HAND)
+                        UIEngine.clientApi.clientConnection()
+                            .sendPayload(
+                                "tower:hittower",
+                                Unpooled.copiedBuffer(key.uniqueID.toString(), Charsets.UTF_8)
+                            )
+                    }
+              }
             }
         }
 

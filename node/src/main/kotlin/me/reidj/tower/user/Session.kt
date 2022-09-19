@@ -1,8 +1,7 @@
 package me.reidj.tower.user
 
-import clepto.bukkit.world.Label
 import me.func.mod.conversation.ModTransfer
-import me.reidj.tower.app
+import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.data.Improvement
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.Pumping
@@ -15,16 +14,7 @@ import me.reidj.tower.upgrade.Upgradable
  **/
 data class Session(var towerImprovement: MutableMap<ImprovementType, Improvement>) : Upgradable {
 
-    val arenaSpawn: Label = app.worldMeta.getLabel("start").apply {
-        yaw = -90f
-        x += 0.5
-        z += 0.5
-    }
-    val cubeLocation = app.worldMeta.getLabel("tower").clone().apply {
-        x += 0.5
-        z += 0.5
-    }
-    val generators = app.worldMeta.getLabels("mob").filter { it.distanceSquared(cubeLocation) < 900 }
+    var arena = ArenaManager.arenas[0]
 
     fun updateHealth(user: User) {
         val stat = user.stat

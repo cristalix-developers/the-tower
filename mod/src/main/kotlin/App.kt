@@ -24,6 +24,7 @@ lateinit var mod: App
 class App : KotlinMod() {
 
     lateinit var cube: V3
+
     var inited = false
     var gameActive = false
 
@@ -32,16 +33,30 @@ class App : KotlinMod() {
 
         mod = this
 
-        TimeBar
+        TimeBar()
+        Cube()
+        PlayerHud()
+        QueueStatus()
+        Rank()
         Banners
         BarManager
         TowerManager
-        Cube
-        PlayerHud
-        QueueStatus()
-        Rank()
 
         registerHandler<PlayerListRender> { isCancelled = gameActive }
+
+        registerChannel("tower:map-change") {
+            Banners.remove(TowerManager.healthBanner!!.uuid)
+            cube = V3(readDouble(), readDouble() + 1, readDouble())
+            TowerManager.healthBanner = Banners.create(
+                UUID.randomUUID(),
+                cube.x,
+                cube.y - 1.5,
+                cube.z,
+                "§4${Formatter.toFormat(TowerManager.health)} ❤",
+                1.5,
+                true
+            )
+        }
 
         registerChannel("tower:update-state") {
             gameActive = readBoolean()
@@ -49,7 +64,7 @@ class App : KotlinMod() {
             BarManager.protectionBox.enabled = gameActive
             BarManager.tokenBox.enabled = gameActive
             if (gameActive) {
-                mod.cube = V3(
+                cube = V3(
                     readDouble(),
                     readDouble() + 1,
                     readDouble()
@@ -59,21 +74,21 @@ class App : KotlinMod() {
                 TowerManager.ticksStrike = readInt()
                 TowerManager.healthBanner = Banners.create(
                     UUID.randomUUID(),
-                    mod.cube.x,
-                    mod.cube.y - 1.25,
-                    mod.cube.z,
+                    cube.x,
+                    cube.y - 1.25,
+                    cube.z,
                     "§4${Formatter.toFormat(TowerManager.health)} ❤",
                     2.0,
                     true
                 )
-                mod.inited = true
+                inited = true
 
                 MobManager
             } else {
                 inited = false
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 MobManager.clear()
-                with(TowerManager.activeAmmo.iterator()) { forEach { ammo ->
+                with(TowerManager.towerActiveAmmo.iterator()) { forEach { ammo ->
                     UIEngine.worldContexts.remove(ammo.sphere)
                     remove()
                 } }

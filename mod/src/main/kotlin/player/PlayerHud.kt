@@ -15,7 +15,7 @@ import util.Formatter
  * @project tower
  * @author Рейдж
  */
-object PlayerHud {
+class PlayerHud {
 
     private val gemBox = createBox(true, "gem")
     private val moneyBox = createBox(false, "coin")

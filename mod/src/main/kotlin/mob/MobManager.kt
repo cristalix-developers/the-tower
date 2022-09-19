@@ -30,16 +30,18 @@ object MobManager {
             mobs.keys.forEach { mob ->
                 if (now - lastTick > mob.aiMoveSpeed * 1000) {
                     lastTick = now
-                    mobs.keys.filter { (mod.cube.x - it.x).pow(2.0) + (mod.cube.z - it.z).pow(2.0) > 7.7 }.forEach { entity ->
-                        val dX = mod.cube.x - entity.x
-                        val dZ = mod.cube.z - entity.z
-                        val rotation =
-                            Math.toDegrees(-kotlin.math.atan2(mod.cube.x - entity.x, mod.cube.z - entity.z)).toFloat()
-                        entity.rotationYawHead = rotation
-                        entity.setYaw(rotation)
-                        val vector = Vector(dX, 0.0, dZ).normalize().multiply(moveSpeed)
-                        entity.teleport(entity.x + vector.x, entity.y, entity.z + vector.z)
-                    }
+                    mobs.filter { (key, value) -> (mod.cube.x - key.x).pow(2.0) + (mod.cube.z - key.z).pow(2.0) > value.attackRange }
+                        .forEach { (key, _) ->
+                            val dX = mod.cube.x - key.x
+                            val dZ = mod.cube.z - key.z
+                            val rotation =
+                                Math.toDegrees(-kotlin.math.atan2(mod.cube.x - key.x, mod.cube.z - key.z))
+                                    .toFloat()
+                            key.rotationYawHead = rotation
+                            key.setYaw(rotation)
+                            val vector = Vector(dX, 0.0, dZ).normalize().multiply(moveSpeed)
+                            key.teleport(key.x + vector.x, key.y, key.z + vector.z)
+                        }
                 }
             }
         }

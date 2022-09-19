@@ -14,6 +14,7 @@ import me.func.mod.ui.Glow
 import me.func.mod.util.listener
 import me.func.protocol.data.color.GlowColor
 import me.func.protocol.data.status.EndStatus
+import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.clock.detail.DropItem
 import me.reidj.tower.clock.detail.TopManager
@@ -90,6 +91,7 @@ class App : JavaPlugin() {
 
         Default()
         Rating()
+        ArenaManager()
 
         MainGui()
         UpgradeMenu()
@@ -172,7 +174,7 @@ class App : JavaPlugin() {
                 user.run {
                     val damage =
                         mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
-                    tower.health -= damage
+                    //tower.health -= damage
                     Glow.animate(player, .5, GlowColor.RED)
                     Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
                     tower.updateHealth()

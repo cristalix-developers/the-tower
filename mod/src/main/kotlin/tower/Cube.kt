@@ -9,12 +9,12 @@ import ru.cristalix.uiengine.UIEngine
 import java.lang.Math.cos
 import java.lang.Math.sin
 
-object Cube {
+class Cube {
 
     init {
         var angle = 0.0
         val mc = UIEngine.clientApi.minecraft()
-        val distanceBetweenTowerAndGround = 9.0
+        val distanceBetweenTowerAndGround = 10.0
 
         var lastRender = System.currentTimeMillis()
 
@@ -58,7 +58,7 @@ object Cube {
                 repeat(angles.toInt()) {
                     glVertex3d(
                         radius * sin(Math.toRadians(it / angles * 360.0)),
-                        0.01,
+                        0.1,
                         radius * cos(Math.toRadians(it / angles * 360.0))
                     )
                 }
@@ -71,7 +71,7 @@ object Cube {
                 repeat(angles.toInt()) {
                     glVertex3d(
                         radius * sin(Math.toRadians(it / angles * 360.0)),
-                        0.01,
+                        0.1,
                         radius * cos(Math.toRadians(it / angles * 360.0))
                     )
                 }

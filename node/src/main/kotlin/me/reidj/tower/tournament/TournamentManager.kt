@@ -20,7 +20,7 @@ object TournamentManager : ClockInject {
 
     private const val COUNTDOWN_DAYS = 3L
 
-    private val startDate = LocalDate.of(2022, 7, 24)
+    private val startDate = LocalDate.of(2022, 7, 20)
 
     private var tournamentHasStarted = false
 
@@ -56,10 +56,14 @@ object TournamentManager : ClockInject {
     fun getTimeAfter(unit: ChronoUnit) = unit.between(LocalTime.now(), LocalTime.MAX)
     override fun run(tick: Int) {
         val now = LocalTime.now()
-        if (isTournamentDay() && now.hour == 23 && now.minute == 59 && now.second == 59 && getTournamentPlayers() == 0) {
+        if (now.hour == 23 && now.minute == 59 && now.second == 59 && now.nano == 999999999)
+            println(1233456)
+        if (now == LocalTime.MAX)
+            println("djsalkdjkl")
+        /*if (isTournamentDay() && now.hour == 18 && now.minute == 15 && now.second == 59 && now.nano == 999999999 && getTournamentPlayers() == 0) {
             println(12111)
             endOfTournament()
-        }
+        }*/
     }
 
     fun endOfTournament() {

@@ -4,6 +4,7 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
 import me.reidj.tower.app
+import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.mob.Mob
@@ -27,11 +28,11 @@ data class Wave(
 
     fun start() {
         aliveMobs.clear()
-        ModTransfer("$level волна", 40).send("tower:timebar", player)
+        ModTransfer(40).send("tower:bar", player)
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater
-                drawMob(session.generators.random().apply {
+                drawMob(session.arena.generators.random().apply {
                     x += Math.random() * 4 - 2
                     z += Math.random() * 4 - 2
                 })
@@ -43,6 +44,8 @@ data class Wave(
     fun end() {
         val user = app.getUser(player) ?: return
         val stat = user.stat
+        val session = user.session!!
+        session.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(session.arena) + 1]
         startTime = 0
         level++
         mobs.clear()
@@ -51,6 +54,9 @@ data class Wave(
             Anime.cursorMessage(user.player, "§e+10 §fмонет")
             user.giveMoney(10.0)
         }
+        val cubeLocation = session.arena.cubeLocation
+        ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
+        player.teleport(session.arena.arenaSpawn)
         Anime.counting321(user.player)
         after(3 * 20) { start() }
     }
@@ -67,6 +73,8 @@ data class Wave(
                         type = EntityType.valueOf(it.name)
                         isBoss = true
                         moveSpeed = it.moveSpeed
+                        attackRange = it.attackRange
+                        isShooter = it.isShooter
                     }.location(location).create(player).run {
                         aliveMobs.add(this)
                         mobs.add(this)
@@ -76,6 +84,8 @@ data class Wave(
                     hp = it.hp
                     damage = it.damage
                     type = EntityType.valueOf(it.name)
+                    attackRange = it.attackRange
+                    isShooter = it.isShooter
                 }.location(location).create(player).run {
                     aliveMobs.add(this)
                     mobs.add(this)

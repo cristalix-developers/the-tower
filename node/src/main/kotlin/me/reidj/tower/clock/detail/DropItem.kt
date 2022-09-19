@@ -16,11 +16,11 @@ class DropItem {
         type = Material.CLAY_BALL
         nbt("tower", "gem")
     }
-    private val locations = app.worldMeta.getLabels("gem")
 
     init {
-        B.repeat(20 * 120) {
-            TournamentManager.getOnlinePlayers().forEach { _ -> app.worldMeta.world.dropItem(locations.random(), gem) }
+        B.repeat(20 * 300) {
+            TournamentManager.getOnlinePlayers()
+                .forEach { user -> app.worldMeta.world.dropItem(user.session?.arena?.gemLocations?.random(), gem) }
         }
     }
 }

@@ -70,7 +70,7 @@ interface Game {
             player.run {
                 inventory.clear()
                 inventory.setItem(4, workshop)
-                teleport(session.arenaSpawn)
+                teleport(session.arena.arenaSpawn)
                 flying()
             }
 
@@ -98,7 +98,7 @@ interface Game {
             )
 
             // Отправляем точки со спавнерами
-            session.generators.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
+            session.arena.generators.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
 
             Anime.counting321(player)
 
@@ -110,9 +110,9 @@ interface Game {
                 // Игра началась
                 ModTransfer(
                     true,
-                    session.cubeLocation.x,
-                    session.cubeLocation.y,
-                    session.cubeLocation.z,
+                    session.arena.cubeLocation.x,
+                    session.arena.cubeLocation.y,
+                    session.arena.cubeLocation.z,
                     MOVE_SPEED,
                     TICKS_BEFORE_STRIKE,
                     CONST_TICKS_BEFORE_STRIKE
