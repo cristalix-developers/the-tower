@@ -1,87 +1,62 @@
 import dev.xdark.clientapi.event.lifecycle.GameLoop
-import dev.xdark.feder.NetUtil
+import dev.xdark.clientapi.resource.ResourceLocation
 import mob.MobManager
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.element.RectangleElement
 import ru.cristalix.uiengine.element.TextElement
-import ru.cristalix.uiengine.eventloop.EventLoopImpl
-import ru.cristalix.uiengine.eventloop.Task
-import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
-import kotlin.reflect.KMutableProperty
 
-object TimeBar {
+class TimeBar {
 
-    private lateinit var line: RectangleElement
-    private lateinit var content: TextElement
-
-    var isRemove = false
+    private val box = carved {
+        origin = TOP
+        align = TOP
+        color = Color(0, 0, 0, 0.62)
+        size = V3(60.0, 20.0)
+        +text {
+            origin = CENTER
+            align = CENTER
+            shadow = true
+            offset.x += 5.0
+            +rectangle {
+                origin = LEFT
+                align = LEFT
+                color = WHITE
+                size = V3(12.0, 12.0)
+                offset = V3(8.0, 0.5)
+                textureLocation = ResourceLocation.of("minecraft", "mcpatcher/cit/tower/watch.png")
+            }
+        }
+    }
+    private val content = box.children[4] as TextElement
 
     init {
-        var currentTime = System.currentTimeMillis()
-        var bar: RectangleElement? = null
         var time = 0
+        var currentTime = System.currentTimeMillis()
 
         mod.registerHandler<GameLoop> {
             if (System.currentTimeMillis() - currentTime > 1000) {
                 time--
                 currentTime = System.currentTimeMillis()
-                content.content = content.content.dropLast(7) + (time / 60).toString()
-                    .padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0') + " ⏳"
+                content.content =
+                    (time / 60).toString().padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0')
                 if (MobManager.mobs.isEmpty() || !mod.gameActive) {
-                    isRemove = true
-                    UIEngine.overlayContext.removeChild(bar!!)
+                    UIEngine.overlayContext.removeChild(box)
                 }
             }
         }
 
-        content = text {
-            origin = TOP
-            align = TOP
-            color = WHITE
-            shadow = true
-            content = "Загрузка..."
-            offset.y -= 15
-        }
-
-        mod.registerChannel("tower:timebar") {
-            val text = NetUtil.readUtf8(this) + " XX:XX ⏳"
-            time = this.readInt()
-
-            line = rectangle {
-                origin = LEFT
-                align = LEFT
-                size = V3(180.0, 5.0, 0.0)
-                color = Color(42, 102, 189, 1.0)
-            }
-
-            bar = rectangle {
-                enabled = false
-                offset = V3(0.0, 25.0)
-                origin = TOP
-                align = TOP
-                size = V3(180.0, 5.0, 0.0)
-                color = Color(0, 0, 0, 0.62)
-                +line
-                +content
-            }
+        mod.registerChannel("tower:bar") {
+            time = readInt()
 
             if (time == 0) {
-                UIEngine.overlayContext.removeChild(bar!!)
+                UIEngine.overlayContext.removeChild(box)
                 return@registerChannel
             }
 
-            UIEngine.overlayContext + bar!!
-            content.content = text
-            bar!!.enabled = true
-            isRemove = false
+            content.content = (time / 60).toString().padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0')
+            UIEngine.overlayContext + box
 
-            line.animate(time - 0.1) { size.x = 0.0 }
-
-            UIEngine.schedule(time) {
-                if (isRemove)
-                    UIEngine.overlayContext.removeChild(bar!!)
-            }
+            UIEngine.schedule(time) { UIEngine.overlayContext.removeChild(box) }
         }
     }
 }
