@@ -1,5 +1,6 @@
 package me.reidj.tower.data
 
+import me.reidj.tower.booster.BoosterInfo
 import java.util.*
 
 /**
@@ -21,6 +22,8 @@ data class Stat(
     var userImprovementType: MutableMap<ImprovementType, Improvement>,
     var towerImprovementType: MutableMap<ImprovementType, Improvement>,
     var researchType: MutableMap<ResearchType, Research>,
+    var localBoosters: MutableList<BoosterInfo>,
+    var donates: MutableSet<String>,
     var tournament: Tournament,
     var sword: String,
     var rank: RankType,

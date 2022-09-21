@@ -56,7 +56,7 @@ class UpgradeMenu {
                         if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
                         value.level++
                         user.tower!!.updateHealth()
-                        player.performCommand("workshop")
+                        player.performCommand("workshop ${category.name}")
                         if (notInGame) {
                             user.update(user)
                             SwordType.valueOf(stat.sword).update(user)

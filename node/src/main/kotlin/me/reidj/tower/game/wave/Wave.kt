@@ -3,6 +3,7 @@ package me.reidj.tower.game.wave
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
+import me.func.protocol.math.Position
 import me.reidj.tower.app
 import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.data.ImprovementType
@@ -29,6 +30,7 @@ data class Wave(
     fun start() {
         aliveMobs.clear()
         ModTransfer(40).send("tower:bar", player)
+        Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: ", "Волна: $level")
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater
@@ -45,7 +47,6 @@ data class Wave(
         val user = app.getUser(player) ?: return
         val stat = user.stat
         val session = user.session!!
-        session.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(session.arena) + 1]
         startTime = 0
         level++
         mobs.clear()
@@ -53,10 +54,13 @@ data class Wave(
         if (level % 10 == 0) {
             Anime.cursorMessage(user.player, "§e+10 §fмонет")
             user.giveMoney(10.0)
+        } else if (level == 25) {
+            Anime.alert(player, "Поздравляем!", "Вы прошли ${session.arena.arenaNumber} уровень!")
+            session.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(session.arena) + 1]
+            val cubeLocation = session.arena.cubeLocation
+            ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
+            player.teleport(session.arena.arenaSpawn)
         }
-        val cubeLocation = session.arena.cubeLocation
-        ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
-        player.teleport(session.arena.arenaSpawn)
         Anime.counting321(user.player)
         after(3 * 20) { start() }
     }

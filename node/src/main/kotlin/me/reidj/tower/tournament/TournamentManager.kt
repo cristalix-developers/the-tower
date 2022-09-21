@@ -16,11 +16,12 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+
 object TournamentManager : ClockInject {
 
     private const val COUNTDOWN_DAYS = 3L
 
-    private val startDate = LocalDate.of(2022, 7, 20)
+    private val startDate = LocalDate.of(2022, 7, 16)
 
     private var tournamentHasStarted = false
 
@@ -55,11 +56,16 @@ object TournamentManager : ClockInject {
 
     fun getTimeAfter(unit: ChronoUnit) = unit.between(LocalTime.now(), LocalTime.MAX)
     override fun run(tick: Int) {
+        if (tick % 20 != 0)
+            return
         val now = LocalTime.now()
-        if (now.hour == 23 && now.minute == 59 && now.second == 59 && now.nano == 999999999)
+        if (now.hour == 23 && now.minute == 59 && now.second == 59)
             println(1233456)
         if (now == LocalTime.MAX)
             println("djsalkdjkl")
+        if (now == LocalTime.MIDNIGHT) {
+            println("ya ebal")
+        }
         /*if (isTournamentDay() && now.hour == 18 && now.minute == 15 && now.second == 59 && now.nano == 999999999 && getTournamentPlayers() == 0) {
             println(12111)
             endOfTournament()

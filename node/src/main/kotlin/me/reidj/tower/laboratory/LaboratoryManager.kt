@@ -8,13 +8,13 @@ import me.func.mod.ui.menu.confirmation.Confirmation
 import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
 import me.func.protocol.data.color.GlowColor
-import me.func.protocol.data.status.MessageStatus
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.data.Category
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.util.Formatter.toFormat
 import me.reidj.tower.util.PATH
+import me.reidj.tower.util.error
 import me.reidj.tower.util.plural
 import org.bukkit.Bukkit
 
@@ -64,7 +64,7 @@ class LaboratoryManager : ClockInject {
                                                 .toInt() / 1000 + key.duration - stat.researchType[ResearchType.LABORATORY_SPEED]!!.getValue()
                                     }.open(player)
                                 } else {
-                                    Anime.systemMessage(player, MessageStatus.ERROR, "Недостаточно средств")
+                                    player.error("Недостаточно средств")
                                 }
                             }
                             onRightClick { player, _, _ ->
@@ -83,7 +83,7 @@ class LaboratoryManager : ClockInject {
                                         value.whenBought = null
                                     }.open(player)
                                 } else {
-                                    Anime.systemMessage(player, MessageStatus.ERROR, "Недостаточно средств")
+                                    player.error("Недостаточно средств")
                                 }
                             }
                         }

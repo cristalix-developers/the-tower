@@ -5,7 +5,8 @@ import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import io.netty.buffer.Unpooled
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
+import kotlinx.coroutines.future.await
 import me.func.mod.Anime
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
@@ -22,6 +23,7 @@ import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
+import me.reidj.tower.donate.DonateMenu
 import me.reidj.tower.game.Default
 import me.reidj.tower.game.Rating
 import me.reidj.tower.game.wave.WaveManager
@@ -31,6 +33,7 @@ import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.PlayerPickUpEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.npc.NpcManager
+import me.reidj.tower.protocol.RequestGlobalBoostersPackage
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.UpgradeMenu
@@ -42,6 +45,9 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
+import ru.cristalix.core.command.ICommandService
+import ru.cristalix.core.coupons.BukkitCouponsService
+import ru.cristalix.core.coupons.ICouponsService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
@@ -72,6 +78,7 @@ class App : JavaPlugin() {
 
         CoreApi.get().run {
             registerService(ITransferService::class.java, TransferService(socketClient))
+            registerService(ICouponsService::class.java, BukkitCouponsService(socketClient, ICommandService.get()))
         }
 
         Anime.include(Kit.NPC, Kit.DIALOG, Kit.EXPERIMENTAL, Kit.STANDARD)
@@ -95,6 +102,7 @@ class App : JavaPlugin() {
 
         MainGui()
         UpgradeMenu()
+        DonateMenu()
 
         DropItem()
 
@@ -238,7 +246,7 @@ class App : JavaPlugin() {
 
     fun getHub(): RealmId = RealmId.of("HUB-2")
 
-    fun findMob(user: User, bytes: ByteArray): Mob? {
+    private fun findMob(user: User, bytes: ByteArray): Mob? {
         if (user.wave == null)
             return null
         return user.wave!!.aliveMobs.find { mob ->
