@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import me.reidj.tower.booster.BoosterInfo
 import me.reidj.tower.protocol.*
 import ru.cristalix.core.CoreApi
 import ru.cristalix.core.microservice.MicroServicePlatform
@@ -12,6 +13,8 @@ import ru.cristalix.core.microservice.MicroserviceBootstrap
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.permissions.IPermissionService
 import ru.cristalix.core.permissions.PermissionService
+
+private val globalBoosters = mutableListOf<BoosterInfo>()
 
 fun main() {
     MicroserviceBootstrap.bootstrap(MicroServicePlatform(4))
@@ -59,6 +62,13 @@ fun main() {
                 if (pckg.isSortAscending) stat.rank.downgradeRank() ?: return@listen else stat.rank.upgradeRank() ?: return@listen
             stat.tournamentMaximumWavePassed = 0
             mongoAdapter.save(stat)
+        }
+        listen<RequestGlobalBoostersPackage> { realm, pckg ->
+            pckg.boosters = globalBoosters
+            forward(realm, pckg)
+        }
+        listen<SaveGlobalBoosterPackage> { _, pckg ->
+            globalBoosters.add(pckg.booster)
         }
     }
 }

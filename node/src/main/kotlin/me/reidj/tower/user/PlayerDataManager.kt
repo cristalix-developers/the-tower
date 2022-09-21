@@ -7,9 +7,13 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
+import me.func.mod.ui.booster.Booster
+import me.func.mod.ui.booster.Boosters
 import me.func.mod.util.after
 import me.func.protocol.ui.indicator.Indicators
 import me.reidj.tower.app
+import me.reidj.tower.booster.BoosterInfo
+import me.reidj.tower.booster.BoosterType
 import me.reidj.tower.clientSocket
 import me.reidj.tower.content.DailyRewardType
 import me.reidj.tower.game.Rating
@@ -22,6 +26,7 @@ import me.reidj.tower.util.giveDefaultItems
 import me.reidj.tower.util.transfer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent
@@ -39,6 +44,8 @@ class PlayerDataManager : Listener {
     val userMap = mutableMapOf<UUID, User>()
 
     val spawn: Label = app.worldMeta.getLabel("spawn").apply { yaw = 0f }
+
+    var globalBoosters = mutableListOf<BoosterInfo>()
 
     @EventHandler
     fun AsyncPlayerPreLoginEvent.handle() = registerIntent(app).apply {
@@ -92,6 +99,12 @@ class PlayerDataManager : Listener {
             RankManager.createRank(user)
             RankManager.showAll(user)
 
+            if (app.playerDataManager.globalBoosters.isNotEmpty()) {
+                sendBoosters(player, *app.playerDataManager.globalBoosters.toTypedArray())
+            } else if (user.stat.localBoosters.isNotEmpty()) {
+                sendBoosters(player, *user.stat.localBoosters.toTypedArray())
+            }
+
             val now = System.currentTimeMillis().toDouble()
             // Обнулить комбо сбора наград если прошло больше суток или комбо > 7
             if ((stat.rewardStreak > 0 && now - stat.lastEnter > 24 * 60 * 60 * 1000) || stat.rewardStreak > 6) {
@@ -122,9 +135,31 @@ class PlayerDataManager : Listener {
         clientSocket.write(SaveUserPackage(uuid, user.stat))
     }
 
+    fun calcMultiplier(uuid: UUID, type: BoosterType): Double {
+        globalBoosters.removeIf {
+            Boosters.send(Bukkit.getPlayer(uuid), Booster(it.uuid, false, "Бустер ${it.type.title}", it.multiplier))
+            it.hadExpire()
+        }
+        return (userMap[uuid] ?: return 1.0).calcMultiplier(type) + globalBoosters
+            .filter { it.type === type && it.until > System.currentTimeMillis() }
+            .sumOf { it.multiplier - 1.0 }
+    }
+
+    fun calcGlobalMultiplier(type: BoosterType) = 1f + globalBoosters
+        .filter { it.type == type && it.until > System.currentTimeMillis() }.sumOf { it.multiplier - 1.0 }
+
     fun bulkSave(remove: Boolean): BulkSaveUserPackage? = BulkSaveUserPackage(Bukkit.getOnlinePlayers().map {
         val uuid = it.uniqueId
         val user = (if (remove) userMap.remove(uuid) else userMap[uuid]) ?: return null
         SaveUserPackage(uuid, user.stat)
     })
+
+    fun sendBoosters(player: Player, vararg localBoosters: BoosterInfo) {
+        localBoosters.forEach {
+            Boosters.run {
+                send(player, Booster(it.uuid, true, "Бустер ${it.type.title}", it.multiplier))
+                mode(player, true)
+            }
+        }
+    }
 }
