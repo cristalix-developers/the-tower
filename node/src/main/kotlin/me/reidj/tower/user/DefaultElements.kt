@@ -28,6 +28,7 @@ object DefaultElements {
         mutableSetOf(),
         Tournament(RankType.NONE,  mutableListOf()),
         "NONE",
+        "CRYSTAL",
         RankType.NONE,
     )
 }

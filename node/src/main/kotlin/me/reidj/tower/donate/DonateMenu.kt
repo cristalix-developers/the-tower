@@ -38,6 +38,9 @@ class DonateMenu {
         converter: (ReactiveButton, T) -> ReactiveButton = { button, _ -> button }
     ) {
         selection {
+            val user = app.getUser(player) ?: return@selection
+            val stat = user.stat
+
             this.title = title
             this.rows = rows
             this.columns = columns
@@ -52,12 +55,27 @@ class DonateMenu {
 
             storage = donate.map { pos ->
                 converter(button {
+                    val has = pos.getObjectName() in stat.donates
+                    val current = has && when (pos) {
+                        is CubeTexture -> stat.currentCubeTexture == pos.name
+                        else -> false
+                    }
                     description(pos.getDescription())
                     price(pos.getPrice())
                     texture(pos.getTexture())
-                    hint("Купить")
+                    hint(if (current) "Выбрано" else if (has) "Выбрать" else "Купить")
                     onClick { player, _, _ ->
+                        if (current)
+                            return@onClick
                         Anime.close(player)
+                        if (has) {
+                            when (pos) {
+                                is CubeTexture -> stat.currentCubeTexture = pos.name
+                            }
+                            Anime.title(player, "§dВыбрано!")
+                            clientSocket.write(SaveUserPackage(player.uniqueId, user.stat))
+                            return@onClick
+                        }
                         buy(player, pos)
                     }
                     this.title = pos.getTitle()
@@ -93,6 +111,13 @@ class DonateMenu {
                     temp(player, "Бустеры", 3, 2, *BoosterType.values())
                 }
             },
+            button {
+                title("Кубы")
+                texture("${PATH}crystal.png")
+                onClick { player, _, _ ->
+                    temp(player, "Кубы", 3, 3, *CubeTexture.values())
+                }
+            }
         )
     }
 

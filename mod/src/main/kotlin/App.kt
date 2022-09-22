@@ -9,6 +9,7 @@ import player.PlayerHud
 import queue.QueueStatus
 import rank.Rank
 import ru.cristalix.clientapi.KotlinMod
+import ru.cristalix.clientapi.readUtf8
 import ru.cristalix.uiengine.UIEngine
 import ru.cristalix.uiengine.utility.V3
 import tower.BarManager
@@ -27,6 +28,8 @@ class App : KotlinMod() {
 
     var inited = false
     var gameActive = false
+
+    private var program: Int = 0
 
     override fun onEnable() {
         UIEngine.initialize(this)
@@ -64,6 +67,7 @@ class App : KotlinMod() {
             BarManager.protectionBox.enabled = gameActive
             BarManager.tokenBox.enabled = gameActive
             if (gameActive) {
+                Cube.texture = readUtf8()
                 cube = V3(
                     readDouble(),
                     readDouble() + 1,
@@ -88,10 +92,12 @@ class App : KotlinMod() {
                 inited = false
                 Banners.remove(TowerManager.healthBanner!!.uuid)
                 MobManager.clear()
-                with(TowerManager.towerActiveAmmo.iterator()) { forEach { ammo ->
-                    UIEngine.worldContexts.remove(ammo.sphere)
-                    remove()
-                } }
+                with(TowerManager.towerActiveAmmo.iterator()) {
+                    forEach { ammo ->
+                        UIEngine.worldContexts.remove(ammo.sphere)
+                        remove()
+                    }
+                }
             }
         }
 

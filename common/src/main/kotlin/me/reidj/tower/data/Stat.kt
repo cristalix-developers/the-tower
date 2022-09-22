@@ -26,5 +26,6 @@ data class Stat(
     var donates: MutableSet<String>,
     var tournament: Tournament,
     var sword: String,
+    var currentCubeTexture: String,
     var rank: RankType,
 )

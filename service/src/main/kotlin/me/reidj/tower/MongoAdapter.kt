@@ -160,4 +160,10 @@ open class MongoAdapter(dbUrl: String, dbName: String, collection: String) {
             }
         }
     }
+
+    fun clear(uuid: UUID) {
+        data.deleteOne(Filters.eq("uuid", uuid.toString())) { _, throwable: Throwable? ->
+            throwable?.printStackTrace()
+        }
+    }
 }

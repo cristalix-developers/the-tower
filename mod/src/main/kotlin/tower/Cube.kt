@@ -11,6 +11,10 @@ import java.lang.Math.sin
 
 class Cube {
 
+    companion object {
+        lateinit var texture: String
+    }
+
     init {
         var angle = 0.0
         val mc = UIEngine.clientApi.minecraft()
@@ -48,7 +52,7 @@ class Cube {
                 GlStateManager.translate(mod.cube.x, mod.cube.y - distanceBetweenTowerAndGround, mod.cube.z)
 
                 UIEngine.clientApi.renderEngine()
-                    .bindTexture(ResourceLocation.of("minecraft", "textures/blocks/diamond_block.png"))
+                    .bindTexture(ResourceLocation.of("minecraft", "mcpatcher/cit/tower/$texture.png"))
 
                 // Рисуем выделение зоны
                 GlStateManager.color(0.066666f, 0.52941f, 1f, 0.21f)
@@ -95,7 +99,7 @@ class Cube {
 
                 glScalef(0.8f, 0.8f, 0.8f)
 
-                glBegin(GL_POLYGON)
+                glBegin(GL_QUADS)
                 glVertex3d(1.0, -1.0, -1.0)
                 glTexCoord2d(0.0, 0.0)
                 glVertex3d(1.0, 1.0, -1.0)
@@ -105,7 +109,7 @@ class Cube {
                 glVertex3d(1.0, -1.0, 1.0)
                 glTexCoord2d(1.0, 0.0)
                 glEnd()
-                glBegin(GL_POLYGON)
+                glBegin(GL_QUADS)
                 glVertex3d(-1.0, -1.0, 1.0)
                 glTexCoord2d(0.0, 0.0)
                 glVertex3d(-1.0, 1.0, 1.0)
@@ -115,7 +119,7 @@ class Cube {
                 glVertex3d(-1.0, -1.0, -1.0)
                 glTexCoord2d(1.0, 0.0)
                 glEnd()
-                glBegin(GL_POLYGON)
+                glBegin(GL_QUADS)
                 glVertex3d(1.0, 1.0, 1.0)
                 glTexCoord2d(0.0, 0.0)
                 glVertex3d(1.0, 1.0, -1.0)
@@ -125,7 +129,7 @@ class Cube {
                 glVertex3d(-1.0, 1.0, 1.0)
                 glTexCoord2d(1.0, 0.0)
                 glEnd()
-                glBegin(GL_POLYGON)
+                glBegin(GL_QUADS)
                 glVertex3d(1.0, -1.0, -1.0)
                 glTexCoord2d(0.0, 0.0)
                 glVertex3d(1.0, -1.0, 1.0)
@@ -135,7 +139,7 @@ class Cube {
                 glVertex3d(-1.0, -1.0, -1.0)
                 glTexCoord2d(1.0, 0.0)
                 glEnd()
-                glBegin(GL_POLYGON)
+                glBegin(GL_QUADS)
                 glVertex3d(-1.0, -1.0, -1.0)
                 glTexCoord2d(0.0, 0.0)
                 glVertex3d(-1.0, 1.0, -1.0)
@@ -145,7 +149,7 @@ class Cube {
                 glVertex3d(1.0, -1.0, -1.0)
                 glTexCoord2d(1.0, 0.0)
                 glEnd()
-                glBegin(GL_POLYGON)
+                glBegin(GL_QUADS)
                 glVertex3d(1.0, -1.0, 1.0)
                 glTexCoord2d(0.0, 0.0)
                 glVertex3d(1.0, 1.0, 1.0)

@@ -1,10 +1,7 @@
 package me.reidj.tower
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.future.await
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import me.reidj.tower.booster.BoosterInfo
 import me.reidj.tower.protocol.*
 import ru.cristalix.core.CoreApi
@@ -13,6 +10,7 @@ import ru.cristalix.core.microservice.MicroserviceBootstrap
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.permissions.IPermissionService
 import ru.cristalix.core.permissions.PermissionService
+import java.util.*
 
 private val globalBoosters = mutableListOf<BoosterInfo>()
 
@@ -69,6 +67,16 @@ fun main() {
         }
         listen<SaveGlobalBoosterPackage> { _, pckg ->
             globalBoosters.add(pckg.booster)
+        }
+    }
+
+    runBlocking {
+        val command = readLine()
+        if (command!!.startsWith("delete")) {
+            val args = command.split(" ")
+            val uuid = UUID.fromString(args[1])
+            mongoAdapter.clear(uuid)
+            println("Removed $uuid's data from db...")
         }
     }
 }
