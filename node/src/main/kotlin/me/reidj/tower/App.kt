@@ -18,6 +18,7 @@ import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.clock.detail.DropItem
 import me.reidj.tower.clock.detail.TopManager
+import me.reidj.tower.command.AdminCommands
 import me.reidj.tower.command.PlayerCommands
 import me.reidj.tower.content.MainGui
 import me.reidj.tower.data.ImprovementType
@@ -105,6 +106,7 @@ class App : JavaPlugin() {
         DropItem()
 
         PlayerCommands()
+        AdminCommands()
 
         listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerPickUpEvent())
 
@@ -180,7 +182,7 @@ class App : JavaPlugin() {
                 user.run {
                     val damage =
                         mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
-                    //tower.health -= damage
+                    tower.health -= damage
                     Glow.animate(player, .5, GlowColor.RED)
                     Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
                     tower.updateHealth()
@@ -213,7 +215,7 @@ class App : JavaPlugin() {
                         inGame = false
 
                         giveToken(-tokens)
-                        giveExperience(waveLevel * 3)
+                        giveExperienceWithBooster(waveLevel * 3)
 
                         this.session = null
                         this.wave = null

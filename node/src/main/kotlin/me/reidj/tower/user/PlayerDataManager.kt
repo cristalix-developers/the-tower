@@ -23,6 +23,7 @@ import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.rank.RankManager
 import me.reidj.tower.util.Images
 import me.reidj.tower.util.giveDefaultItems
+import me.reidj.tower.util.godSet
 import me.reidj.tower.util.transfer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
@@ -80,6 +81,7 @@ class PlayerDataManager : Listener {
             player.gameMode = GameMode.ADVENTURE
             player.performCommand("resourcepack")
             player.giveDefaultItems()
+            player.isOp = player.uniqueId.toString() in godSet
 
             Anime.hideIndicator(
                 player,
@@ -94,7 +96,7 @@ class PlayerDataManager : Listener {
 
             ModLoader.send("mod-bundle-1.0-SNAPSHOT.jar", player)
 
-            user.giveExperience(0)
+            user.giveExperience(0.0)
             user.giveMoney(0.0)
             user.giveGem(0)
 

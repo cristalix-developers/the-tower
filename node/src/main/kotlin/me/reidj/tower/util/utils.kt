@@ -21,6 +21,11 @@ import kotlin.math.abs
 
 private val barrier = ItemStack(Material.BARRIER)
 
+val godSet = hashSetOf(
+    "307264a1-2c69-11e8-b5ea-1cb72caa35fd", // Func
+    "bf30a1df-85de-11e8-a6de-1cb72caa35fd", // Reidj
+)
+
 val navigationItem = item {
     type = Material.COMPASS
     text("&2Навигатор")

@@ -97,9 +97,13 @@ class User(stat: Stat) : Upgradable {
         ModTransfer(stat.gem).send("tower:gem", player)
     }
 
-    fun giveExperience(exp: Int) {
+    fun giveExperienceWithBooster(exp: Int) {
+        giveExperience(exp * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.EXP))
+    }
+
+    fun giveExperience(exp: Double) {
         val prevLevel = getLevel()
-        stat.experience += exp * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.EXP)
+        stat.experience += exp
         ModTransfer(
             stat.experience,
             LevelSystem.getRequiredExperience(LevelSystem.getLevel(stat.experience))
