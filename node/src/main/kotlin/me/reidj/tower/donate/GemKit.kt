@@ -23,7 +23,7 @@ enum class GemKit(
 
     override fun getDescription() = "Вы получите $reward Самоцветов"
 
-    override fun getTexture() = "$PATH${name.lowercase()}"
+    override fun getTexture() = "$PATH${name.lowercase()}.png"
 
     override fun getObjectName() = name
 

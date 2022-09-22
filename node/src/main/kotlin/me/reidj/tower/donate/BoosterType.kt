@@ -73,7 +73,7 @@ enum class BoosterType(
 
     override fun getDescription() = description
 
-    override fun getTexture() = "$PATH${name.lowercase()}"
+    override fun getTexture() = "$PATH${name.lowercase()}.png"
 
     override fun getObjectName() = name
 

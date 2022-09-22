@@ -11,6 +11,7 @@ import me.func.protocol.data.color.GlowColor
 import me.reidj.tower.app
 import me.reidj.tower.clientSocket
 import me.reidj.tower.protocol.SaveUserPackage
+import me.reidj.tower.util.PATH
 import org.bukkit.entity.Player
 import ru.cristalix.core.coupons.ICouponsService
 import ru.cristalix.core.formatting.Formatting
@@ -53,7 +54,7 @@ class DonateMenu {
                 converter(button {
                     description(pos.getDescription())
                     price(pos.getPrice())
-                    sale(ICouponsService.get().getDiscount(player.uniqueId))
+                    texture(pos.getTexture())
                     hint("Купить")
                     onClick { player, _, _ ->
                         Anime.close(player)
@@ -73,16 +74,23 @@ class DonateMenu {
         buttons(
             button {
                 title("Самоцветы")
-                texture("")
+                texture("${PATH}gem.png")
                 onClick { player, _, _ ->
                     temp(player, "Самоцветы", 3, 2, *GemKit.values())
                 }
             },
             button {
                 title("Стартовые наборы")
-                texture("")
+                texture("${PATH}kit.png")
                 onClick { player, _, _ ->
                     temp(player, "Стартовые наборы", 2, 2, *StartingKit.values())
+                }
+            },
+            button {
+                title("Бустеры")
+                texture("${PATH}boosters.png")
+                onClick { player, _, _ ->
+                    temp(player, "Бустеры", 3, 2, *BoosterType.values())
                 }
             },
         )

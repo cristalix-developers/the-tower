@@ -12,9 +12,9 @@ import me.func.protocol.world.npc.NpcBehaviour
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.tournament.TournamentManager
-import me.reidj.tower.tournament.TournamentManager.getTimeAfter
-import me.reidj.tower.tournament.TournamentManager.getTournamentPlayers
-import me.reidj.tower.tournament.TournamentManager.isTournamentDay
+import me.reidj.tower.tournament.TournamentManager.Companion.getTimeAfter
+import me.reidj.tower.tournament.TournamentManager.Companion.getTournamentPlayers
+import me.reidj.tower.tournament.TournamentManager.Companion.isTournamentDay
 import me.reidj.tower.util.Formatter
 import org.bukkit.Bukkit
 import java.time.temporal.ChronoUnit

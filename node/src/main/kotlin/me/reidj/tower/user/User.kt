@@ -13,6 +13,7 @@ import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.Pumping
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.data.Stat
+import me.reidj.tower.donate.StartingKit
 import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.upgrade.Upgradable
@@ -64,7 +65,10 @@ class User(stat: Stat) : Upgradable {
     }
 
     fun giveMoney(money: Double) {
-        stat.money += money * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.MONEY).toInt()
+        stat.money += money * app.playerDataManager.calcMultiplier(
+            stat.uuid,
+            BoosterType.MONEY
+        ) * if (StartingKit.STARTER_KIT.name in stat.donates) 2.0 else if (StartingKit.EPIC_KIT.name in stat.donates) 4.0 else 1.0
         ModTransfer(stat.money).send("tower:money", player)
     }
 

@@ -5,8 +5,7 @@ import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
 import io.netty.buffer.Unpooled
-import kotlinx.coroutines.*
-import kotlinx.coroutines.future.await
+import kotlinx.coroutines.runBlocking
 import me.func.mod.Anime
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
@@ -33,7 +32,6 @@ import me.reidj.tower.listener.InteractEvent
 import me.reidj.tower.listener.PlayerPickUpEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.npc.NpcManager
-import me.reidj.tower.protocol.RequestGlobalBoostersPackage
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.UpgradeMenu
@@ -113,7 +111,7 @@ class App : JavaPlugin() {
         Bukkit.getScheduler()
             .runTaskTimerAsynchronously(
                 this,
-                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager(), TournamentManager)),
+                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager(), TournamentManager())),
                 0,
                 1
             )

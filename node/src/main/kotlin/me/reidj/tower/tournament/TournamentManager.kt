@@ -16,79 +16,71 @@ import java.time.temporal.ChronoUnit
 import java.util.*
 import java.util.concurrent.TimeUnit
 
+private const val COUNTDOWN_DAYS = 3L
+class TournamentManager : ClockInject {
 
-object TournamentManager : ClockInject {
+    companion object {
+        private val startDate = LocalDate.of(2022, 7, 16)
 
-    private const val COUNTDOWN_DAYS = 3L
+        private var tournamentHasStarted = false
+        fun end(user: User) = user.run {
+            stat.tournament.passedWaves.add(user.wave!!.level)
+            stat.tournamentMaximumWavePassed = Collections.max(stat.tournament.passedWaves)
+            if (tournamentHasStarted && LocalTime.now().hour >= 24 && getTournamentPlayers() == 0) {
+                endOfTournament()
+            }
+        }
 
-    private val startDate = LocalDate.of(2022, 7, 16)
+        fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter { it.inGame }
 
-    private var tournamentHasStarted = false
+        fun getTournamentPlayers() = getOnlinePlayers().filter { it.isTournament }.size
 
-    fun end(user: User) = user.run {
-        stat.tournament.passedWaves.add(user.wave!!.level)
-        stat.tournamentMaximumWavePassed = Collections.max(stat.tournament.passedWaves)
-        if (tournamentHasStarted && LocalTime.now().hour >= 24 && getTournamentPlayers() == 0) {
-            endOfTournament()
+        fun isTournamentDay() =
+            TimeUnit.DAYS.convert(
+                System.currentTimeMillis() - startDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
+                TimeUnit.MILLISECONDS
+            ) % COUNTDOWN_DAYS == 0L
+
+        fun getTimeBefore(): Duration {
+            if (isTournamentDay()) return Duration.ZERO
+            var duration = Duration.ZERO
+            var i = 1
+            while (duration.isNegative || duration.isZero) {
+                duration = Duration.between(LocalDateTime.now(), startDate.plusDays(COUNTDOWN_DAYS * i).atStartOfDay())
+                i++
+            }
+            return duration
+        }
+
+        fun getTimeAfter(unit: ChronoUnit) = unit.between(LocalTime.now(), LocalTime.MAX)
+
+        fun endOfTournament() {
+            CoroutineScope(Dispatchers.IO).launch {
+                val sortAscending = clientSocket.writeAndAwaitResponse<TopPackage>(
+                    TopPackage(
+                        "tournamentMaximumWavePassed",
+                        1,
+                        true
+                    )
+                ).await()
+                val sortDescending = clientSocket.writeAndAwaitResponse<TopPackage>(
+                    TopPackage(
+                        "tournamentMaximumWavePassed",
+                        1,
+                        false
+                    )
+                ).await()
+                RankManager.changeRank(sortAscending, sortDescending)
+            }
         }
     }
 
-    fun getOnlinePlayers() = Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.filter { it.inGame }
-
-    fun getTournamentPlayers() = getOnlinePlayers().filter { it.isTournament }.size
-
-    fun isTournamentDay() =
-        TimeUnit.DAYS.convert(
-            System.currentTimeMillis() - startDate.atStartOfDay().toInstant(ZoneOffset.UTC).toEpochMilli(),
-            TimeUnit.MILLISECONDS
-        ) % COUNTDOWN_DAYS == 0L
-
-    fun getTimeBefore(): Duration {
-        if (isTournamentDay()) return Duration.ZERO
-        var duration = Duration.ZERO
-        var i = 1
-        while (duration.isNegative || duration.isZero) {
-            duration = Duration.between(LocalDateTime.now(), startDate.plusDays(COUNTDOWN_DAYS * i).atStartOfDay())
-            i++
-        }
-        return duration
-    }
-
-    fun getTimeAfter(unit: ChronoUnit) = unit.between(LocalTime.now(), LocalTime.MAX)
     override fun run(tick: Int) {
         if (tick % 20 != 0)
             return
         val now = LocalTime.now()
-        if (now.hour == 23 && now.minute == 59 && now.second == 59)
-            println(1233456)
-        if (now == LocalTime.MAX)
-            println("djsalkdjkl")
-        if (now == LocalTime.MIDNIGHT) {
-            println("ya ebal")
-        }
-        /*if (isTournamentDay() && now.hour == 18 && now.minute == 15 && now.second == 59 && now.nano == 999999999 && getTournamentPlayers() == 0) {
-            println(12111)
+        if (isTournamentDay() &&  now.hour == 23 && now.minute == 59 && now.second == 59 && getTournamentPlayers() == 0) {
             endOfTournament()
-        }*/
-    }
-
-    fun endOfTournament() {
-        CoroutineScope(Dispatchers.IO).launch {
-            val sortAscending = clientSocket.writeAndAwaitResponse<TopPackage>(
-                TopPackage(
-                    "tournamentMaximumWavePassed",
-                    1,
-                    true
-                )
-            ).await()
-            val sortDescending = clientSocket.writeAndAwaitResponse<TopPackage>(
-                TopPackage(
-                    "tournamentMaximumWavePassed",
-                    1,
-                    false
-                )
-            ).await()
-            RankManager.changeRank(sortAscending, sortDescending)
         }
     }
 }

@@ -13,15 +13,15 @@ enum class StartingKit(
     private val price: Long,
     private val reward: Int,
 ) : Donate {
-    STARTER("Стартовый набор", "Постоянное увеличение всех заработанных монет в 2 раза", 249, 150),
-    EPIC("Эпический набор", "Постоянное увеличение всех заработанных монет в 4 раза", 399, 750),
+    STARTER_KIT("Стартовый набор", "Постоянное увеличение всех заработанных монет в 2 раза и 150 Самоцветов", 249, 150),
+    EPIC_KIT("Эпический набор", "Постоянное увеличение всех заработанных монет в 4 раза и 750 Самоцветов", 399, 750),
     ;
 
     override fun getTitle() = title
 
     override fun getDescription() = description
 
-    override fun getTexture() = "$PATH${name.lowercase()}"
+    override fun getTexture() = "$PATH${name.lowercase()}.png"
 
     override fun getObjectName() = name
 

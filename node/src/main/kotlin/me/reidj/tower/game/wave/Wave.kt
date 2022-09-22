@@ -30,7 +30,7 @@ data class Wave(
     fun start() {
         aliveMobs.clear()
         ModTransfer(40).send("tower:bar", player)
-        Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: ", "Волна: $level")
+        Anime.overlayText(player, Position.BOTTOM_RIGHT, "Волна: §3$level")
         repeat(6 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater
@@ -54,12 +54,13 @@ data class Wave(
         if (level % 10 == 0) {
             Anime.cursorMessage(user.player, "§e+10 §fмонет")
             user.giveMoney(10.0)
-        } else if (level == 25) {
+        } else if (level == 16) {
             Anime.alert(player, "Поздравляем!", "Вы прошли ${session.arena.arenaNumber} уровень!")
             session.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(session.arena) + 1]
             val cubeLocation = session.arena.cubeLocation
             ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
             player.teleport(session.arena.arenaSpawn)
+            Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: §3${session.arena.arenaNumber}")
         }
         Anime.counting321(user.player)
         after(3 * 20) { start() }
@@ -83,16 +84,17 @@ data class Wave(
                         aliveMobs.add(this)
                         mobs.add(this)
                     }
-                }
-                Mob {
-                    hp = it.hp
-                    damage = it.damage
-                    type = EntityType.valueOf(it.name)
-                    attackRange = it.attackRange
-                    isShooter = it.isShooter
-                }.location(location).create(player).run {
-                    aliveMobs.add(this)
-                    mobs.add(this)
+                } else if (!it.isBoss) {
+                    Mob {
+                        hp = it.hp + level * 0.3
+                        damage = it.damage + level * 0.05
+                        type = EntityType.valueOf(it.name)
+                        attackRange = it.attackRange
+                        isShooter = it.isShooter
+                    }.location(location).create(player).run {
+                        aliveMobs.add(this)
+                        mobs.add(this)
+                    }
                 }
             }
     }
