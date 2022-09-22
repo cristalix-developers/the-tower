@@ -50,10 +50,10 @@ data class Wave(
         startTime = 0
         level++
         mobs.clear()
-        user.giveTokens(stat.userImprovementType[ImprovementType.CASH_BONUS_WAVE_PASS]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue())
+        user.giveTokenWithBooster(stat.userImprovementType[ImprovementType.CASH_BONUS_WAVE_PASS]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue())
         if (level % 10 == 0) {
             Anime.cursorMessage(user.player, "§e+10 §fмонет")
-            user.giveMoney(10.0)
+            user.giveMoneyWithBooster(10.0)
         } else if (level == 16) {
             Anime.alert(player, "Поздравляем!", "Вы прошли ${session.arena.arenaNumber} уровень!")
             session.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(session.arena) + 1]

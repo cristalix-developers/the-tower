@@ -1,12 +1,13 @@
 package me.reidj.tower.command
 
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.ui.dialog.Dialog
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.game.Game
-import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.util.DialogUtil
+import me.reidj.tower.util.error
 import me.reidj.tower.util.transfer
 
 /**
@@ -40,9 +41,25 @@ class PlayerCommands {
                 "guidePageOne"
             )
         }
-        command("test") { player, _ ->  TournamentManager.endOfTournament()}
-        command("test2") { player, args ->
-            (app.getUser(player) ?: return@command).giveExperience(args[0].toInt())
+        command("thx") { player, _ ->
+            if (app.playerDataManager.globalBoosters.isEmpty()) {
+                player.error("Сейчас нету активных бустеров!")
+                return@command
+            }
+            val user = app.getUser(player) ?: return@command
+            app.playerDataManager.globalBoosters.forEach {
+                val owner = app.getUser(it.owner) ?: return@command
+                val uuids = app.playerDataManager.thanksMap[it.uuid] ?: return@command
+                if (uuids.contains(player.uniqueId))
+                    return@forEach
+                uuids.add(player.uniqueId)
+                user.giveGem(2)
+                owner.giveGem(3)
+            }
+            Anime.killboardMessage(
+                player,
+                "Вы поблагодарили за ${app.playerDataManager.globalBoosters.size} бустер(ов)!"
+            )
         }
     }
 }

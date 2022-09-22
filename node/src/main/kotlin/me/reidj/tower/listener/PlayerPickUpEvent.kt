@@ -18,7 +18,7 @@ class PlayerPickUpEvent : Listener {
     @EventHandler
     fun PlayerPickupItemEvent.handle() {
         if (item.itemStack.getType() == Material.CLAY_BALL) {
-            (app.getUser(player) ?: return).giveGem(1)
+            (app.getUser(player) ?: return).giveGemWithBooster(1)
             item.remove()
             isCancelled = true
             val banner = Banners.new {

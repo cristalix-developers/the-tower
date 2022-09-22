@@ -34,6 +34,7 @@ import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import ru.cristalix.core.formatting.Formatting
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @project : tower-simulator
@@ -42,6 +43,7 @@ import java.util.*
 class PlayerDataManager : Listener {
 
     val userMap = mutableMapOf<UUID, User>()
+    val thanksMap = ConcurrentHashMap<UUID, MutableSet<UUID>>()
 
     val spawn: Label = app.worldMeta.getLabel("spawn").apply { yaw = 0f }
 
@@ -137,7 +139,10 @@ class PlayerDataManager : Listener {
 
     fun calcMultiplier(uuid: UUID, type: BoosterType): Double {
         globalBoosters.removeIf {
-            Boosters.send(Bukkit.getPlayer(uuid), Booster(it.uuid, false, "Бустер ${it.type.title}", it.multiplier))
+            val title = it.type.title
+            Bukkit.broadcastMessage(Formatting.fine("Глобальный §bбустер $title §fзакончился!"))
+            Boosters.send(Bukkit.getPlayer(uuid), Booster(it.uuid, false, "Бустер $title", it.multiplier))
+            thanksMap.remove(it.uuid)
             it.hadExpire()
         }
         return (userMap[uuid] ?: return 1.0).calcMultiplier(type) + globalBoosters

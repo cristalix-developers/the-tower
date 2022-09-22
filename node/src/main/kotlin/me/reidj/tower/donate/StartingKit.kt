@@ -27,6 +27,8 @@ enum class StartingKit(
 
     override fun getPrice() = price
 
+    override fun isSave() = true
+
     override fun give(user: User) {
         user.giveGem(reward)
     }

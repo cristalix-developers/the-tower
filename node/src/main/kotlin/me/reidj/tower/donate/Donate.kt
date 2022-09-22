@@ -18,6 +18,8 @@ interface Donate {
 
     fun getPrice(): Long
 
+    fun isSave(): Boolean
+
     fun give(user: User)
 
 }

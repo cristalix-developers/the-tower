@@ -12,6 +12,7 @@ import me.reidj.tower.app
 import me.reidj.tower.clientSocket
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.util.PATH
+import me.reidj.tower.util.error
 import org.bukkit.entity.Player
 import ru.cristalix.core.coupons.ICouponsService
 import ru.cristalix.core.formatting.Formatting
@@ -150,6 +151,10 @@ class DonateMenu {
         ) {
             val user = app.getUser(player) ?: return@Confirmation
             val stat = user.stat
+            if (donate.getObjectName() in stat.donates) {
+                player.error("У Вас уже имеется этот донат")
+                return@Confirmation
+            }
             processInvoice(player.uniqueId, donate.getPrice().toInt(), donate.getTitle()).thenAccept {
                 if (it.errorMessage != null) {
                     Anime.killboardMessage(player, Formatting.error(it.errorMessage))
@@ -159,7 +164,8 @@ class DonateMenu {
                 Anime.title(player, "§dУспешно!")
                 Anime.close(player)
                 Glow.animate(player, 0.4, GlowColor.GREEN)
-                donate.give(user)
+                if (donate.isSave())
+                    donate.give(user)
                 stat.donates.add(donate.getObjectName())
                 player.sendMessage(Formatting.fine("Спасибо за поддержку разработчика!"))
                 clientSocket.write(SaveUserPackage(player.uniqueId, stat))

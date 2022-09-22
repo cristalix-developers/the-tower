@@ -29,6 +29,8 @@ enum class GemKit(
 
     override fun getPrice() = price
 
+    override fun isSave() = true
+
     override fun give(user: User) {
         user.giveGem(reward)
     }

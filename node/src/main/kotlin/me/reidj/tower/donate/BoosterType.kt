@@ -79,6 +79,8 @@ enum class BoosterType(
 
     override fun getPrice() = price
 
+    override fun isSave() = false
+
     override fun give(user: User) {
         val booster = boosterInfo(user)
         val title = booster.type.title
@@ -88,7 +90,10 @@ enum class BoosterType(
                 val message = "Активирован глобальный бустер §b$title§f! Поблагодарить §b/thx"
                 Anime.topMessage(it, message)
                 it.sendMessage(message)
-                app.playerDataManager.sendBoosters(it, booster)
+                app.playerDataManager.run {
+                    sendBoosters(it, booster)
+                    thanksMap[booster.uuid] = mutableSetOf()
+                }
             }
         } else {
             user.stat.localBoosters.add(booster)

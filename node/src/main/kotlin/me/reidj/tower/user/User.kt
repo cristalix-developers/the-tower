@@ -20,6 +20,7 @@ import me.reidj.tower.upgrade.Upgradable
 import me.reidj.tower.util.LevelSystem
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
+import ru.cristalix.core.formatting.Formatting
 
 /**
  * @project : tower-simulator
@@ -64,11 +65,12 @@ class User(stat: Stat) : Upgradable {
             }
     }
 
+    fun giveMoneyWithBooster(money: Double) {
+        giveMoney(money * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.MONEY))
+    }
+
     fun giveMoney(money: Double) {
-        stat.money += money * app.playerDataManager.calcMultiplier(
-            stat.uuid,
-            BoosterType.MONEY
-        ) * if (StartingKit.STARTER_KIT.name in stat.donates) 2.0 else if (StartingKit.EPIC_KIT.name in stat.donates) 4.0 else 1.0
+        stat.money += money * if (StartingKit.STARTER_KIT.name in stat.donates) 2.0 else if (StartingKit.EPIC_KIT.name in stat.donates) 4.0 else 1.0
         ModTransfer(stat.money).send("tower:money", player)
     }
 
@@ -76,13 +78,22 @@ class User(stat: Stat) : Upgradable {
         stat.rebirth += rebirth
     }
 
-    fun giveTokens(tokens: Double) {
-        this.tokens += tokens * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.TOKEN)
+    fun giveTokenWithBooster(tokens: Double) {
+        giveToken(tokens * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.TOKEN))
         ModTransfer(this.tokens).send("tower:tokens", player)
     }
 
+    fun giveToken(tokens: Double) {
+        this.tokens += tokens
+        ModTransfer(this.tokens).send("tower:tokens", player)
+    }
+
+    fun giveGemWithBooster(gem: Int) {
+        giveGem(gem * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.GEM).toInt())
+    }
+
     fun giveGem(gem: Int) {
-        stat.gem += gem * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.GEM).toInt()
+        stat.gem += gem
         ModTransfer(stat.gem).send("tower:gem", player)
     }
 
@@ -105,7 +116,9 @@ class User(stat: Stat) : Upgradable {
 
     fun calcMultiplier(type: BoosterType): Double {
         stat.localBoosters.removeIf {
-            Boosters.send(player, Booster(it.uuid, false, "Бустер ${it.type.title}", it.multiplier))
+            val title = it.type.title
+            Boosters.send(player, Booster(it.uuid, false, "Бустер $title", it.multiplier))
+            player.sendMessage(Formatting.fine("Локальный §bбустер $title §fзакончился!"))
             it.hadExpire()
         }
         var sum = 1.0

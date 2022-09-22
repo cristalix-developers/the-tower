@@ -53,7 +53,7 @@ class UpgradeMenu {
                 description = key.description
                 onClick { player, _, _ ->
                     if (if (notInGame) stat.money >= cost else user.tokens >= cost) {
-                        if (notInGame) user.giveMoney(-cost) else user.giveTokens(-cost)
+                        if (notInGame) user.giveMoney(-cost) else user.giveToken(-cost)
                         value.level++
                         user.tower!!.updateHealth()
                         player.performCommand("workshop ${category.name}")

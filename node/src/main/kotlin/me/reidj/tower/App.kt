@@ -152,7 +152,7 @@ class App : JavaPlugin() {
                         val token =
                             stat.userImprovementType[ImprovementType.CASH_BONUS_KILL]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_KILL]!!.getValue()
 
-                        giveTokens(token)
+                        giveTokenWithBooster(token)
 
                         ModTransfer(
                             mob.uuid.toString(), "§b+${Formatter.toFormat(token)} §f${
@@ -212,7 +212,7 @@ class App : JavaPlugin() {
 
                         inGame = false
 
-                        giveTokens(-tokens)
+                        giveToken(-tokens)
                         giveExperience(waveLevel * 3)
 
                         this.session = null
@@ -226,7 +226,7 @@ class App : JavaPlugin() {
                             "§e+${Formatter.toFormat(reward)} §f${reward.plural("монета", "монеты", "монет")}"
                         )
 
-                        giveMoney(reward)
+                        giveMoneyWithBooster(reward)
                     }
                 }
             }

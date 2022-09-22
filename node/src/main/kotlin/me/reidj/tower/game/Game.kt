@@ -74,7 +74,7 @@ interface Game {
                 flying()
             }
 
-            giveTokens(getLevel() + 1.0)
+            giveTokenWithBooster(getLevel() + 1.0)
 
             tower!!.run tower@{
                 health = maxHealth
