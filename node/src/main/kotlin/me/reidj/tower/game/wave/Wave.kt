@@ -61,20 +61,22 @@ data class Wave(
             ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
             player.teleport(session.arena.arenaSpawn)
             Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: §3${session.arena.arenaNumber}")
+            level = 0
         }
         Anime.counting321(user.player)
         after(3 * 20) { start() }
     }
 
     private fun drawMob(location: Location) {
-        val hasBoss = level % 10 == 0 && mobs.none { it.isBoss }
+        val hpFormula = level * if ((app.getUser(player) ?: return).session!!.arena.arenaNumber > 1) 0.5 else 0.3
+        val damageFormula = level * 0.05
         MobType.values()
             .filter { it.wave.any { wave -> level % wave == 0 } }
             .forEach {
-                if (hasBoss && it.isBoss) {
+                if (level % 10 == 0 && mobs.none { mob -> mob.isBoss } && it.isBoss) {
                     Mob {
-                        hp = it.hp + level * 0.3
-                        damage = it.damage + level * 0.05
+                        hp = it.hp + hpFormula
+                        damage = it.damage + damageFormula
                         type = EntityType.valueOf(it.name)
                         isBoss = true
                         moveSpeed = it.moveSpeed
@@ -86,8 +88,8 @@ data class Wave(
                     }
                 } else if (!it.isBoss) {
                     Mob {
-                        hp = it.hp + level * 0.3
-                        damage = it.damage + level * 0.05
+                        hp = it.hp + hpFormula
+                        damage = it.damage + damageFormula
                         type = EntityType.valueOf(it.name)
                         attackRange = it.attackRange
                         isShooter = it.isShooter

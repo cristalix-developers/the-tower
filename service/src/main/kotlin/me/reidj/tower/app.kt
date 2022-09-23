@@ -1,7 +1,10 @@
 package me.reidj.tower
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.future.await
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import me.reidj.tower.booster.BoosterInfo
 import me.reidj.tower.protocol.*
 import ru.cristalix.core.CoreApi
@@ -30,42 +33,45 @@ fun main() {
 
         CoreApi.get().registerService(IPermissionService::class.java, PermissionService(this))
 
-        listen<LoadUserPackage> { realmId, pckg ->
-            withContext(Dispatchers.IO) { mongoAdapter.find(pckg.uuid).get() }.run {
+        addListener(LoadUserPackage::class.java) { realmId, pckg ->
+            mongoAdapter.find(pckg.uuid).get().run {
                 pckg.stat = this
                 forward(realmId, pckg)
                 println("Loaded on ${realmId.realmName}! Player: ${pckg.uuid}")
             }
         }
-        listen<SaveUserPackage> { realmId, pckg ->
+        addListener(SaveUserPackage::class.java) { realmId, pckg ->
             mongoAdapter.save(pckg.stat)
             println("Received SaveUserPackage from ${realmId.realmName} for ${pckg.uuid}")
 
         }
-        listen<BulkSaveUserPackage> { realmId, pckg ->
+        addListener(BulkSaveUserPackage::class.java) { realmId, pckg ->
             mongoAdapter.save(pckg.packages.map { it.stat })
             println("Received BulkSaveUserPackage from ${realmId.realmName}")
         }
-        listen<TopPackage> { realmId, pckg ->
+        addListener(TopPackage::class.java) { realmId, pckg ->
             CoroutineScope(Dispatchers.IO).launch {
                 val top = mongoAdapter.getTop(pckg.topType, pckg.limit, pckg.isSortAscending)
                 pckg.entries = top
                 forward(realmId, pckg)
-                println("Top generated from ${realmId.realmName}")
+                println("Top generated for ${realmId.realmName}")
             }
         }
-        listen<ChangeRankPackage> { _, pckg ->
-            val stat = mongoAdapter.find(pckg.uuid).await() ?: return@listen
-            stat.rank =
-                if (pckg.isSortAscending) stat.rank.downgradeRank() ?: return@listen else stat.rank.upgradeRank() ?: return@listen
-            stat.tournamentMaximumWavePassed = 0
-            mongoAdapter.save(stat)
+        addListener(ChangeRankPackage::class.java) { _, pckg ->
+            CoroutineScope(Dispatchers.IO).launch {
+                val stat = mongoAdapter.find(pckg.uuid).await() ?: return@launch
+                stat.rank =
+                    if (pckg.isSortAscending) stat.rank.downgradeRank()
+                        ?: return@launch else stat.rank.upgradeRank() ?: return@launch
+                stat.tournamentMaximumWavePassed = 0
+                mongoAdapter.save(stat)
+            }
         }
-        listen<RequestGlobalBoostersPackage> { realm, pckg ->
+        addListener(RequestGlobalBoostersPackage::class.java) { realm, pckg ->
             pckg.boosters = globalBoosters
             forward(realm, pckg)
         }
-        listen<SaveGlobalBoosterPackage> { _, pckg ->
+        addListener(SaveGlobalBoosterPackage::class.java) { _, pckg ->
             globalBoosters.add(pckg.booster)
         }
     }
