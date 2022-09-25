@@ -17,6 +17,7 @@ data class Mob(
     var y: Double = 0.0,
     var z: Double = 0.0,
     var damage: Double = 1.0,
+    var speedAttack: Double = 1.0,
     var moveSpeed: Float = 0.01f,
     var attackRange: Double = 8.0,
     var isShooter: Boolean = false,
@@ -43,6 +44,7 @@ data class Mob(
             y,
             z,
             hp,
+            speedAttack,
             moveSpeed.toDouble(),
             attackRange,
             isShooter

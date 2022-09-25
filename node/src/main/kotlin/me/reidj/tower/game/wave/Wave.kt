@@ -79,6 +79,7 @@ data class Wave(
                         damage = it.damage + damageFormula
                         type = EntityType.valueOf(it.name)
                         isBoss = true
+                        speedAttack = it.speedAttack
                         moveSpeed = it.moveSpeed
                         attackRange = it.attackRange
                         isShooter = it.isShooter
@@ -91,6 +92,7 @@ data class Wave(
                         hp = it.hp + hpFormula
                         damage = it.damage + damageFormula
                         type = EntityType.valueOf(it.name)
+                        speedAttack = it.speedAttack
                         attackRange = it.attackRange
                         isShooter = it.isShooter
                     }.location(location).create(player).run {

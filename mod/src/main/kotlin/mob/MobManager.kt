@@ -53,10 +53,11 @@ object MobManager {
             val y = readDouble()
             val z = readDouble()
             val hp = readDouble()
+            val speedAttack = readDouble()
             val moveSpeed = readDouble()
             val attackRange = readDouble()
             val isShooter = readBoolean()
-            val mob = Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat(), attackRange, isShooter)
+            val mob = Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat(), speedAttack, attackRange, isShooter)
             mobs[mob.create()] = mob
         }
 

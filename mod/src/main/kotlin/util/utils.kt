@@ -1,4 +1,5 @@
 import dev.xdark.clientapi.entity.EntityLivingBase
+import io.netty.buffer.Unpooled
 import ru.cristalix.uiengine.UIEngine
 import tower.TowerManager
 import util.Formatter
@@ -14,6 +15,20 @@ fun EntityLivingBase.updateNameHealth() = apply { customNameTag = "§4${Formatte
 fun EntityLivingBase.updateHealth() = apply {
     health -= TowerManager.damage.toFloat()
     updateNameHealth()
+}
+
+fun EntityLivingBase.hitTower() {
+    UIEngine.clientApi.clientConnection()
+        .sendPayload("tower:hittower", Unpooled.copiedBuffer(uniqueID.toString(), Charsets.UTF_8))
+}
+
+fun MutableList<TowerManager.Bullet>.removeAll() {
+    with(this.iterator()) {
+        forEach { ammo ->
+            UIEngine.worldContexts.remove(ammo.sphere)
+            remove()
+        }
+    }
 }
 
 fun Double.plural(one: String, two: String, five: String): String {

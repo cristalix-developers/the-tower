@@ -5,6 +5,7 @@ import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.clientapi.util.EnumHand
+import hitTower
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import mod
@@ -27,12 +28,14 @@ import kotlin.math.pow
  */
 object TowerManager {
 
-
-    private var lastTickMove = System.currentTimeMillis()
+    private var lastTickMoveTowerBullet = System.currentTimeMillis()
+    private var lastTickMoveMobBullet = System.currentTimeMillis()
     private var lastTickHit = System.currentTimeMillis()
     private var speedAttack = 0.05 // BULLET_DELAY
 
     val towerActiveAmmo = mutableListOf<Bullet>()
+    val mobActiveAmmo = mutableListOf<Bullet>()
+
     var ticksBeforeStrike = 30
     var ticksStrike = 30
     var damage = 0.0
@@ -60,9 +63,27 @@ object TowerManager {
             UIEngine.worldContexts.add(sphere)
         }
 
+        fun move(x: Double, y: Double, z: Double) {
+            val vector = Vector(x - this.x, y + 1.5 - this.y, z - this.z).normalize()
+                .multiply(0.35)
+            sphere.animate(max(speedAttack * .99, 0.001)) {
+                offset.x += vector.x
+                offset.y += vector.y
+                offset.z += vector.z
+            }
+            this.x += vector.x
+            this.y += vector.y
+            this.z += vector.z
+        }
+
         fun remove() {
             UIEngine.worldContexts.remove(sphere)
             towerActiveAmmo.remove(this)
+        }
+
+        fun removeIf() {
+            if (!target.isEntityAlive)
+                remove()
         }
     }
 
@@ -71,54 +92,67 @@ object TowerManager {
             if (MobManager.mobs.isEmpty())
                 return@registerHandler
             val now = System.currentTimeMillis()
-            if (now - lastTickMove > speedAttack * 1000) {
+            if (now - lastTickMoveTowerBullet > speedAttack * 1000) {
                 ticksBeforeStrike--
-                lastTickMove = now
+                lastTickMoveTowerBullet = now
                 if (ticksBeforeStrike < 0) {
                     ticksBeforeStrike = ticksStrike
+                    // Создаю сферу башни если моб подошёл близко
                     MobManager.mobs.keys.filter { (it.x - mod.cube.x).pow(2) + (it.z - mod.cube.z).pow(2) <= radius * radius }
                         .filter { entity -> entity.health - towerActiveAmmo.count { it.target == entity } * damage > 0 }
                         .firstOrNull { towerActiveAmmo.add(Bullet(mod.cube.x, mod.cube.y, mod.cube.z, it)) }
                 }
                 towerActiveAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { it.remove() }
+                // Если сфера попала в моба
                 towerActiveAmmo.filter { (it.x - it.target.x).pow(2.0) + (it.z - it.target.z).pow(2.0) < 1.0 }.forEach {
                     it.target.performHurtAnimation()
                     UIEngine.clientApi.clientConnection().sendPayload(
                         "mob:hit",
                         Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
                     )
-                    towerActiveAmmo.filter { bullet -> !bullet.target.isEntityAlive }.forEach { bullet -> bullet.remove() }
+                    it.removeIf()
                     it.target.updateHealth()
                     it.remove()
                     towerActiveAmmo.remove(it)
                 }
+                // Двигаю сферы башни
                 towerActiveAmmo.forEach {
-                    val vector = Vector(it.target.x - it.x, it.target.y + 1.5 - it.y, it.target.z - it.z).normalize()
-                        .multiply(0.35)
-                    it.sphere.animate(max(speedAttack * .99, 0.001)) {
-                        offset.x += vector.x
-                        offset.y += vector.y
-                        offset.z += vector.z
-                    }
-                    it.x += vector.x
-                    it.y += vector.y
-                    it.z += vector.z
+                    val target = it.target
+                    it.move(target.x, target.y, target.z)
                 }
-            }
-            if (now - lastTickHit > 1 * 1000) {
-                lastTickHit = now
-                MobManager.mobs.filter { (key, value) -> (key.x - mod.cube.x).pow(2.0) + (key.z - mod.cube.z).pow(2.0) <= value.attackRange }.forEach { (key, value) ->
-                    if (value.isShooter) {
-
-                    } else {
-                        key.swingArm(EnumHand.MAIN_HAND)
-                        UIEngine.clientApi.clientConnection()
-                            .sendPayload(
-                                "tower:hittower",
-                                Unpooled.copiedBuffer(key.uniqueID.toString(), Charsets.UTF_8)
-                            )
+            } else if (now - lastTickMoveMobBullet > 0.1 * 1000) {
+                lastTickMoveMobBullet = now
+                // Двигаю сферы мобов
+                mobActiveAmmo.onEach {
+                    val cube = mod.cube
+                    it.move(cube.x, cube.y, cube.z)
+                    it.removeIf()
+                }
+                // Если сфера попала в куб, то наношу урон
+                mobActiveAmmo.filter { (it.x - mod.cube.x).pow(2.0) + (it.z - mod.cube.z).pow(2.0) < 1.0 }
+                    .forEach {
+                        it.target.hitTower()
+                        it.remove()
+                        mobActiveAmmo.remove(it)
                     }
-              }
+            }
+            MobManager.mobs.values.forEach { mob ->
+                if (now - lastTickHit > mob.speedAttack * 1000) {
+                    lastTickHit = now
+                    // Если моб подошёл достаточно близко к башне, то наношу урон либо спавню сферы
+                    MobManager.mobs.filter { (key, value) ->
+                        (key.x - mod.cube.x).pow(2.0) + (key.z - mod.cube.z).pow(2.0) <= value.attackRange
+                    }.forEach { (key, value) ->
+                        if (value.isShooter) {
+                            mobActiveAmmo.add(Bullet(key.x, key.y + 2.0, key.z, key))
+                        } else {
+                            key.run {
+                                swingArm(EnumHand.MAIN_HAND)
+                                hitTower()
+                            }
+                        }
+                    }
+                }
             }
         }
 
