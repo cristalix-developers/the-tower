@@ -110,7 +110,7 @@ interface Game {
                 // Игра началась
                 ModTransfer(
                     true,
-                    stat.currentCubeTexture,
+                    stat.currentCubeTexture.lowercase(),
                     session.arena.cubeLocation.x,
                     session.arena.cubeLocation.y,
                     session.arena.cubeLocation.z,
