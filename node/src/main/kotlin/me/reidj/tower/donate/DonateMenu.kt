@@ -14,7 +14,6 @@ import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.util.PATH
 import me.reidj.tower.util.error
 import org.bukkit.entity.Player
-import ru.cristalix.core.coupons.ICouponsService
 import ru.cristalix.core.formatting.Formatting
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.network.packages.GetAccountBalancePackage
@@ -145,7 +144,7 @@ class DonateMenu {
                 clientSocket.writeAndAwaitResponse(
                     MoneyTransactionRequestPackage(
                         user,
-                        ICouponsService.get().priceWithDiscountInt(user, price),
+                        price,
                         true,
                         description
                     )

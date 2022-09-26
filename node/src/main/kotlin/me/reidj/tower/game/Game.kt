@@ -71,10 +71,11 @@ interface Game {
             player.run {
                 inventory.clear()
                 inventory.setItem(4, workshop)
-                SwordType.valueOf(stat.currentSwordSkin).giveSword(this@user)
                 teleport(session.arena.arenaSpawn)
                 flying()
             }
+
+            SwordType.valueOf(stat.sword).giveSword(this@user)
 
             giveTokenWithBooster(getLevel() + 1.0)
 

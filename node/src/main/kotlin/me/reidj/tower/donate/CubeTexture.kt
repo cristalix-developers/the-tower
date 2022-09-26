@@ -16,6 +16,9 @@ enum class CubeTexture(
     EMERALD("Изумрудный", 59),
     RUBY("Рубиновый", 59),
     STRUCTURE("Астральный", 59),
+    NAUTICAL("Морской", 59),
+    MAGIC("Магический", 59),
+    FACETED("Огранённый", 59),
     ;
 
     override fun getTitle() = "$title куб"

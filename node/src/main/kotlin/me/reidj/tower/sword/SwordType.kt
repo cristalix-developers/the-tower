@@ -31,8 +31,12 @@ enum class SwordType(private val title: String, private val material: Material, 
         val skin = SwordSkin.valueOf(user.stat.currentSwordSkin)
         if (material != Material.AIR)
             player.inventory.setItem(0, item {
-                text(if (material == Material.STICK) title else skin.getTitle())
                 type = material
+                text("""
+                    ${if (material == Material.STICK) title else skin.getTitle()}
+                    §7§o${damage.toInt()} урона
+                """.trimIndent())
+                nbt("HideFlags", 63)
                 nbt("tower", skin.name.lowercase())
             })
     }

@@ -15,6 +15,7 @@ import me.reidj.tower.data.ResearchType
 import me.reidj.tower.util.Formatter.toFormat
 import me.reidj.tower.util.PATH
 import me.reidj.tower.util.error
+import me.reidj.tower.util.formatSecond
 import me.reidj.tower.util.plural
 import org.bukkit.Bukkit
 
@@ -22,6 +23,7 @@ import org.bukkit.Bukkit
  * @project : tower-simulator
  * @author : Рейдж
  **/
+
 class LaboratoryManager : ClockInject {
 
     private val menu = selection {
@@ -43,48 +45,48 @@ class LaboratoryManager : ClockInject {
                             menu.vault = "${PATH}coin.png"
                             texture = key.texture
                             description =
-                                if (value.whenBought != null) "Нажмите ПКМ, чтобы изучить прямо сейчас" else "${
+                                if (value.whenBought != 0L) "Нажмите ПКМ, чтобы изучить прямо сейчас" else "${
                                     toFormat(value.getValue())
                                 } §f➠ §l${toFormat(key.value + key.step * (value.level + 1))}\n" + "Время улучшения ${key.duration} секунд"
                             price = cost.toLong()
-                            hint(if (value.whenBought == null) "Изучить" else "В процессе")
+                            hint(if (value.whenBought == 0L) "Изучить" else "В процессе")
                             onLeftClick { player, _, _ ->
-                                if (value.whenBought != null)
+                                if (value.whenBought != 0L)
                                     return@onLeftClick
-                                if (stat.money >= cost) {
-                                    Confirmation(
-                                        "Купить §a'${key.title}'",
-                                        "§fза §b${toFormat(cost)} ${cost.plural("монету", "монеты", "монет")}"
-                                    ) { accepter ->
+                                Confirmation(
+                                    "Купить §a'${key.title}'",
+                                    "§fза §b${toFormat(cost)} ${cost.plural("монету", "монеты", "монет")}"
+                                ) { accepter ->
+                                    if (stat.money >= cost) {
                                         giveMoney(-cost)
                                         Glow.animate(player, 1.0, GlowColor.GREEN)
                                         Anime.title(accepter, "§dУспешно!")
-                                        value.whenBought =
-                                            System.currentTimeMillis()
-                                                .toInt() / 1000 + key.duration - stat.researchType[ResearchType.LABORATORY_SPEED]!!.getValue()
-                                    }.open(player)
-                                } else {
-                                    player.error("Недостаточно средств")
-                                }
+                                        addProgress(key)
+                                        value.whenBought = System.currentTimeMillis()
+                                    } else {
+                                        player.error("Недостаточно средств")
+                                    }
+                                }.open(player)
                             }
                             onRightClick { player, _, _ ->
-                                if (value.whenBought != null)
+                                if (value.whenBought != 0L)
                                     return@onRightClick
-                                if (stat.gem >= gem) {
-                                    Confirmation(
-                                        "Купить §a'Спешка'",
-                                        "§fза §d$gem ${Humanize.plurals("Самоцвет", "Самоцвета", "Самоцветов", gem)}"
-                                    ) { accepter ->
+                                Confirmation(
+                                    "Купить §a'Спешка'",
+                                    "§fза §d$gem ${Humanize.plurals("Самоцвет", "Самоцвета", "Самоцветов", gem)}"
+                                ) { accepter ->
+                                    if (stat.gem >= gem) {
                                         giveGem(-gem)
                                         Glow.animate(player, 1.0, GlowColor.GREEN)
                                         Anime.title(accepter, "§dУспешно!")
                                         Anime.killboardMessage(player, "Завершено исследование: §a${key.title}")
                                         value.level++
-                                        value.whenBought = null
-                                    }.open(player)
-                                } else {
-                                    player.error("Недостаточно средств")
-                                }
+                                        value.whenBought = 0
+                                    } else {
+                                        player.error("Недостаточно средств")
+                                    }
+                                }.open(player)
+
                             }
                         }
                     }.toMutableList()
@@ -98,14 +100,21 @@ class LaboratoryManager : ClockInject {
             return
         Bukkit.getOnlinePlayers()
             .mapNotNull { app.getUser(it) }
-            .forEach { user ->
+            .forEach user@{ user ->
                 user.stat.researchType
-                    .filter { it.value.whenBought != null }
                     .forEach { (key, value) ->
-                        if (System.currentTimeMillis().toInt() / 1000 >= value.whenBought!!) {
+                        val now = System.currentTimeMillis()
+                        val progress = user.activeProgress[key] ?: return@forEach
+                        val end = value.whenBought + value.getFullDuration() * 1000
+                        if (now >= end) {
                             Anime.killboardMessage(user.player, "Завершено исследование: §a${key.title}")
+                            progress.delete(setOf(user.player))
+                            user.activeProgress.remove(key)
+                            value.whenBought = 0
                             value.level++
-                            value.whenBought = null
+                        } else {
+                            progress.progress = 1 - (now * 1.0 - value.whenBought) / (end - value.whenBought)
+                            progress.text = "${key.title} ${formatSecond(-((now - value.whenBought) - (end - value.whenBought)) / 1000)}"
                         }
                     }
             }

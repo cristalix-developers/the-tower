@@ -14,6 +14,7 @@ import me.func.mod.ui.Glow
 import me.func.mod.util.listener
 import me.func.protocol.data.color.GlowColor
 import me.func.protocol.data.status.EndStatus
+import me.func.protocol.math.Position
 import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.clock.detail.DropItem
@@ -44,9 +45,6 @@ import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import ru.cristalix.core.CoreApi
-import ru.cristalix.core.command.ICommandService
-import ru.cristalix.core.coupons.BukkitCouponsService
-import ru.cristalix.core.coupons.ICouponsService
 import ru.cristalix.core.network.ISocketClient
 import ru.cristalix.core.realm.IRealmService
 import ru.cristalix.core.realm.RealmId
@@ -77,7 +75,6 @@ class App : JavaPlugin() {
 
         CoreApi.get().run {
             registerService(ITransferService::class.java, TransferService(socketClient))
-            registerService(ICouponsService::class.java, BukkitCouponsService(socketClient, ICommandService.get()))
         }
 
         Anime.include(Kit.NPC, Kit.DIALOG, Kit.EXPERIMENTAL, Kit.STANDARD)
@@ -113,7 +110,7 @@ class App : JavaPlugin() {
         Bukkit.getScheduler()
             .runTaskTimerAsynchronously(
                 this,
-                GameTimer(listOf(WaveManager(), TopManager(), LaboratoryManager(), NpcManager(), TournamentManager())),
+                GameTimer(listOf(WaveManager(), TopManager(), NpcManager(), LaboratoryManager(), TournamentManager())),
                 0,
                 1
             )
@@ -210,6 +207,8 @@ class App : JavaPlugin() {
                         ModTransfer(false).send("tower:update-state", player)
 
                         Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
+                        Anime.overlayText(player, Position.BOTTOM_RIGHT, "")
+
                         wave.aliveMobs.clear(player)
 
                         inGame = false
