@@ -2,10 +2,12 @@ package me.reidj.tower.user
 
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.reactive.ReactiveProgress
 import me.func.mod.ui.Glow
 import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
 import me.func.protocol.data.color.GlowColor
+import me.func.protocol.math.Position
 import me.reidj.tower.app
 import me.reidj.tower.booster.BoosterType
 import me.reidj.tower.clientSocket
@@ -15,12 +17,15 @@ import me.reidj.tower.data.ResearchType
 import me.reidj.tower.data.Stat
 import me.reidj.tower.donate.StartingKit
 import me.reidj.tower.game.wave.Wave
+import me.reidj.tower.npc.NpcManager
+import me.reidj.tower.npc.NpcType
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.upgrade.Upgradable
 import me.reidj.tower.util.LevelSystem
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.cristalix.core.formatting.Formatting
+import java.util.function.Supplier
 
 /**
  * @project : tower-simulator
@@ -41,6 +46,15 @@ class User(stat: Stat) : Upgradable {
     var inGame = false
     var isArmLock = false
     var isTournament = false
+
+    val activeProgress = hashMapOf<ResearchType, ReactiveProgress>()
+
+    private val progress = Supplier {
+        ReactiveProgress.builder()
+            .position(Position.BOTTOM)
+            .hideOnTab(false)
+            .color(GlowColor.BLUE)
+    }
 
     init {
         this.stat = stat
@@ -103,9 +117,10 @@ class User(stat: Stat) : Upgradable {
 
     fun giveExperience(exp: Double) {
         val prevLevel = getLevel()
+        val beforeExperience = LevelSystem.getRequiredExperience(getLevel() - 1)
         stat.experience += exp
         ModTransfer(
-            stat.experience,
+            stat.experience - beforeExperience,
             LevelSystem.getRequiredExperience(LevelSystem.getLevel(stat.experience))
         ).send("tower:exp", player)
         if (getLevel() > prevLevel) {
@@ -133,6 +148,18 @@ class User(stat: Stat) : Upgradable {
         }
         clientSocket.write(SaveUserPackage(stat.uuid, stat))
         return sum
+    }
+
+    private val location = NpcManager.npcs[NpcType.LABORATORY]!!.data
+    private val margin = 0.6
+
+    fun addProgress(type: ResearchType) {
+        activeProgress[type] = progress.get()
+            .offsetX(location.x)
+            .offsetY(location.y + 2.5 + margin * activeProgress.size / 2)
+            .offsetZ(location.z)
+            .build()
+            .apply { send(player) }
     }
 
     override fun update(user: User, vararg pumping: Pumping) {
