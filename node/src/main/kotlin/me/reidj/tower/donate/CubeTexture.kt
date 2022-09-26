@@ -12,7 +12,7 @@ enum class CubeTexture(
     private val price: Long
 ) : Donate {
     CRYSTAL("Кристальный", 0),
-    MIGRATION("", 59),
+    MIGRATION("Демонический", 59),
     EMERALD("Изумрудный", 59),
     RUBY("Рубиновый", 59),
     STRUCTURE("Астральный", 59),

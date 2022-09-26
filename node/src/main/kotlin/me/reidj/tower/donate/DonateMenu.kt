@@ -59,6 +59,7 @@ class DonateMenu {
                     val has = pos.getObjectName() in stat.donates
                     val current = has && when (pos) {
                         is CubeTexture -> stat.currentCubeTexture == pos.name
+                        is SwordSkin -> stat.currentSwordSkin == pos.name
                         else -> false
                     }
                     description(pos.getDescription())
@@ -72,6 +73,7 @@ class DonateMenu {
                         if (has) {
                             when (pos) {
                                 is CubeTexture -> stat.currentCubeTexture = pos.name
+                                is SwordSkin -> stat.currentSwordSkin = pos.name
                             }
                             Anime.title(player, "§dВыбрано!")
                             clientSocket.write(SaveUserPackage(player.uniqueId, user.stat))
@@ -113,12 +115,19 @@ class DonateMenu {
                 }
             },
             button {
-                title("Кубы")
+                title("Скины на куб")
                 texture("${PATH}crystal.png")
                 onClick { player, _, _ ->
                     temp(player, "Кубы", 3, 3, *CubeTexture.values())
                 }
-            }
+            },
+            button {
+                title("Скины на меч")
+                texture("${PATH}hellscream.png")
+                onClick { player, _, _ ->
+                    temp(player, "Мечи", 4, 2, *SwordSkin.values())
+                }
+            },
         )
     }
 
@@ -164,9 +173,9 @@ class DonateMenu {
                 Anime.title(player, "§dУспешно!")
                 Anime.close(player)
                 Glow.animate(player, 0.4, GlowColor.GREEN)
+                donate.give(user)
                 if (donate.isSave())
-                    donate.give(user)
-                stat.donates.add(donate.getObjectName())
+                    stat.donates.add(donate.getObjectName())
                 player.sendMessage(Formatting.fine("Спасибо за поддержку разработчика!"))
                 clientSocket.write(SaveUserPackage(player.uniqueId, stat))
             }

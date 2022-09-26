@@ -10,6 +10,7 @@ import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.Wave
+import me.reidj.tower.sword.SwordType
 import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.user.Session
 import me.reidj.tower.util.PATH
@@ -58,7 +59,7 @@ interface Game {
 
     fun start(player: Player) {
         Anime.close(player)
-        (app.getUser(player) ?: return).run {
+        (app.getUser(player) ?: return).run user@{
             session = Session(tower!!.upgrades)
 
             val session = session!!
@@ -70,20 +71,21 @@ interface Game {
             player.run {
                 inventory.clear()
                 inventory.setItem(4, workshop)
+                SwordType.valueOf(stat.currentSwordSkin).giveSword(this@user)
                 teleport(session.arena.arenaSpawn)
                 flying()
             }
 
             giveTokenWithBooster(getLevel() + 1.0)
 
-            tower!!.run tower@{
+            tower!!.run {
                 health = maxHealth
                 updateHealth()
                 updateBulletDelay()
                 updateDamage()
                 updateProtection()
                 update(
-                    this@run,
+                    this@user,
                     ImprovementType.REGEN,
                     ImprovementType.RADIUS,
                 )

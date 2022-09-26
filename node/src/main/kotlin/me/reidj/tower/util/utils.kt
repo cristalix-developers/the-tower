@@ -86,6 +86,9 @@ fun MutableList<Mob>.clear(player: Player) = apply {
     Anime.close(player)
 }
 
+fun convertSecond(totalSeconds: Int): String =
+    "${totalSeconds / 3600}:${(totalSeconds % 3600) / 60}:${totalSeconds % 60}"
+
 fun Double.plural(one: String, two: String, five: String): String {
     val n = abs(this) % 100
     val n1 = n % 10
