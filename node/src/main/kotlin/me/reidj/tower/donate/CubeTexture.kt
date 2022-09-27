@@ -11,17 +11,18 @@ enum class CubeTexture(
     private val title: String,
     private val price: Long
 ) : Donate {
-    CRYSTAL("Кристальный", 0),
-    MIGRATION("Демонический", 59),
-    EMERALD("Изумрудный", 59),
-    RUBY("Рубиновый", 59),
-    STRUCTURE("Астральный", 59),
-    NAUTICAL("Морской", 59),
-    MAGIC("Магический", 59),
-    FACETED("Огранённый", 59),
+    CROSS("Крестовый куб", 0),
+    CARAMEL("Карамельный куб", 39),
+    WISH("Куб желаний", 39),
+    ICE_HEART("Куб ледяного сердца", 39),
+    RUBY("Рубиновый куб", 39),
+    TIME_LOOP("Куб петля времени", 59),
+    MAGIC("Магический куб", 59),
+    GEM_CUBE("Куб Самоцветов", 59),
+    DEMON("Демонический куб", 59),
     ;
 
-    override fun getTitle() = "$title куб"
+    override fun getTitle() = title
 
     override fun getDescription() = ""
 

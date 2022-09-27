@@ -25,10 +25,10 @@ object DefaultElements {
         ImprovementType.values().filter { !it.userImprovement }.associateWith { Improvement(it.name, 1) }.toMutableMap(),
         ResearchType.values().associateWith { Research(it.name, 1, 0) }.toMutableMap(),
         mutableListOf(),
-        mutableSetOf("CRYSTAL"),
+        mutableSetOf("CROSS", "MITHRIL_SWORD"),
         Tournament(RankType.NONE,  mutableListOf()),
         "NONE",
-        "CRYSTAL",
+        "CROSS",
         "MITHRIL_SWORD",
         RankType.NONE,
     )

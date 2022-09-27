@@ -115,7 +115,7 @@ class DonateMenu {
             },
             button {
                 title("Скины на куб")
-                texture("${PATH}crystal.png")
+                texture("${PATH}demon.png")
                 onClick { player, _, _ ->
                     temp(player, "Кубы", 3, 3, *CubeTexture.values())
                 }
