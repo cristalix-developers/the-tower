@@ -45,8 +45,10 @@ class LaboratoryManager : ClockInject {
                             menu.vault = "${PATH}coin.png"
                             texture = key.texture
                             description =
-                                if (value.whenBought != 0L) "Нажмите ПКМ, чтобы изучить прямо сейчас" else "${
-                                    toFormat(value.getValue())
+                                if (value.whenBought != 0L) "Нажмите ПКМ, чтобы закончить изучение" else "${
+                                    toFormat(
+                                        value.getValue()
+                                    )
                                 } §f➠ §l${toFormat(key.value + key.step * (value.level + 1))}\n" + "Время улучшения ${key.duration} секунд"
                             price = cost.toLong()
                             hint(if (value.whenBought == 0L) "Изучить" else "В процессе")
@@ -62,7 +64,7 @@ class LaboratoryManager : ClockInject {
                                         Glow.animate(player, 1.0, GlowColor.GREEN)
                                         Anime.title(accepter, "§dУспешно!")
                                         addProgress(key)
-                                        value.whenBought = System.currentTimeMillis()
+                                        value.whenBought = System.currentTimeMillis() / 1000
                                     } else {
                                         player.error("Недостаточно средств")
                                     }
@@ -105,7 +107,8 @@ class LaboratoryManager : ClockInject {
                     .forEach { (key, value) ->
                         val now = System.currentTimeMillis()
                         val progress = user.activeProgress[key] ?: return@forEach
-                        val end = value.whenBought + value.getFullDuration() * 1000
+                        val whenBought = value.whenBought * 1000
+                        val end = whenBought + value.getFullDuration() * 1000
                         if (now >= end) {
                             Anime.killboardMessage(user.player, "Завершено исследование: §a${key.title}")
                             progress.delete(setOf(user.player))
@@ -113,8 +116,9 @@ class LaboratoryManager : ClockInject {
                             value.whenBought = 0
                             value.level++
                         } else {
-                            progress.progress = 1 - (now * 1.0 - value.whenBought) / (end - value.whenBought)
-                            progress.text = "${key.title} ${formatSecond(-((now - value.whenBought) - (end - value.whenBought)) / 1000)}"
+                            progress.progress = 1 - (now * 1.0 - whenBought) / (end - whenBought)
+                            progress.text =
+                                "${key.title} ${formatSecond(-((now - value.whenBought) - (end - value.whenBought)) / 1000)}"
                         }
                     }
             }

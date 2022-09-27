@@ -19,7 +19,7 @@ class ArenaManager {
             Arena(
                 arenaNumber,
                 app.worldMeta.getLabel("$arenaNumber-start").apply {
-                    yaw = tagFloat
+                    //yaw = tagFloat
                     x += 0.5
                     z += 0.5
                 },
@@ -30,6 +30,6 @@ class ArenaManager {
                 app.worldMeta.getLabels("$arenaNumber-mob").filter { it.distanceSquared(label) < 900 },
                 app.worldMeta.getLabels("$arenaNumber-gem")
             )
-        }.reversed()
+        }.sortedBy { it.arenaNumber }
     }
 }

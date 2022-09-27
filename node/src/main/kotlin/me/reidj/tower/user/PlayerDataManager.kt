@@ -77,7 +77,6 @@ class PlayerDataManager : Listener {
         user.tower = Tower(player, user.health, stat.maxHealth, stat.towerImprovementType, stat.researchType)
 
         after(3) {
-            player.inventory.clear()
             player.gameMode = GameMode.ADVENTURE
             player.performCommand("resourcepack")
             player.giveDefaultItems()
@@ -99,6 +98,10 @@ class PlayerDataManager : Listener {
             user.giveExperience(0.0)
             user.giveMoney(0.0)
             user.giveGem(0)
+
+           stat.researchType
+               .filter { type -> type.value.whenBought != 0L }
+               .forEach { user.addProgress(it.key) }
 
             RankManager.createRank(user)
             RankManager.showAll(user)
