@@ -48,8 +48,10 @@ class MainGui {
             (app.getUser(player) ?: return@command).stat.run {
                 after {
                     buttons[0].hover = """
-                         §7Монет: §3${Formatter.toFormat(money)}
-                         §7Волн пройдено: §3${maximumWavePassed}
+                         §7Монеты: §3${Formatter.toFormat(money)}
+                         §7Самоцветы: §3$gem
+                         §7Опыт: §3${experience.toInt()}
+                         §7Волн пройдено: §3$maximumWavePassed
                          §7Ранг: §3${rank.title}
                 """.trimIndent()
                 }

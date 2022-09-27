@@ -84,7 +84,14 @@ class NpcManager : ClockInject {
                 Banners.content(
                     player,
                     NpcType.CHARACTER.banner!!,
-                    "${NpcType.CHARACTER.bannerTitle}\n§fМонет: §3${Formatter.toFormat(stat.money)}\n§fВолн пройдено: §3${stat.maximumWavePassed}\n§fРанг: §3${stat.rank.title}"
+                    """
+                        ${NpcType.CHARACTER.bannerTitle}
+                         §fМонеты: §3${Formatter.toFormat(stat.money)}
+                         §fСамоцветы: §3${stat.gem}
+                         §fОпыт: §3${stat.experience.toInt()}
+                         §fВолн пройдено: §3${stat.maximumWavePassed}
+                         §fРанг: §3${stat.rank.title}
+                    """.trimIndent()
                 )
             }
         }
