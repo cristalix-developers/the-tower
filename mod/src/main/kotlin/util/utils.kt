@@ -1,3 +1,4 @@
+
 import dev.xdark.clientapi.entity.EntityLivingBase
 import io.netty.buffer.Unpooled
 import ru.cristalix.uiengine.UIEngine
@@ -12,8 +13,8 @@ import kotlin.math.abs
 
 fun EntityLivingBase.updateNameHealth() = apply { customNameTag = "§4${Formatter.toFormat(health.toDouble())} ❤" }
 
-fun EntityLivingBase.updateHealth() = apply {
-    health -= TowerManager.damage.toFloat()
+fun EntityLivingBase.updateHealth(damage: Double) = apply {
+    health -= damage.toFloat()
     updateNameHealth()
 }
 

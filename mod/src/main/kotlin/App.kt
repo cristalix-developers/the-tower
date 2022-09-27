@@ -5,7 +5,7 @@ import dev.xdark.clientapi.event.entity.EntityLeftClick
 import dev.xdark.clientapi.event.render.PlayerListRender
 import io.netty.buffer.Unpooled
 import mob.MobManager
-import player.PlayerHud
+import player.PlayerManager
 import queue.QueueStatus
 import rank.Rank
 import ru.cristalix.clientapi.KotlinMod
@@ -38,7 +38,7 @@ class App : KotlinMod() {
 
         TimeBar()
         Cube()
-        PlayerHud()
+        PlayerManager()
         QueueStatus()
         Rank()
         Banners
@@ -102,14 +102,16 @@ class App : KotlinMod() {
         var isArmsLock = false
 
         registerHandler<EntityLeftClick> {
+            if (PlayerManager.swordDamage == 0.0)
+                return@registerHandler
             if (!isArmsLock) {
                 isArmsLock = true
                 clientApi.clientConnection().sendPayload(
                     "mob:hit",
                     Unpooled.copiedBuffer("${entity.uniqueID}:true", Charsets.UTF_8)
                 )
-                if (MobManager.mobs.contains(entity))
-                    (entity as EntityLivingBase).updateHealth()
+                if (entity in MobManager.mobs)
+                    (entity as EntityLivingBase).updateHealth(PlayerManager.swordDamage)
                 UIEngine.schedule(3) { isArmsLock = false }
             }
         }

@@ -111,7 +111,7 @@ object TowerManager {
                         Unpooled.copiedBuffer("${it.target.uniqueID}:false", Charsets.UTF_8)
                     )
                     it.removeIf()
-                    it.target.updateHealth()
+                    it.target.updateHealth(damage)
                     it.remove()
                     towerActiveAmmo.remove(it)
                 }

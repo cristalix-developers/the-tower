@@ -15,7 +15,7 @@ import util.Formatter
  * @project tower
  * @author Рейдж
  */
-class PlayerHud {
+class PlayerManager {
 
     private val gemBox = createBox(true, "gem")
     private val moneyBox = createBox(false, "coin")
@@ -40,6 +40,10 @@ class PlayerHud {
         }
     }
 
+    companion object {
+        var swordDamage = 1.0
+    }
+
     init {
         UIEngine.overlayContext.addChild(gemBox, moneyBox, levelBox)
 
@@ -61,10 +65,15 @@ class PlayerHud {
             (levelBox.children[4] as TextElement).content = "${experience.toInt()} из $requiredExperience"
         }
 
+        mod.registerChannel("user:sword") {
+            swordDamage = readDouble()
+        }
+
         mod.registerHandler<GameLoop> {
-            moneyBox.enabled = if (mod.gameActive) false else screenCheck()
-            gemBox.enabled = if (mod.gameActive) false else screenCheck()
-            levelBox.enabled = if (mod.gameActive) false else screenCheck()
+            val has = if (mod.gameActive) false else screenCheck()
+            moneyBox.enabled = has
+            gemBox.enabled = has
+            levelBox.enabled = has
         }
     }
 

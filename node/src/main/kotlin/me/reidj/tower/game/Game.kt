@@ -8,7 +8,6 @@ import me.func.mod.ui.menu.choicer
 import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
-import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.tournament.TournamentManager
@@ -92,13 +91,7 @@ interface Game {
                 )
             }
 
-            update(
-                this,
-                ImprovementType.CASH_BONUS_KILL,
-                ImprovementType.CASH_BONUS_WAVE_PASS,
-                ResearchType.CASH_BONUS_WAVE_PASS,
-                ResearchType.CASH_BONUS_KILL
-            )
+            update(this, ImprovementType.SWORD,)
 
             // Отправляем точки со спавнерами
             session.arena.generators.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
