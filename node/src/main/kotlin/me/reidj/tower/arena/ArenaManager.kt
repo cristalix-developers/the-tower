@@ -19,7 +19,7 @@ class ArenaManager {
             Arena(
                 arenaNumber,
                 app.worldMeta.getLabel("$arenaNumber-start").apply {
-                    //yaw = tagFloat
+                    yaw = tagFloat
                     x += 0.5
                     z += 0.5
                 },

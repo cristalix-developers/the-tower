@@ -12,6 +12,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import ru.cristalix.core.transfer.ITransferService
+import java.text.DecimalFormat
 import kotlin.math.abs
 
 /**
@@ -55,6 +56,10 @@ val hubItem = item {
     nbt("other", "arrow_back")
     nbt("click", "leave")
 }
+
+private val MONEY_FORMAT = DecimalFormat("###,###,###,###,###,###.##")
+
+fun toFormat(money: Double?): String = MONEY_FORMAT.format(money)
 
 fun Player.flying(state: Boolean = true) = run {
     allowFlight = state

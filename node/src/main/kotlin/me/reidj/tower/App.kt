@@ -90,8 +90,6 @@ class App : JavaPlugin() {
 
         worldMeta = MapLoader().load("tower")!!
 
-        playerDataManager = PlayerDataManager()
-
         Default()
         Rating()
         ArenaManager()
@@ -105,8 +103,6 @@ class App : JavaPlugin() {
         PlayerCommands()
         AdminCommands()
 
-        listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerPickUpEvent())
-
         Bukkit.getScheduler()
             .runTaskTimerAsynchronously(
                 this,
@@ -114,6 +110,12 @@ class App : JavaPlugin() {
                 0,
                 1
             )
+
+        playerDataManager = PlayerDataManager()
+
+        listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerPickUpEvent())
+
+
 
         Anime.createReader("mob:hit") { player, buffer ->
             // Нужно для проверки кто нанёс урон, башня или игрок

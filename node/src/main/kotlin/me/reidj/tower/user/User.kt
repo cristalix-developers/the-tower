@@ -17,8 +17,6 @@ import me.reidj.tower.data.ResearchType
 import me.reidj.tower.data.Stat
 import me.reidj.tower.donate.StartingKit
 import me.reidj.tower.game.wave.Wave
-import me.reidj.tower.npc.NpcManager
-import me.reidj.tower.npc.NpcType
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.upgrade.Upgradable
 import me.reidj.tower.util.LevelSystem
@@ -49,7 +47,7 @@ class User(stat: Stat) : Upgradable {
 
     val activeProgress = hashMapOf<ResearchType, ReactiveProgress>()
 
-    private val progress = Supplier {
+    val progress = Supplier {
         ReactiveProgress.builder()
             .position(Position.BOTTOM)
             .hideOnTab(false)
@@ -121,7 +119,7 @@ class User(stat: Stat) : Upgradable {
         stat.experience += exp
         ModTransfer(
             stat.experience - beforeExperience,
-            LevelSystem.getRequiredExperience(LevelSystem.getLevel(stat.experience))
+            LevelSystem.getRequiredExperience(getLevel()) - beforeExperience
         ).send("tower:exp", player)
         if (getLevel() > prevLevel) {
             Anime.alert(
@@ -148,18 +146,6 @@ class User(stat: Stat) : Upgradable {
         }
         clientSocket.write(SaveUserPackage(stat.uuid, stat))
         return sum
-    }
-
-    private val location = NpcManager.npcs[NpcType.LABORATORY]!!.data
-    private val margin = 0.6
-
-    fun addProgress(type: ResearchType) {
-        activeProgress[type] = progress.get()
-            .offsetX(location.x)
-            .offsetY(location.y + 2.5 + margin * activeProgress.size / 2)
-            .offsetZ(location.z)
-            .build()
-            .apply { send(player) }
     }
 
     override fun update(user: User, vararg pumping: Pumping) {

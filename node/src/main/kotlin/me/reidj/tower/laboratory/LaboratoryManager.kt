@@ -63,7 +63,7 @@ class LaboratoryManager : ClockInject {
                                         giveMoney(-cost)
                                         Glow.animate(player, 1.0, GlowColor.GREEN)
                                         Anime.title(accepter, "§dУспешно!")
-                                        addProgress(key)
+                                        app.playerDataManager.addProgress(this@run, key)
                                         value.whenBought = System.currentTimeMillis() / 1000
                                     } else {
                                         player.error("Недостаточно средств")
@@ -113,6 +113,7 @@ class LaboratoryManager : ClockInject {
                             Anime.killboardMessage(user.player, "Завершено исследование: §a${key.title}")
                             progress.delete(setOf(user.player))
                             user.activeProgress.remove(key)
+                            app.playerDataManager.updateProgressOffset(user, *user.activeProgress.map { it.key }.toTypedArray())
                             value.whenBought = 0
                             value.level++
                         } else {

@@ -9,6 +9,7 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
 import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
+import me.func.mod.ui.scoreboard.ScoreBoard
 import me.func.mod.util.after
 import me.func.protocol.ui.indicator.Indicators
 import me.reidj.tower.app
@@ -16,15 +17,15 @@ import me.reidj.tower.booster.BoosterInfo
 import me.reidj.tower.booster.BoosterType
 import me.reidj.tower.clientSocket
 import me.reidj.tower.content.DailyRewardType
+import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.Rating
+import me.reidj.tower.npc.NpcManager
+import me.reidj.tower.npc.NpcType
 import me.reidj.tower.protocol.BulkSaveUserPackage
 import me.reidj.tower.protocol.LoadUserPackage
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.rank.RankManager
-import me.reidj.tower.util.Images
-import me.reidj.tower.util.giveDefaultItems
-import me.reidj.tower.util.godSet
-import me.reidj.tower.util.transfer
+import me.reidj.tower.util.*
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -34,6 +35,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import ru.cristalix.core.formatting.Formatting
+import ru.cristalix.core.realm.IRealmService
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -49,6 +51,19 @@ class PlayerDataManager : Listener {
     val spawn: Label = app.worldMeta.getLabel("spawn").apply { yaw = 0f }
 
     var globalBoosters = mutableListOf<BoosterInfo>()
+    
+    init {
+        ScoreBoard.builder()
+            .key("scoreboard")
+            .header("TowerSimulator")
+            .dynamic("Уровень") { app.getUser(it)?.getLevel() }
+            .dynamic("Опыт") { toFormat(app.getUser(it)?.stat?.experience) }
+            .dynamic("Монет") { toFormat(app.getUser(it)?.stat?.money) }
+            .dynamic("Самоцветов") { app.getUser(it)?.stat?.gem }
+            .empty()
+            .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }
+            .build()
+    }
 
     @EventHandler
     fun AsyncPlayerPreLoginEvent.handle() = registerIntent(app).apply {
@@ -93,6 +108,8 @@ class PlayerDataManager : Listener {
             )
             Anime.loadTextures(player, *Images.values().map { it.path() }.toTypedArray())
 
+            ScoreBoard.subscribe("scoreboard", player)
+
             ModLoader.send("mod-bundle-1.0-SNAPSHOT.jar", player)
 
             user.giveExperience(0.0)
@@ -101,7 +118,7 @@ class PlayerDataManager : Listener {
 
            stat.researchType
                .filter { type -> type.value.whenBought != 0L }
-               .forEach { user.addProgress(it.key) }
+               .forEach { addProgress(user, it.key) }
 
             RankManager.createRank(user)
             RankManager.showAll(user)
@@ -170,6 +187,24 @@ class PlayerDataManager : Listener {
                 send(player, Booster(it.uuid, true, "Бустер ${it.type.title}", it.multiplier))
                 mode(player, true)
             }
+        }
+    }
+
+    private val location = NpcManager.npcs[NpcType.LABORATORY]!!.data
+    private val margin = 0.6
+
+    fun addProgress(user: User, type: ResearchType) {
+        user.activeProgress[type] = user.progress.get()
+            .offsetX(location.x)
+            .offsetY(location.y + 2.5 + margin * user.activeProgress.size / 2)
+            .offsetZ(location.z)
+            .build()
+            .apply { send(user.player) }
+    }
+
+    fun updateProgressOffset(user: User, vararg types: ResearchType) {
+        types.forEach {
+            user.activeProgress[it]?.offsetY = location.y + 2.5 + margin * user.activeProgress.size / 2
         }
     }
 }
