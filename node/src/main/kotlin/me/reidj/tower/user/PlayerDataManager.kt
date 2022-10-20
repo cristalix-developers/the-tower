@@ -9,6 +9,8 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModLoader
 import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
+import me.func.mod.ui.menu.button
+import me.func.mod.ui.menu.dailyReward
 import me.func.mod.ui.scoreboard.ScoreBoard
 import me.func.mod.util.after
 import me.func.protocol.ui.indicator.Indicators
@@ -145,13 +147,17 @@ class PlayerDataManager : Listener {
             }
             if (now - stat.dailyClaimTimestamp > 14 * 60 * 60 * 1000) {
                 stat.dailyClaimTimestamp = now
-                Anime.openDailyRewardMenu(
-                    player,
-                    stat.rewardStreak,
-                    *DailyRewardType.values().map { it.reward }.toTypedArray()
-                )
+                dailyReward {
+                    currentDay = stat.rewardStreak
+                    storage = DailyRewardType.values().map {
+                        button {
+                            title = it.title
+                            item = it.icon
+                        }
+                    }.toMutableList()
+                }.open(player)
                 val dailyReward = DailyRewardType.values()[stat.rewardStreak]
-                player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.reward.title))
+                player.sendMessage(Formatting.fine("Ваша ежедневная награда: " + dailyReward.title))
                 dailyReward.give(user)
                 stat.rewardStreak++
             }
@@ -172,7 +178,7 @@ class PlayerDataManager : Listener {
         globalBoosters.removeIf {
             val title = it.type.title
             Bukkit.broadcastMessage(Formatting.fine("Глобальный §bбустер $title §fзакончился!"))
-            Boosters.send(Bukkit.getPlayer(uuid), Booster(it.uuid, false, "Бустер $title", it.multiplier))
+            Boosters.send(Bukkit.getPlayer(uuid), Booster("Бустер $title", it.multiplier))
             thanksMap.remove(it.uuid)
             it.hadExpire()
         }
@@ -190,14 +196,9 @@ class PlayerDataManager : Listener {
         SaveUserPackage(uuid, user.stat)
     })
 
-    fun sendBoosters(player: Player, vararg localBoosters: BoosterInfo) {
-        localBoosters.forEach {
-            Boosters.run {
-                send(player, Booster(it.uuid, true, "Бустер ${it.type.title}", it.multiplier))
-                mode(player, true)
-            }
-        }
-    }
+    fun sendBoosters(player: Player, vararg localBoosters: BoosterInfo) =
+        localBoosters.forEach { Boosters.send(player, Booster("Бустер ${it.type.title}", it.multiplier)) }
+
 
     private val location = NpcManager.npcs[NpcType.LABORATORY]!!.data
     private val margin = 0.6

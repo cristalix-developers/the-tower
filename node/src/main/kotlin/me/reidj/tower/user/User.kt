@@ -111,7 +111,7 @@ class User(stat: Stat) : Upgradable {
         ModTransfer(stat.gem).send("tower:gem", player)
     }
 
-    fun giveExperienceWithBooster(exp: Int) {
+    fun giveExperienceWithBooster(exp: Double) {
         giveExperience(exp * app.playerDataManager.calcMultiplier(stat.uuid, BoosterType.EXP))
     }
 
@@ -135,7 +135,7 @@ class User(stat: Stat) : Upgradable {
     fun calcMultiplier(type: BoosterType): Double {
         stat.localBoosters.removeIf {
             val title = it.type.title
-            Boosters.send(player, Booster(it.uuid, false, "Бустер $title", it.multiplier))
+            Boosters.send(player, Booster("Бустер $title", it.multiplier))
             player.sendMessage(Formatting.fine("Локальный §bбустер $title §fзакончился!"))
             it.hadExpire()
         }
