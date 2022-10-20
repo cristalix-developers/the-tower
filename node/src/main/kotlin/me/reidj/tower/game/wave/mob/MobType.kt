@@ -10,8 +10,8 @@ enum class MobType(
     var isBoss: Boolean,
     var isShooter: Boolean
 ) {
-    ZOMBIE(9.0, 1.0, 36.0,9.0, 0.01f, 1..3, false, true),
-    SKELETON( 8.0, 2.5, 8.0,0.1, 0.02f,3..5, false, false),
+    ZOMBIE(2.0, 1.0, 8.0,9.0, 0.01f, 1..3, false, false),
+    SKELETON( 3.0, 1.5, 36.0,9.0, 0.02f,3..5, false, true),
     HORSE(8.0, 3.0, 8.0,5.0,0.90f,6..15, false, false),
     POLAR_BEAR(12.0, 1.5, 8.0,7.0,0.04f,16..25, false, false),
     WOLF(4.0, 2.0, 8.0,2.0,0.03f,26..30, false, false),

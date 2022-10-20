@@ -45,14 +45,14 @@ class MainGui {
 
     init {
         command("menu") { player, _ ->
-            (app.getUser(player) ?: return@command).stat.run {
+            (app.getUser(player) ?: return@command).run {
                 after {
                     buttons[0].hover = """
-                         §7Монеты: §3${Formatter.toFormat(money)}
-                         §7Самоцветы: §3$gem
-                         §7Опыт: §3${experience.toInt()}
-                         §7Волн пройдено: §3$maximumWavePassed
-                         §7Ранг: §3${rank.title}
+                         §7Монеты: §3${Formatter.toFormat(stat.money)}
+                         §7Самоцветы: §3${stat.gem}
+                         §7Опыт: §3${requiredExperience()}
+                         §7Волн пройдено: §3${stat.maximumWavePassed}
+                         §7Ранг: §3${stat.rank.title}
                 """.trimIndent()
                 }
             }

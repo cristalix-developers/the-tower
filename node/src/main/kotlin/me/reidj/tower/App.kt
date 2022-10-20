@@ -223,18 +223,13 @@ class App : JavaPlugin() {
                         inGame = false
 
                         giveToken(-tokens)
-                        giveExperienceWithBooster(waveLevel * 3)
+                        giveExperienceWithBooster(waveLevel * 3 * 0.3)
 
                         this.session = null
                         this.wave = null
 
                         if (reward == 0.0)
                             return@createReader
-
-                        Anime.cursorMessage(
-                            player,
-                            "§e+${Formatter.toFormat(reward)} §f${reward.plural("монета", "монеты", "монет")}"
-                        )
 
                         giveMoneyWithBooster(reward)
                     }

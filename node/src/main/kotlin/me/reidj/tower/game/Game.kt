@@ -77,7 +77,7 @@ interface Game {
 
             SwordType.valueOf(stat.sword).giveSword(this@user)
 
-            giveTokenWithBooster(getLevel() + 1.0)
+            giveTokenWithBooster(80 + getLevel() * 3 * 0.5)
 
             tower!!.run {
                 health = maxHealth

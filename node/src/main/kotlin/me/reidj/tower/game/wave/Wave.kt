@@ -30,8 +30,7 @@ data class Wave(
     fun start() {
         aliveMobs.clear()
         ModTransfer(40).send("tower:bar", player)
-        Anime.overlayText(player, Position.BOTTOM_RIGHT, "Волна: §3$level")
-        repeat(6 + level * 2) {
+        repeat(4 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater
                 drawMob(session.arena.generators.random().apply {
