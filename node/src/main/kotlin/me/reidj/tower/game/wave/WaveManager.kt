@@ -1,5 +1,6 @@
 package me.reidj.tower.game.wave
 
+import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.data.ImprovementType
@@ -15,7 +16,6 @@ class WaveManager : ClockInject {
     override fun run(tick: Int) {
         if (tick % 20 != 0)
             return
-
         Bukkit.getOnlinePlayers()
             .mapNotNull { app.getUser(it) }
             .filter { it.wave != null && it.session != null && it.tower != null }
@@ -24,7 +24,7 @@ class WaveManager : ClockInject {
                 if (wave.startTime > 0) {
                     if ((System.currentTimeMillis() - wave.startTime) / 1000 == 40.toLong() || wave.aliveMobs.isEmpty()) {
                         wave.aliveMobs.clear(it.player)
-                        wave.end()
+                        after { wave.end() }
                     }
                     val session = it.session!!
                     val tower = it.tower!!
