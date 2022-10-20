@@ -49,7 +49,7 @@ class PlayerManager {
 
         mod.registerChannel("tower:money") {
             val money = readDouble()
-            (moneyBox.children[4] as TextElement).content = Formatter.toFormat(money)
+            (moneyBox.children[4] as TextElement).content = Formatter.toMoneyFormat(money)
         }
 
         mod.registerChannel("tower:gem") {

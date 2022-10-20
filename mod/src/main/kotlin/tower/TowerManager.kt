@@ -189,11 +189,11 @@ object TowerManager {
         maxHealth = maxHealthUpdate
 
         (BarManager.healthBox.children[3] as TextElement).content =
-            "${Formatter.toFormat(health)} из ${Formatter.toFormat(maxHealth)}"
+            "${Formatter.toHealthFormat(health)} из ${Formatter.toHealthFormat(maxHealth)}"
 
         if (mod.gameActive) {
             Banners.text(
-                "§4${Formatter.toFormat(health)} ❤",
+                "§4${Formatter.toHealthFormat(health)} ❤",
                 healthBanner!!,
                 Banners.banners[healthBanner!!.uuid]!!.second
             )

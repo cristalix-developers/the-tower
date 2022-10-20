@@ -2,6 +2,7 @@
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
+import dev.xdark.clientapi.event.render.PlayerListRender
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import player.PlayerManager
@@ -50,11 +51,13 @@ class App : KotlinMod() {
                 cube.x,
                 cube.y - 1.5,
                 cube.z,
-                "§4${Formatter.toFormat(TowerManager.health)} ❤",
+                "§4${Formatter.toHealthFormat(TowerManager.health)} ❤",
                 1.5,
                 true
             )
         }
+
+        registerHandler<PlayerListRender> { isCancelled = gameActive }
 
         registerChannel("tower:update-state") {
             gameActive = readBoolean()
@@ -76,7 +79,7 @@ class App : KotlinMod() {
                     cube.x,
                     cube.y - 1.25,
                     cube.z,
-                    "§4${Formatter.toFormat(TowerManager.health)} ❤",
+                    "§4${Formatter.toHealthFormat(TowerManager.health)} ❤",
                     2.0,
                     true
                 )

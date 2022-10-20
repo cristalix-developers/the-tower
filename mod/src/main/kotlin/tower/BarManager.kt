@@ -90,7 +90,7 @@ object BarManager {
 
         mod.registerChannel("tower:tokens") {
             val tokens = readDouble()
-            (tokenBox.children[4] as TextElement).content = Formatter.toFormat(tokens)
+            (tokenBox.children[4] as TextElement).content = Formatter.toMoneyFormat(tokens)
         }
     }
 }
