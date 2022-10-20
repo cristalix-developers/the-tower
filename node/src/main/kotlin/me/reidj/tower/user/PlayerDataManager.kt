@@ -51,15 +51,24 @@ class PlayerDataManager : Listener {
     val spawn: Label = app.worldMeta.getLabel("spawn").apply { yaw = 0f }
 
     var globalBoosters = mutableListOf<BoosterInfo>()
-    
+
     init {
         ScoreBoard.builder()
-            .key("scoreboard")
+            .key("lobby-scoreboard")
             .header("TowerSimulator")
-            .dynamic("Уровень") { app.getUser(it)?.getLevel() }
-            .dynamic("Опыт") { toFormat(app.getUser(it)?.stat?.experience) }
-            .dynamic("Монет") { toFormat(app.getUser(it)?.stat?.money) }
-            .dynamic("Самоцветов") { app.getUser(it)?.stat?.gem }
+            .dynamic("Уровень") { "§b${app.getUser(it)?.getLevel()}" }
+            .dynamic("Опыт") { "§a${toFormat(app.getUser(it)?.requiredExperience())}" }
+            .dynamic("Монет") { "§6${toFormat(app.getUser(it)?.stat?.money)}" }
+            .dynamic("Самоцветов") { "§2${app.getUser(it)?.stat?.gem}" }
+            .empty()
+            .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }
+            .build()
+
+        ScoreBoard.builder()
+            .key("game-scoreboard")
+            .header("TowerSimulator")
+            .dynamic("Токенов") { toFormat(app.getUser(it)?.tokens) }
+            .dynamic("Волна") { app.getUser(it)?.wave?.level }
             .empty()
             .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }
             .build()
@@ -108,7 +117,7 @@ class PlayerDataManager : Listener {
             )
             Anime.loadTextures(player, *Images.values().map { it.path() }.toTypedArray())
 
-            ScoreBoard.subscribe("scoreboard", player)
+            ScoreBoard.subscribe("lobby-scoreboard", player)
 
             ModLoader.send("mod-bundle-1.0-SNAPSHOT.jar", player)
 

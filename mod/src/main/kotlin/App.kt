@@ -2,7 +2,6 @@
 import banner.Banners
 import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.entity.EntityLeftClick
-import dev.xdark.clientapi.event.render.PlayerListRender
 import io.netty.buffer.Unpooled
 import mob.MobManager
 import player.PlayerManager
@@ -29,8 +28,6 @@ class App : KotlinMod() {
     var inited = false
     var gameActive = false
 
-    private var program: Int = 0
-
     override fun onEnable() {
         UIEngine.initialize(this)
 
@@ -44,8 +41,6 @@ class App : KotlinMod() {
         Banners
         BarManager
         TowerManager
-
-        registerHandler<PlayerListRender> { isCancelled = gameActive }
 
         registerChannel("tower:map-change") {
             Banners.remove(TowerManager.healthBanner!!.uuid)

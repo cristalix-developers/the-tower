@@ -11,6 +11,8 @@ import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.ui.Glow
+import me.func.mod.ui.scoreboard.ScoreBoard
+import me.func.mod.util.after
 import me.func.mod.util.listener
 import me.func.protocol.data.color.GlowColor
 import me.func.protocol.data.status.EndStatus
@@ -183,7 +185,7 @@ class App : JavaPlugin() {
                         mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
                     tower.health -= damage
                     Glow.animate(player, .5, GlowColor.RED)
-                    Anime.killboardMessage(player, "Вам нанесли §c§l$damage урона")
+                    Anime.killboardMessage(player, "Вам нанесли §c§l${toFormat(damage)} урона")
                     tower.updateHealth()
                     val wave = wave ?: return@createReader
                     val waveLevel = wave.level
@@ -198,6 +200,11 @@ class App : JavaPlugin() {
                         if (isTournament) {
                             TournamentManager.end(this)
                             isTournament = false
+                        }
+
+                        after {
+                            ScoreBoard.hide(player)
+                            ScoreBoard.subscribe("lobby-scoreboard", player)
                         }
 
                         player.giveDefaultItems()

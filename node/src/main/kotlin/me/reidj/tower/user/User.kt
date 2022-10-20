@@ -60,6 +60,8 @@ class User(stat: Stat) : Upgradable {
 
     fun getLevel() = LevelSystem.getLevel(stat.experience)
 
+    fun requiredExperience() = stat.experience - LevelSystem.getRequiredExperience(getLevel() - 1)
+
     fun hideFromAll() {
         Bukkit.getOnlinePlayers().forEach { current ->
             player.hidePlayer(app, current)
@@ -115,11 +117,10 @@ class User(stat: Stat) : Upgradable {
 
     fun giveExperience(exp: Double) {
         val prevLevel = getLevel()
-        val beforeExperience = LevelSystem.getRequiredExperience(getLevel() - 1)
         stat.experience += exp
         ModTransfer(
-            stat.experience - beforeExperience,
-            LevelSystem.getRequiredExperience(getLevel()) - beforeExperience
+            requiredExperience(),
+            LevelSystem.getRequiredExperience(getLevel()) - LevelSystem.getRequiredExperience(getLevel() - 1)
         ).send("tower:exp", player)
         if (getLevel() > prevLevel) {
             Anime.alert(

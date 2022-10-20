@@ -5,6 +5,7 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.choicer
+import me.func.mod.ui.scoreboard.ScoreBoard
 import me.func.mod.util.after
 import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
@@ -102,6 +103,9 @@ interface Game {
             after(3 * 20) {
                 wave = Wave(System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
                 wave!!.start()
+
+                ScoreBoard.hide(player)
+                ScoreBoard.subscribe("game-scoreboard", player)
 
                 // Игра началась
                 ModTransfer(
