@@ -26,9 +26,8 @@ class WaveManager : ClockInject {
                         wave.aliveMobs.clear(it.player)
                         after { wave.end() }
                     }
-                    val session = it.session!!
                     val tower = it.tower!!
-                    val value = session.towerImprovement[ImprovementType.REGEN]!!.getValue()
+                    val value = it.session!!.towerImprovement[ImprovementType.REGEN]!!.getValue()
                     if (tower.health < (tower.maxHealth) && value > 0.0) {
                         tower.health = tower.maxHealth - maxOf(0.0, tower.maxHealth - tower.health - value)
                         tower.updateHealth()

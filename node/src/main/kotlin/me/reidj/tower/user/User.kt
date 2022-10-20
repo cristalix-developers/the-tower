@@ -6,6 +6,7 @@ import me.func.mod.reactive.ReactiveProgress
 import me.func.mod.ui.Glow
 import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
+import me.func.mod.util.after
 import me.func.protocol.data.color.GlowColor
 import me.func.protocol.math.Position
 import me.reidj.tower.app
@@ -100,6 +101,14 @@ class User(stat: Stat) : Upgradable {
     fun giveToken(tokens: Double) {
         this.tokens += tokens
         ModTransfer(this.tokens).send("tower:tokens", player)
+    }
+
+    fun armLock(): Boolean {
+        if (isArmLock)
+            return true
+        isArmLock = true
+        after(5) { isArmLock = false }
+        return false
     }
 
     fun giveGemWithBooster(gem: Int) {

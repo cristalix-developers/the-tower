@@ -44,14 +44,22 @@ interface Game {
                     texture = "${PATH}default.png"
                     description = "Игроков: §3${TournamentManager.getOnlinePlayers().size}"
                     hint("Играть")
-                    onClick { player, _, _ -> player.performCommand("default") }
+                    onClick { player, _, _ ->
+                        if (!(app.getUser(player) ?: return@onClick).armLock()) {
+                            player.performCommand("default")
+                        }
+                    }
                 },
                 button {
                     title = "Турнир"
                     texture = "${PATH}rating.png"
                     description = "Игроков: §3${TournamentManager.getTournamentPlayers()}"
                     hint("Играть")
-                    onClick { player, _, _ -> player.performCommand("tournament") }
+                    onClick { player, _, _ ->
+                        if (!(app.getUser(player) ?: return@onClick).armLock()) {
+                            player.performCommand("tournament")
+                        }
+                    }
                 }
             )
         }
@@ -92,10 +100,15 @@ interface Game {
                 )
             }
 
-            update(this, ImprovementType.SWORD,)
+            update(this, ImprovementType.SWORD)
 
             // Отправляем точки со спавнерами
-            session.arena.generators.forEach { label -> ModTransfer(label.x, label.y, label.z).send("mobs:init", player) }
+            session.arena.generators.forEach { label ->
+                ModTransfer(label.x, label.y, label.z).send(
+                    "mobs:init",
+                    player
+                )
+            }
 
             Anime.counting321(player)
 

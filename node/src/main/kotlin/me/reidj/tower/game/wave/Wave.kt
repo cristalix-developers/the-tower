@@ -28,18 +28,17 @@ data class Wave(
 ) {
 
     fun start() {
-        aliveMobs.clear()
+        startTime = System.currentTimeMillis()
         ModTransfer(40).send("tower:bar", player)
-        repeat(4 + level * 2) {
+        repeat(3 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater
-                drawMob(session.arena.generators.random().apply {
+                drawMob(session.arena.generators.random().clone().apply {
                     x += Math.random() * 4 - 2
                     z += Math.random() * 4 - 2
                 })
             }, minOf(it.toLong() * 12, 400))
         }
-        startTime = System.currentTimeMillis()
     }
 
     fun end() {

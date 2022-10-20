@@ -2,6 +2,7 @@ package me.reidj.tower.upgrade
 
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.selection
+import me.func.mod.util.after
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.data.Category
@@ -52,25 +53,27 @@ class UpgradeMenu {
                 title = "§3${value.level} LVL"
                 description = key.description
                 onClick { player, _, _ ->
-                    if (if (notInGame) stat.money >= cost else user.tokens >= cost) {
-                        if (notInGame) user.giveMoney(-cost) else user.giveToken(-cost)
-                        value.level++
-                        user.tower!!.updateHealth()
-                        player.performCommand("workshop ${category.name}")
-                        if (notInGame) {
-                            user.update(user)
-                            SwordType.valueOf(stat.sword).update(user)
-                        } else {
-                            user.session!!.run {
-                                updateHealth(user)
-                                updateBulletDelay(user)
-                                updateDamage(user)
-                                updateProtection(user)
+                    if (!(app.getUser(player) ?: return@onClick).armLock()) {
+                        if (if (notInGame) stat.money >= cost else user.tokens >= cost) {
+                            if (notInGame) user.giveMoney(-cost) else user.giveToken(-cost)
+                            value.level++
+                            user.tower!!.updateHealth()
+                            player.performCommand("workshop ${category.name}")
+                            if (notInGame) {
+                                user.update(user)
+                                SwordType.valueOf(stat.sword).update(user)
+                            } else {
+                                user.session!!.run {
+                                    updateHealth(user)
+                                    updateBulletDelay(user)
+                                    updateDamage(user)
+                                    updateProtection(user)
+                                }
+                                user.session!!.update(user, ImprovementType.RADIUS)
                             }
-                            user.session!!.update(user, ImprovementType.RADIUS)
+                        } else {
+                            player.error("Недостаточно средств")
                         }
-                    } else {
-                        player.error("Недостаточно средств")
                     }
                 }
             }

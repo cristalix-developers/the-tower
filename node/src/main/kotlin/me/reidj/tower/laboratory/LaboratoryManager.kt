@@ -59,14 +59,16 @@ class LaboratoryManager : ClockInject {
                                     "Купить §a'${key.title}'",
                                     "§fза §b${toFormat(cost)} ${cost.plural("монету", "монеты", "монет")}"
                                 ) { accepter ->
-                                    if (stat.money >= cost) {
-                                        giveMoney(-cost)
-                                        Glow.animate(player, 1.0, GlowColor.GREEN)
-                                        Anime.title(accepter, "§dУспешно!")
-                                        app.playerDataManager.addProgress(this@run, key)
-                                        value.whenBought = System.currentTimeMillis() / 1000
-                                    } else {
-                                        player.error("Недостаточно средств")
+                                    if (!(app.getUser(accepter) ?: return@Confirmation).armLock()) {
+                                        if (stat.money >= cost) {
+                                            giveMoney(-cost)
+                                            Glow.animate(player, 1.0, GlowColor.GREEN)
+                                            Anime.title(accepter, "§dУспешно!")
+                                            app.playerDataManager.addProgress(this@run, key)
+                                            value.whenBought = System.currentTimeMillis() / 1000
+                                        } else {
+                                            player.error("Недостаточно средств")
+                                        }
                                     }
                                 }.open(player)
                             }
