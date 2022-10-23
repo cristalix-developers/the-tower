@@ -10,6 +10,6 @@ data class Arena(
     val arenaNumber: Int,
     val arenaSpawn: Location,
     val cubeLocation: Location,
-    val generators: List<Location>,
-    val gemLocations: List<Location>
+    val generators: Set<Location>,
+    val gemLocations: Set<Location>
 )

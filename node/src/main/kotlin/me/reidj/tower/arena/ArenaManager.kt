@@ -27,8 +27,8 @@ class ArenaManager {
                     x += 0.5
                     z += 0.5
                 },
-                app.worldMeta.getLabels("$arenaNumber-mob").filter { it.distanceSquared(label) < 900 },
-                app.worldMeta.getLabels("$arenaNumber-gem")
+                app.worldMeta.getLabels("$arenaNumber-mob").filter { it.distanceSquared(label) < 900 }.toSet(),
+                app.worldMeta.getLabels("$arenaNumber-gem").toSet()
             )
         }.sortedBy { it.arenaNumber }
     }

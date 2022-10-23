@@ -27,7 +27,10 @@ import me.reidj.tower.protocol.BulkSaveUserPackage
 import me.reidj.tower.protocol.LoadUserPackage
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.rank.RankManager
-import me.reidj.tower.util.*
+import me.reidj.tower.util.Images
+import me.reidj.tower.util.giveDefaultItems
+import me.reidj.tower.util.godSet
+import me.reidj.tower.util.transfer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.entity.Player
@@ -59,9 +62,7 @@ class PlayerDataManager : Listener {
             .key("lobby-scoreboard")
             .header("TowerSimulator")
             .dynamic("Уровень") { "§b${app.getUser(it)?.getLevel()}" }
-            .dynamic("Опыт") { "§a${toFormat(app.getUser(it)?.requiredExperience())}" }
-            .dynamic("Монет") { "§6${toFormat(app.getUser(it)?.stat?.money)}" }
-            .dynamic("Самоцветов") { "§2${app.getUser(it)?.stat?.gem}" }
+            .dynamic("Ранг") { "§a${app.getUser(it)?.stat?.rank?.title}" }
             .empty()
             .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }
             .build()
@@ -69,7 +70,6 @@ class PlayerDataManager : Listener {
         ScoreBoard.builder()
             .key("game-scoreboard")
             .header("TowerSimulator")
-            .dynamic("Токенов") { toFormat(app.getUser(it)?.tokens) }
             .dynamic("Волна") { app.getUser(it)?.wave?.level }
             .empty()
             .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }

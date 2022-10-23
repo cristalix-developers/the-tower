@@ -18,7 +18,7 @@ enum class ImprovementType(
     DAMAGE(
         "Урон §3+6",
         "${PATH}damage.png",
-        -5.0,
+        -6.0,
         10.0,
         6.0,
     false,

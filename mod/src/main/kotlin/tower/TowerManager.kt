@@ -172,7 +172,7 @@ object TowerManager {
             val protect = readDouble()
             if (protect != protection) {
                 protection = protect
-                (BarManager.protectionBox.children[4] as TextElement).content = "${100 / protection * 100}%"
+                (BarManager.protectionBox.children[4] as TextElement).content = "${Formatter.toHealthFormat(protection)}%"
             }
         }
 

@@ -2,7 +2,6 @@ package me.reidj.tower.upgrade
 
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.selection
-import me.func.mod.util.after
 import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.data.Category
@@ -63,13 +62,12 @@ class UpgradeMenu {
                                 user.update(user)
                                 SwordType.valueOf(stat.sword).update(user)
                             } else {
-                                user.session!!.run {
-                                    updateHealth(user)
-                                    updateBulletDelay(user)
-                                    updateDamage(user)
-                                    updateProtection(user)
+                                user.tower!!.run {
+                                    updateBulletDelay()
+                                    updateDamage()
+                                    updateProtection()
+                                    update(user, ImprovementType.RADIUS)
                                 }
-                                user.session!!.update(user, ImprovementType.RADIUS)
                             }
                         } else {
                             player.error("Недостаточно средств")

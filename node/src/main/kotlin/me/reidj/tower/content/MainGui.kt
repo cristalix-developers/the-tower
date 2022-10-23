@@ -50,7 +50,7 @@ class MainGui {
                     buttons[0].hover = """
                          §7Монеты: §3${Formatter.toFormat(stat.money)}
                          §7Самоцветы: §3${stat.gem}
-                         §7Опыт: §3${requiredExperience()}
+                         §7Опыт: §3${Formatter.toFormat(requiredExperience())}
                          §7Волн пройдено: §3${stat.maximumWavePassed}
                          §7Ранг: §3${stat.rank.title}
                 """.trimIndent()

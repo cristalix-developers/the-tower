@@ -92,8 +92,8 @@ enum class ResearchType(
         "${PATH}protection.png",
         30,
         15,
-        -1.03,
-        1.03,
+        -0.1,
+        0.1,
         Category.PROTECTION_IMPROVEMENTS
     ),
     BULLET_DELAY(
