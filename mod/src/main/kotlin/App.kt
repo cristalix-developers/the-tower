@@ -51,7 +51,7 @@ class App : KotlinMod() {
                 cube.x,
                 cube.y - 1.5,
                 cube.z,
-                "§4${Formatter.toHealthFormat(TowerManager.health)} ❤",
+                "§4${Formatter.toFormat(TowerManager.health)} ❤",
                 1.5,
                 true
             )
@@ -79,7 +79,7 @@ class App : KotlinMod() {
                     cube.x,
                     cube.y - 1.25,
                     cube.z,
-                    "§4${Formatter.toHealthFormat(TowerManager.health)} ❤",
+                    "§4${Formatter.toFormat(TowerManager.health)} ❤",
                     2.0,
                     true
                 )

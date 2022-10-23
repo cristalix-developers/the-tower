@@ -23,7 +23,7 @@ class PlayerManager {
         origin = BOTTOM
         align = BOTTOM
         offset.y -= 24.0
-        size = V3(66.0, 12.0)
+        size = V3(58.0, 12.0)
         color = Color(0, 0, 0, 0.62)
         +carved {
             origin = CENTER
@@ -54,7 +54,7 @@ class PlayerManager {
 
         mod.registerChannel("tower:gem") {
             val gem = readInt()
-            (gemBox.children[4] as TextElement).content = gem.toString()
+            (gemBox.children[4] as TextElement).content = Formatter.toMoneyFormat(gem.toDouble())
         }
 
         mod.registerChannel("tower:exp") {
@@ -62,7 +62,7 @@ class PlayerManager {
             val requiredExperience = readInt()
 
             (levelBox.children[3] as RectangleElement).animate(1) { size.x = 66.0 / requiredExperience * experience }
-            (levelBox.children[4] as TextElement).content = "${experience.toInt()} из $requiredExperience"
+            (levelBox.children[4] as TextElement).content = "${Formatter.toFormat(experience)} из $requiredExperience"
         }
 
         mod.registerChannel("user:sword") {
@@ -80,8 +80,8 @@ class PlayerManager {
     private fun createBox(isLeft: Boolean, texture: String) = carved {
         origin = BOTTOM
         align = BOTTOM
-        offset = V3(if (isLeft) -62.5 else 62.5, -24.0)
-        size = V3(57.0, 12.0)
+        offset = V3(if (isLeft) -60.9 else 60.9, -24.0)
+        size = V3(60.0, 12.0)
         color = Color(0, 0, 0, 0.62)
         +rectangle {
             origin = CENTER
@@ -95,7 +95,7 @@ class PlayerManager {
             origin = CENTER
             align = CENTER
             shadow = true
-            if (isLeft) offset.x += 4.0 else offset.x -= 4.0
+            if (isLeft) offset.x += 5.0 else offset.x -= 5.0
             scale = V3(0.9, 0.9)
             content = "Загрузка..."
         }

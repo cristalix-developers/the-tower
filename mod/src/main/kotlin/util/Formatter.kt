@@ -6,9 +6,9 @@ object Formatter {
 
     private val moneyFormat = DecimalFormat("#,###,###,##0")
 
-    private val healthFormat = DecimalFormat("#,###.##")
+    private val doubleFormat = DecimalFormat("#,###.##")
 
     fun toMoneyFormat(double: Double): String = moneyFormat.format(double)
 
-    fun toHealthFormat(double: Double): String = healthFormat.format(double)
+    fun toFormat(double: Double): String = doubleFormat.format(double)
 }

@@ -10,7 +10,7 @@ import util.Formatter
  * @author Рейдж
  */
 
-fun EntityLivingBase.updateNameHealth() = apply { customNameTag = "§4${Formatter.toHealthFormat(health.toDouble())} ❤" }
+fun EntityLivingBase.updateNameHealth() = apply { customNameTag = "§4${Formatter.toFormat(health.toDouble())} ❤" }
 
 fun EntityLivingBase.updateHealth(damage: Double) = apply {
     health -= damage.toFloat()

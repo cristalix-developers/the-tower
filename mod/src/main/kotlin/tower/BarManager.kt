@@ -32,8 +32,8 @@ object BarManager {
             origin = CENTER
             align = CENTER
             shadow = true
-            scale = V3(0.95, 0.95, 0.95)
-            offset.x += 4.0
+            scale = V3(0.9, 0.9, 0.9)
+            offset.x += 6.0
             content = "Загрузка..."
         }
     }

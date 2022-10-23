@@ -172,7 +172,7 @@ object TowerManager {
             val protect = readDouble()
             if (protect != protection) {
                 protection = protect
-                (BarManager.protectionBox.children[4] as TextElement).content = "${Formatter.toHealthFormat(protection)}%"
+                (BarManager.protectionBox.children[4] as TextElement).content = "${Formatter.toFormat(protection)}%"
             }
         }
 
@@ -189,11 +189,11 @@ object TowerManager {
         maxHealth = maxHealthUpdate
 
         (BarManager.healthBox.children[3] as TextElement).content =
-            "${Formatter.toHealthFormat(health)} из ${Formatter.toHealthFormat(maxHealth)}"
+            "${Formatter.toFormat(health)} из ${Formatter.toFormat(maxHealth)}"
 
         if (mod.gameActive) {
             Banners.text(
-                "§4${Formatter.toHealthFormat(health)} ❤",
+                "§4${Formatter.toFormat(health)} ❤",
                 healthBanner!!,
                 Banners.banners[healthBanner!!.uuid]!!.second
             )
