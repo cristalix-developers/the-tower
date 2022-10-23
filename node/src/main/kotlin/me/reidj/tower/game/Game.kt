@@ -113,10 +113,10 @@ interface Game {
             Anime.counting321(player)
 
             inGame = true
-            after(3 * 20) {
-                wave = Wave(System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
-                wave!!.start()
+            wave = Wave(System.currentTimeMillis(), 1, mutableListOf(), mutableListOf(), player)
+            wave!!.start()
 
+            after(3 * 20) {
                 ScoreBoard.hide(player)
                 ScoreBoard.subscribe("game-scoreboard", player)
 

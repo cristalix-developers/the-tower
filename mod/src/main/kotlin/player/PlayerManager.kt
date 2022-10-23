@@ -61,7 +61,7 @@ class PlayerManager {
             val experience = readDouble()
             val requiredExperience = readInt()
 
-            (levelBox.children[3] as RectangleElement).animate(1) { size.x = 66.0 / requiredExperience * experience }
+            (levelBox.children[3] as RectangleElement).animate(1) { size.x = 58.0 / requiredExperience * experience }
             (levelBox.children[4] as TextElement).content = "${Formatter.toFormat(experience)} из $requiredExperience"
         }
 
