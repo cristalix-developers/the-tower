@@ -66,12 +66,13 @@ data class Wave(
     }
 
     private fun drawMob(location: Location) {
-        val hpFormula = level * if ((app.getUser(player) ?: return).session!!.arena.arenaNumber > 1) 0.5 else 0.3
-        val damageFormula = level * 0.05
+        val has = (app.getUser(player) ?: return).session!!.arena.arenaNumber > 1
+        val hpFormula = level * if (has) 0.5 else 0.3
+        val damageFormula = level * if (has) 0.5 else 0.05
         MobType.values()
             .filter { it.wave.any { wave -> level % wave == 0 } }
             .forEach {
-                if (level % 10 == 0 && mobs.none { mob -> mob.isBoss } && it.isBoss) {
+                if (level % 5 == 0 && mobs.none { mob -> mob.isBoss } && it.isBoss) {
                     Mob {
                         hp = it.hp + hpFormula
                         damage = it.damage + damageFormula

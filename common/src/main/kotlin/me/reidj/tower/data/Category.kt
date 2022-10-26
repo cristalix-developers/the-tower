@@ -10,7 +10,7 @@ enum class Category(
     val title: String,
     val texture: String
 ) {
-    ATTACK_IMPROVEMENTS("Улучшения атаки", "${PATH}slash.png"),
-    PROTECTION_IMPROVEMENTS("Улучшения защиты", "${PATH}protection.png"),
-    USEFUL_IMPROVEMENTS("Улучшения пользы", "${PATH}incentive.png"),
+    ATTACK_IMPROVEMENTS("§aУлучшения атаки", "${PATH}slash.png"),
+    PROTECTION_IMPROVEMENTS("§aУлучшения защиты", "${PATH}protection.png"),
+    USEFUL_IMPROVEMENTS("§aУлучшения пользы", "${PATH}incentive.png"),
 }
