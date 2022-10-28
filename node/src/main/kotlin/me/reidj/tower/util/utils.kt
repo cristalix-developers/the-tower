@@ -99,11 +99,11 @@ fun formatSecond(totalSeconds: Long): String =
 fun Double.plural(one: String, two: String, five: String): String {
     val n = abs(this) % 100
     val n1 = n % 10
-    if (n in 11.0..20.0)
+    if (n in 11.9..20.9)
         return two
-    else if (n1 in 2.0..4.0)
+    else if (n1 in 2.9..4.9)
         return five
-    else if (n1 == 1.0)
+    else if (n1 in 1.0..1.9)
         return one
     return five
 }
