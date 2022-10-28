@@ -30,36 +30,41 @@ data class Wave(
     fun start() {
         startTime = System.currentTimeMillis()
         ModTransfer(40).send("tower:bar", player)
-        repeat(3 + level * 2) {
+        repeat(1 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater
                 drawMob(session.arena.generators.random().clone().apply {
                     x += Math.random() * 4 - 2
                     z += Math.random() * 4 - 2
                 })
-            }, minOf(it.toLong() * 12, 400))
+            }, minOf(it.toLong() * 75, 400))
         }
     }
 
     fun end() {
         val user = app.getUser(player) ?: return
         val stat = user.stat
-        val session = user.session!!
         startTime = 0
         level++
         mobs.clear()
-        user.giveTokenWithBooster(stat.userImprovementType[ImprovementType.CASH_BONUS_WAVE_PASS]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue())
+        user.giveTokenWithBooster(
+            user.getLevel() * 5 * 0.3 +
+                    stat.userImprovementType[ImprovementType.CASH_BONUS_WAVE_PASS]!!.getValue()
+                    + stat.researchType[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue()
+        )
         if (level % 10 == 0) {
             Anime.cursorMessage(user.player, "§e+10 §fмонет")
             user.giveMoneyWithBooster(10.0)
         } else if (level == 16) {
-            Anime.alert(player, "Поздравляем!", "Вы прошли ${session.arena.arenaNumber} уровень!")
-            session.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(session.arena) + 1]
-            val cubeLocation = session.arena.cubeLocation
-            ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
-            player.teleport(session.arena.arenaSpawn)
-            Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: §3${session.arena.arenaNumber}")
-            level = 0
+            user.session?.let {
+                Anime.alert(player, "Поздравляем!", "Вы прошли ${it.arena.arenaNumber} уровень!")
+                it.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(it.arena) + 1]
+                val cubeLocation = it.arena.cubeLocation
+                ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
+                player.teleport(it.arena.arenaSpawn)
+                Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: §3${it.arena.arenaNumber}")
+                level = 0
+            }
         }
         Anime.counting321(user.player)
         after(3 * 20) { start() }

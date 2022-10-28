@@ -37,17 +37,17 @@ data class Mob(
     fun location(location: Location) = location(location.x, location.y, location.z)
 
     fun create(player: Player) = apply {
-        ModTransfer(
-            uuid.toString(),
-            type.typeId.toInt(),
-            x,
-            y,
-            z,
-            hp,
-            speedAttack,
-            moveSpeed.toDouble(),
-            attackRange,
-            isShooter
-        ).send("mob:init", player)
+        ModTransfer()
+            .uuid(uuid)
+            .integer(type.typeId.toInt())
+            .double(x)
+            .double(y)
+            .double(z)
+            .double(hp)
+            .double(speedAttack)
+            .double(moveSpeed.toDouble())
+            .double(attackRange)
+            .boolean(isShooter)
+            .send("mob:init", player)
     }
 }

@@ -16,10 +16,10 @@ enum class ImprovementType(
     val category: Category,
 ) : Pumping {
     DAMAGE(
-        "Урон §3+6",
+        "Урон §3+1",
         "${PATH}damage.png",
         0.0,
-        10.0,
+        8.0,
         1.0,
     false,
         Category.ATTACK_IMPROVEMENTS
@@ -37,7 +37,7 @@ enum class ImprovementType(
         "Здоровье §3+1",
         "${PATH}health.png",
         4.0,
-        5.0,
+        8.0,
         1.0,
         false,
         Category.PROTECTION_IMPROVEMENTS
@@ -46,7 +46,7 @@ enum class ImprovementType(
         "Регенерация §3+0.1",
         "${PATH}regeneration.png",
         -0.1,
-        30.0,
+        10.0,
         .1,
         false,
         Category.PROTECTION_IMPROVEMENTS
@@ -55,7 +55,7 @@ enum class ImprovementType(
         "Защита §3+0.1",
         "${PATH}protection.png",
         -0.1,
-        40.0,
+        10.0,
         0.1,
         false,
         Category.PROTECTION_IMPROVEMENTS
@@ -64,7 +64,7 @@ enum class ImprovementType(
         "Радиус атаки §3+0.1",
         "${PATH}radius.png",
         9.9,
-        3.0,
+        8.0,
         0.1,
         false,
         Category.ATTACK_IMPROVEMENTS
@@ -73,7 +73,7 @@ enum class ImprovementType(
         "Шанс крит.удара §3+1",
         "${PATH}critical_strike_chance.png",
         1.0,
-        33.0,
+        10.0,
         1.0,
         false,
         Category.ATTACK_IMPROVEMENTS
@@ -82,7 +82,7 @@ enum class ImprovementType(
         "Коэффициент крит.удара §3+0.10",
         "${PATH}critical_hit_ratio.png",
         1.0,
-        33.0,
+        10.0,
         0.10,
         false,
         Category.ATTACK_IMPROVEMENTS
@@ -100,7 +100,7 @@ enum class ImprovementType(
         "Бонус за убийство §3+1",
         "${PATH}kill_bonus.png",
         0.0,
-        130.0,
+        16.0,
         1.0,
         true,
         Category.USEFUL_IMPROVEMENTS
@@ -109,7 +109,7 @@ enum class ImprovementType(
         "Бонус за волну §3+1",
         "${PATH}cash_bonus_wave_pass.png",
         0.0,
-        160.0,
+        16.0,
         1.0,
         true,
         Category.USEFUL_IMPROVEMENTS
