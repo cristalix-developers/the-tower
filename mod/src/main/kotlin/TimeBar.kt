@@ -39,8 +39,9 @@ class TimeBar {
                 currentTime = System.currentTimeMillis()
                 content.content =
                     (time / 60).toString().padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0')
-                if (MobManager.mobs.isEmpty() || !mod.gameActive) {
+                if (MobManager.mobs.isEmpty()) {
                     UIEngine.overlayContext.removeChild(box)
+                    UIEngine
                 }
             }
         }
@@ -55,8 +56,6 @@ class TimeBar {
 
             content.content = (time / 60).toString().padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0')
             UIEngine.overlayContext + box
-
-            UIEngine.schedule(time) { UIEngine.overlayContext.removeChild(box) }
         }
     }
 }
