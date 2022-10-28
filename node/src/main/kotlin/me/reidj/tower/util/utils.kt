@@ -57,6 +57,8 @@ val hubItem = item {
     nbt("click", "leave")
 }
 
+const val STORAGE = "https://storage.c7x.dev/reidj/tower/"
+
 private val MONEY_FORMAT = DecimalFormat("###,###,###,###,###,###.##")
 
 fun toFormat(money: Double?): String = MONEY_FORMAT.format(money)

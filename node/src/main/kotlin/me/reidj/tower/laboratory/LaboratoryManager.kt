@@ -12,6 +12,7 @@ import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.data.Category
 import me.reidj.tower.data.ResearchType
+import me.reidj.tower.sound.SoundType
 import me.reidj.tower.util.Formatter.toFormat
 import me.reidj.tower.util.PATH
 import me.reidj.tower.util.error
@@ -62,6 +63,7 @@ class LaboratoryManager : ClockInject {
                                     if (!(app.getUser(accepter) ?: return@Confirmation).armLock()) {
                                         if (stat.money >= cost) {
                                             giveMoney(-cost)
+                                            SoundType.BUY.send(player)
                                             Glow.animate(player, 1.0, GlowColor.GREEN)
                                             Anime.title(accepter, "§dУспешно!")
                                             app.playerDataManager.addProgress(this@run, key)

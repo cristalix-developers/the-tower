@@ -19,7 +19,8 @@ dependencies {
 
     implementation 'cristalix:boards-bukkit-api:3.0.15'
 
-    implementation 'me.func:animation-api:3.10.0'
+    implementation 'me.func:sound-api:1.0.5'
+    implementation 'me.func:animation-api:3.10.5'
 
     implementation project(':common')
 }

@@ -17,6 +17,8 @@ import me.func.mod.util.listener
 import me.func.protocol.data.color.GlowColor
 import me.func.protocol.data.status.EndStatus
 import me.func.protocol.math.Position
+import me.func.sound.Category
+import me.func.sound.Music
 import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.clock.GameTimer
 import me.reidj.tower.clock.detail.DropItem
@@ -90,6 +92,8 @@ class App : JavaPlugin() {
             readableName = "Просто снос башки"
             groupName = "Секрет"
         }
+
+        Music.block(Category.VOICE).block(Category.PLAYERS)
 
         worldMeta = MapLoader().load("tower")!!
 
@@ -183,7 +187,10 @@ class App : JavaPlugin() {
             app.findMob(user, pair[0].encodeToByteArray())?.let { mob ->
                 user.run {
                     val damage =
-                        max(1.0, mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue())
+                        max(
+                            1.0,
+                            mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
+                        )
                     tower.health -= damage
                     Glow.animate(player, .5, GlowColor.RED)
                     Anime.killboardMessage(player, "Вам нанесли §c§l${toFormat(damage)} урона")

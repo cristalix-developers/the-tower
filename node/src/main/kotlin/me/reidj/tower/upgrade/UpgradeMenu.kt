@@ -7,6 +7,7 @@ import me.reidj.tower.app
 import me.reidj.tower.data.Category
 import me.reidj.tower.data.Improvement
 import me.reidj.tower.data.ImprovementType
+import me.reidj.tower.sound.SoundType
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.user.User
 import me.reidj.tower.util.Formatter
@@ -45,7 +46,7 @@ class UpgradeMenu {
         menu.vault = if (notInGame) "${PATH}coin.png" else "${PATH}token.png"
         menu.storage = type.filter { it.key.category == category }.map { (key, value) ->
             val level = value.level
-            val cost = key.price + level
+            val cost = key.price * level * 0.5
             button {
                 texture = key.texture
                 price = cost.toLong()
@@ -55,11 +56,11 @@ class UpgradeMenu {
                     if (!(app.getUser(player) ?: return@onClick).armLock()) {
                         if (if (notInGame) stat.money >= cost else user.tokens >= cost) {
                             if (notInGame) user.giveMoney(-cost) else user.giveToken(-cost)
+                            SoundType.BUY.send(player)
                             value.level++
                             user.tower!!.updateHealth()
                             player.performCommand("workshop ${category.name}")
                             if (notInGame) {
-                                user.update(user)
                                 SwordType.valueOf(stat.sword).update(user)
                             } else {
                                 user.tower!!.run {
