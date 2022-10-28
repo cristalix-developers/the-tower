@@ -3,6 +3,7 @@ package me.reidj.tower.util
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.choicer
 import me.reidj.tower.data.Category
+import me.reidj.tower.sound.SoundType
 import org.bukkit.entity.Player
 
 /**
@@ -22,7 +23,10 @@ object CategoryMenu {
                 title = it.title
                 texture = it.texture
                 hint("Перейти")
-                onClick { player, _, _ -> player.performCommand("$command ${it.name}") }
+                onClick { player, _, _ ->
+                    player.performCommand("$command ${it.name}")
+                    SoundType.CLICK_MENU.send(player)
+                }
             }
         }.toMutableList()
         if (index != null) {

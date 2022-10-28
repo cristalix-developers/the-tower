@@ -12,6 +12,7 @@ import org.bukkit.entity.Player
 enum class SoundType {
     GEM_DROP,
     BUY,
+    CLICK_MENU,
     ;
 
     fun send(player: Player) = Sound("${STORAGE}${name.lowercase()}.ogg")
