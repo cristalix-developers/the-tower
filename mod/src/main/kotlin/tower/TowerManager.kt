@@ -89,7 +89,7 @@ object TowerManager {
 
     init {
         mod.registerHandler<GameLoop> {
-            if (MobManager.mobs.isEmpty())
+            if (MobManager.mobs.isEmpty() || !mod.isCubeInitialized())
                 return@registerHandler
             val now = System.currentTimeMillis()
             if (now - lastTickMoveTowerBullet > speedAttack * 1000) {
