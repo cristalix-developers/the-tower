@@ -100,7 +100,7 @@ class App : KotlinMod() {
         var isArmsLock = false
 
         registerHandler<EntityLeftClick> {
-            if (PlayerManager.swordDamage == 0.0)
+            if (PlayerManager.swordDamage == 0.0 || clientApi.minecraft().player.heldItemMainhand.isEmpty)
                 return@registerHandler
             if (!isArmsLock) {
                 isArmsLock = true
