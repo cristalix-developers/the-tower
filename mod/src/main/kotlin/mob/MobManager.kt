@@ -5,7 +5,7 @@ import dev.xdark.clientapi.entity.EntityLivingBase
 import dev.xdark.clientapi.event.lifecycle.GameLoop
 import dev.xdark.feder.NetUtil
 import mod
-import ru.cristalix.clientapi.readUtf8
+import ru.cristalix.clientapi.readId
 import ru.cristalix.uiengine.UIEngine
 import util.Vector
 import java.util.*
@@ -24,7 +24,7 @@ object MobManager {
 
     init {
         mod.registerHandler<GameLoop> {
-            if (mobs.isEmpty())
+            if (mobs.isEmpty() || !mod.isCubeInitialized())
                 return@registerHandler
             val now = System.currentTimeMillis()
             mobs.keys.forEach { mob ->
@@ -47,7 +47,7 @@ object MobManager {
         }
 
         mod.registerChannel("mob:init") {
-            val uuid = UUID.fromString(readUtf8())
+            val uuid = readId()
             val id = readInt()
             val x = readDouble()
             val y = readDouble()

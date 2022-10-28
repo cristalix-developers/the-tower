@@ -115,4 +115,6 @@ class App : KotlinMod() {
             }
         }
     }
+
+    fun isCubeInitialized() = ::cube.isInitialized
 }
