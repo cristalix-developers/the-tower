@@ -42,7 +42,7 @@ class UpgradeMenu {
         menu.money =
             if (notInGame) "Монет ${Formatter.toFormat(stat.money)}" else "Токенов ${Formatter.toFormat(user.tokens)}"
         menu.rows = 3
-        menu.columns = 3
+        menu.columns = 2
         menu.vault = if (notInGame) "${PATH}coin.png" else "${PATH}token.png"
         menu.storage = type.filter { it.key.category == category }.map { (key, value) ->
             val level = value.level

@@ -108,8 +108,9 @@ class App : KotlinMod() {
                     "mob:hit",
                     Unpooled.copiedBuffer("${entity.uniqueID}:true", Charsets.UTF_8)
                 )
-                if (entity in MobManager.mobs)
+                if (entity in MobManager.mobs) {
                     (entity as EntityLivingBase).updateHealth(PlayerManager.swordDamage)
+                }
                 UIEngine.schedule(3) { isArmsLock = false }
             }
         }

@@ -1,6 +1,7 @@
 package me.reidj.tower.sword
 
 import dev.implario.bukkit.item.item
+import me.func.mod.conversation.ModTransfer
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.Pumping
 import me.reidj.tower.donate.SwordSkin
@@ -41,7 +42,7 @@ enum class SwordType(private val title: String, private val material: Material, 
             })
     }
 
-    fun update(user: User) = update(user, ImprovementType.SWORD)
+    fun update(user: User) = ModTransfer(damage).send("user:sword",user.player)
 
     open fun getNext(): SwordType? =
         if (ordinal >= SwordType.values().size - 1) null else SwordType.values()[ordinal + 1]

@@ -12,14 +12,11 @@ import me.func.protocol.math.Position
 import me.reidj.tower.app
 import me.reidj.tower.booster.BoosterType
 import me.reidj.tower.clientSocket
-import me.reidj.tower.data.ImprovementType
-import me.reidj.tower.data.Pumping
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.data.Stat
 import me.reidj.tower.donate.StartingKit
 import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.protocol.SaveUserPackage
-import me.reidj.tower.upgrade.Upgradable
 import me.reidj.tower.util.LevelSystem
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -30,7 +27,7 @@ import java.util.function.Supplier
  * @project : tower-simulator
  * @author : Рейдж
  **/
-class User(stat: Stat) : Upgradable {
+class User(stat: Stat) {
     val stat: Stat
 
     lateinit var player: Player
@@ -156,22 +153,5 @@ class User(stat: Stat) : Upgradable {
         }
         clientSocket.write(SaveUserPackage(stat.uuid, stat))
         return sum
-    }
-
-    override fun update(user: User, vararg pumping: Pumping) {
-        pumping.filterIsInstance<ImprovementType>()
-            .forEach {
-                ModTransfer(stat.userImprovementType[ImprovementType.valueOf(it.name)]!!.getValue()).send(
-                    "user:${it.name.lowercase()}",
-                    user.player
-                )
-            }
-        pumping.filterIsInstance<ResearchType>()
-            .forEach {
-                ModTransfer(stat.researchType[ResearchType.valueOf(it.name)]!!.getValue()).send(
-                    "user:${it.name.lowercase()}",
-                    user.player
-                )
-            }
     }
 }

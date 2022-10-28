@@ -100,7 +100,7 @@ interface Game {
                 )
             }
 
-            update(this, ImprovementType.SWORD)
+            SwordType.valueOf(stat.sword).update(this)
 
             // Отправляем точки со спавнерами
             session.arena.generators.forEach { label ->
