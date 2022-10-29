@@ -11,10 +11,7 @@ import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
-import org.bukkit.event.player.PlayerArmorStandManipulateEvent
-import org.bukkit.event.player.PlayerDropItemEvent
-import org.bukkit.event.player.PlayerMoveEvent
-import org.bukkit.event.player.PlayerSwapHandItemsEvent
+import org.bukkit.event.player.*
 
 /**
  * @project tower
@@ -24,6 +21,9 @@ class UnusedEvent : Listener {
 
     @EventHandler
     fun PlayerMoveEvent.handle() { if (player.location.y <= 80) player.teleport(app.playerDataManager.spawn) }
+
+    @EventHandler
+    fun PlayerInteractEvent.handle() { isCancelled = true }
 
     @EventHandler
     fun BlockPlaceEvent.handle() { isCancelled = true }

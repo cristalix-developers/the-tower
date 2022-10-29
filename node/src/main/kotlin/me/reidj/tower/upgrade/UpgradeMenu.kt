@@ -61,7 +61,7 @@ class UpgradeMenu {
                             user.tower!!.updateHealth()
                             player.performCommand("workshop ${category.name}")
                             if (notInGame) {
-                                SwordType.valueOf(stat.sword).update(user)
+                                SwordType.valueOf(stat.sword).swordImprove(user)
                             } else {
                                 user.tower!!.run {
                                     updateBulletDelay()
