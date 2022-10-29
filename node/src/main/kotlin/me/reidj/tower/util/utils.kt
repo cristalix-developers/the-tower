@@ -87,14 +87,16 @@ fun MutableList<Mob>.clear(player: Player) = apply {
     clear()
 }
 
- fun Player.error(subTitle: String) {
+fun Player.error(subTitle: String) {
     Glow.animate(player, 2.0, GlowColor.RED)
     Anime.itemTitle(player, barrier, "Ошибка", subTitle, 2.0)
     Anime.close(player)
 }
 
 fun formatSecond(totalSeconds: Long): String =
-    "${totalSeconds / 3600}:${(totalSeconds % 3600) / 60}:${totalSeconds % 60}"
+    "${(totalSeconds / 3600).toString().padStart(2, '0')}:${
+        ((totalSeconds % 3600) / 60).toString().padStart(2, '0')
+    }:${(totalSeconds % 60).toString().padStart(2, '0')}"
 
 fun Double.plural(one: String, two: String, five: String): String {
     val n = abs(this) % 100

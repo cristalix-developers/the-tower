@@ -39,18 +39,15 @@ class LaboratoryManager : ClockInject {
                 menu.money = "Монет ${toFormat(stat.money)}"
                 menu.storage =
                     stat.researchType.filter { it.key.category == Category.valueOf(args[0]) }.map { (key, value) ->
-                        val cost = key.price * value.level - stat.researchType[ResearchType.DISCOUNT]!!.getValue()
+                        val cost = key.price * value.level * 0.5 - stat.researchType[ResearchType.DISCOUNT]!!.getValue()
                         val gem = 5 * value.level
                         button {
                             title = "${key.title} §3${value.level} LVL"
                             menu.vault = "${PATH}coin.png"
                             texture = key.texture
                             description =
-                                if (value.whenBought != 0L) "Нажмите ПКМ, чтобы закончить изучение" else "${
-                                    toFormat(
-                                        value.getValue()
-                                    )
-                                } §f➠ §l${toFormat(key.value + key.step * (value.level + 1))}\n" + "Время улучшения ${key.duration} секунд"
+                                if (value.whenBought != 0L) "Нажмите ПКМ, чтобы закончить изучение" else "${toFormat(value.getValue())
+                                } §f➠ §l${toFormat(key.value + key.step * (value.level + 1))}\n" + "Время улучшения ${key.duration * value.level} секунд"
                             price = cost.toLong()
                             hint(if (value.whenBought == 0L) "Изучить" else "В процессе")
                             onLeftClick { player, _, _ ->
@@ -75,7 +72,7 @@ class LaboratoryManager : ClockInject {
                                 }.open(player)
                             }
                             onRightClick { player, _, _ ->
-                                if (value.whenBought != 0L)
+                                if (value.whenBought == 0L)
                                     return@onRightClick
                                 Confirmation(
                                     "Купить §a'Спешка'",
@@ -112,7 +109,7 @@ class LaboratoryManager : ClockInject {
                         val now = System.currentTimeMillis()
                         val progress = user.activeProgress[key] ?: return@forEach
                         val whenBought = value.whenBought * 1000
-                        val end = whenBought + value.getFullDuration() * 1000
+                        val end = whenBought + value.getFullDuration() * value.level * 1000
                         if (now >= end) {
                             Anime.killboardMessage(user.player, "Завершено исследование: §a${key.title}")
                             progress.delete(setOf(user.player))

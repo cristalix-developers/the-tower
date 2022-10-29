@@ -48,7 +48,7 @@ data class Wave(
         level++
         mobs.clear()
         user.giveTokenWithBooster(
-            user.getLevel() * 5 * 0.3 +
+            user.getLevel() * 8 * 0.3 +
                     stat.userImprovementType[ImprovementType.CASH_BONUS_WAVE_PASS]!!.getValue()
                     + stat.researchType[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue()
         )

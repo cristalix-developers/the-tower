@@ -6,10 +6,7 @@ package me.reidj.tower.data
  **/
 data class Research(private val objectName: String, var level: Int, var whenBought: Long = 0) {
 
-    fun getValue(): Double {
-        val researchType = ResearchType.valueOf(objectName)
-        return researchType.value + researchType.step * level
-    }
+    fun getValue() = ResearchType.valueOf(objectName).let { it.value + it.step * level }
 
     fun getFullDuration() = ResearchType.valueOf(objectName).duration
 }

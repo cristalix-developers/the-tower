@@ -28,7 +28,7 @@ data class Tower(
 
     fun updateBulletDelay() {
         val upgrade =
-            upgrades[ImprovementType.BULLET_DELAY]!!.getValue() + researches[ResearchType.BULLET_DELAY]!!.getValue()
+            upgrades[ImprovementType.BULLET_DELAY]!!.getValue() - researches[ResearchType.BULLET_DELAY]!!.getValue()
         ModTransfer(upgrade).send("tower:bullet_delay", owner)
     }
 
