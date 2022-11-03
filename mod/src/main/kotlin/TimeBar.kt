@@ -12,6 +12,7 @@ class TimeBar {
         align = TOP
         color = Color(0, 0, 0, 0.62)
         size = V3(60.0, 20.0)
+        carveSize = 2.0
         +text {
             origin = CENTER
             align = CENTER

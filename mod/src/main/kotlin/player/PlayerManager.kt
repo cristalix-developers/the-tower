@@ -23,12 +23,12 @@ class PlayerManager {
         origin = BOTTOM
         align = BOTTOM
         offset.y -= 24.0
-        size = V3(58.0, 12.0)
+        size = V3(58.0, 13.0)
         color = Color(0, 0, 0, 0.62)
         +carved {
             origin = CENTER
             align = CENTER
-            size = V3(0.0, 11.0, 0.0)
+            size = V3(0.0, 12.0, 0.0)
             color = Color(34, 184, 77, 1.0)
         }
         +text {
@@ -81,7 +81,7 @@ class PlayerManager {
         origin = BOTTOM
         align = BOTTOM
         offset = V3(if (isLeft) -60.9 else 60.9, -24.0)
-        size = V3(60.0, 12.0)
+        size = V3(60.0, 13.0)
         color = Color(0, 0, 0, 0.62)
         +rectangle {
             origin = CENTER

@@ -1,7 +1,6 @@
 package me.reidj.tower.listener
 
 import com.destroystokyo.paper.event.player.PlayerAdvancementCriterionGrantEvent
-import me.reidj.tower.app
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.*
@@ -11,16 +10,16 @@ import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
-import org.bukkit.event.player.*
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent
+import org.bukkit.event.player.PlayerDropItemEvent
+import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerSwapHandItemsEvent
 
 /**
  * @project tower
  * @author Рейдж
  */
 class UnusedEvent : Listener {
-
-    @EventHandler
-    fun PlayerMoveEvent.handle() { if (player.location.y <= 80) player.teleport(app.playerDataManager.spawn) }
 
     @EventHandler
     fun PlayerInteractEvent.handle() { isCancelled = true }

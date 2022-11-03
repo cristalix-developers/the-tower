@@ -18,6 +18,7 @@ import me.reidj.tower.donate.StartingKit
 import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.util.LevelSystem
+import net.minecraft.server.v1_12_R1.PlayerConnection
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import ru.cristalix.core.formatting.Formatting
@@ -31,6 +32,7 @@ class User(stat: Stat) {
     val stat: Stat
 
     lateinit var player: Player
+    lateinit var connection: PlayerConnection
 
     var session: Session? = null
     var tower: Tower? = null

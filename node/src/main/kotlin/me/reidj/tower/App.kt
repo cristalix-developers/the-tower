@@ -1,6 +1,7 @@
 package me.reidj.tower
 
 import clepto.bukkit.B
+import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
@@ -30,12 +31,13 @@ import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.donate.DonateMenu
 import me.reidj.tower.game.Default
+import me.reidj.tower.game.Gem
 import me.reidj.tower.game.Rating
 import me.reidj.tower.game.wave.WaveManager
 import me.reidj.tower.game.wave.mob.Mob
 import me.reidj.tower.laboratory.LaboratoryManager
 import me.reidj.tower.listener.InteractEvent
-import me.reidj.tower.listener.PlayerPickUpEvent
+import me.reidj.tower.listener.PlayerMoveEvent
 import me.reidj.tower.listener.UnusedEvent
 import me.reidj.tower.npc.NpcManager
 import me.reidj.tower.sword.SwordType
@@ -77,6 +79,8 @@ class App : JavaPlugin() {
         B.plugin = this
 
         Platforms.set(PlatformDarkPaper())
+
+        Cristalix.client()
 
         CoreApi.get().run {
             registerService(ITransferService::class.java, TransferService(socketClient))
@@ -120,7 +124,7 @@ class App : JavaPlugin() {
 
         playerDataManager = PlayerDataManager()
 
-        listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerPickUpEvent())
+        listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerMoveEvent())
 
 
 
@@ -227,6 +231,7 @@ class App : JavaPlugin() {
                         Anime.overlayText(player, Position.BOTTOM_RIGHT, "")
 
                         wave.aliveMobs.clear(player)
+                        Gem.bulkRemove(user.connection, session.gems)
 
                         inGame = false
 
@@ -250,6 +255,8 @@ class App : JavaPlugin() {
         runBlocking { clientSocket.write(playerDataManager.bulkSave(true)) }
         Thread.sleep(1000)
     }
+
+    fun getNMSWorld() = worldMeta.world.handle
 
     fun getUser(uuid: UUID) = playerDataManager.userMap[uuid]
 

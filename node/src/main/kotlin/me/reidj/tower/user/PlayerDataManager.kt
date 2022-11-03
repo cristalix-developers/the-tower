@@ -33,6 +33,7 @@ import me.reidj.tower.util.godSet
 import me.reidj.tower.util.transfer
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -90,6 +91,7 @@ class PlayerDataManager : Listener {
     @EventHandler
     fun PlayerJoinEvent.handle() {
         val user = app.getUser(player)
+        val connection = (player as CraftPlayer).handle.playerConnection
 
         if (user == null) {
             player.sendMessage(Formatting.error("Нам не удалось прогрузить Вашу статистику."))
@@ -100,6 +102,7 @@ class PlayerDataManager : Listener {
         val stat = user.stat
 
         user.player = player
+        user.connection = connection
         user.tower = Tower(player, user.health, stat.maxHealth, stat.towerImprovementType, stat.researchType)
 
         after(3) {
