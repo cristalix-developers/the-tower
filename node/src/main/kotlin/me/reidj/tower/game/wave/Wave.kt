@@ -3,9 +3,7 @@ package me.reidj.tower.game.wave
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
-import me.func.protocol.math.Position
 import me.reidj.tower.app
-import me.reidj.tower.arena.ArenaManager
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.mob.Mob
@@ -44,28 +42,25 @@ data class Wave(
     fun end() {
         val user = app.getUser(player) ?: return
         val stat = user.stat
+
         startTime = 0
         level++
         mobs.clear()
+
         user.giveTokenWithBooster(
             user.getLevel() * 8 * 0.3 +
                     stat.userImprovementType[ImprovementType.CASH_BONUS_WAVE_PASS]!!.getValue()
                     + stat.researchType[ResearchType.CASH_BONUS_WAVE_PASS]!!.getValue()
         )
+
         if (level % 10 == 0) {
             Anime.cursorMessage(user.player, "§e+10 §fмонет")
             user.giveMoneyWithBooster(10.0)
         } else if (level == 16) {
-            user.session?.let {
-                Anime.alert(player, "Поздравляем!", "Вы прошли ${it.arena.arenaNumber} уровень!")
-                it.arena = ArenaManager.arenas[ArenaManager.arenas.indexOf(it.arena) + 1]
-                val cubeLocation = it.arena.cubeLocation
-                ModTransfer(cubeLocation.x, cubeLocation.y, cubeLocation.z).send("tower:map-change", player)
-                player.teleport(it.arena.arenaSpawn)
-                Anime.overlayText(player, Position.BOTTOM_RIGHT, "Уровень: §3${it.arena.arenaNumber}")
-                level = 0
-            }
+            user.session!!.arena.arenaChange(user)
+            level = 0
         }
+
         Anime.counting321(user.player)
         after(3 * 20) { start() }
     }
