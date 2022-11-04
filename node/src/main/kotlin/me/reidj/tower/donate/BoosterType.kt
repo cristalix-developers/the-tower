@@ -79,8 +79,6 @@ enum class BoosterType(
 
     override fun getPrice() = price
 
-    override fun isSave() = false
-
     override fun give(user: User) {
         val booster = boosterInfo(user)
         val title = booster.type.title

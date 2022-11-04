@@ -1,6 +1,12 @@
 package me.reidj.tower.game.wave.mob
 
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.reidj.tower.data.ImprovementType
+import me.reidj.tower.data.ResearchType
+import me.reidj.tower.user.User
+import me.reidj.tower.util.Formatter
+import me.reidj.tower.util.plural
 import org.bukkit.Location
 import org.bukkit.entity.EntityType
 import org.bukkit.entity.Player
@@ -49,5 +55,32 @@ data class Mob(
             .double(attackRange)
             .boolean(isShooter)
             .send("mob:init", player)
+    }
+
+    fun hitMob(user: User, damage: Double, message: String) {
+        hp -= damage
+        Anime.killboardMessage(user.player, message)
+        death(user)
+    }
+
+    private fun death(user: User) {
+        if (hp <= 0) {
+            val token =
+                user.stat.userImprovementType[ImprovementType.CASH_BONUS_KILL]!!.getValue() + user.stat.researchType[ResearchType.CASH_BONUS_KILL]!!.getValue()
+
+            user.giveTokenWithBooster(token)
+
+            ModTransfer(
+                uuid.toString(), "§b+${Formatter.toFormat(token)} §f${
+                    token.plural(
+                        "Жетон",
+                        "Жетона",
+                        "Жетонов"
+                    )
+                }"
+            ).send("mob:kill", user.player)
+
+            user.wave!!.aliveMobs.remove(this)
+        }
     }
 }

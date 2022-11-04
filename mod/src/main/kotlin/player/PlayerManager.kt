@@ -70,7 +70,7 @@ class PlayerManager {
         }
 
         mod.registerHandler<GameLoop> {
-            val has = if (mod.gameActive) false else screenCheck()
+            val has = !mod.gameActive && screenCheck()
             moneyBox.enabled = has
             gemBox.enabled = has
             levelBox.enabled = has

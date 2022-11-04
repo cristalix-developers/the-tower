@@ -137,47 +137,21 @@ class App : JavaPlugin() {
                     val damage =
                         session.towerImprovement[ImprovementType.DAMAGE]!!.getValue() + stat.researchType[ResearchType.DAMAGE]!!.getValue()
                     val damageFormat = damage.plural("урон", "урона", "урона")
-                    if (pair[1].toBoolean()) {
-                        val swordDamage = SwordType.valueOf(stat.sword).damage
-                        mob.hp -= swordDamage
-                        Anime.killboardMessage(
-                            player,
-                            "Вы нанесли §c§l${Formatter.toFormat(swordDamage)} §f$damageFormat"
-                        )
-                    } else if (Math.random() > tower!!.upgrades[ImprovementType.CRITICAL_STRIKE_CHANCE]!!.getValue()) {
-                        val criticalDamage =
-                            damage + tower!!.upgrades[ImprovementType.CRITICAL_HIT_RATIO]!!.getValue() + stat.researchType[ResearchType.CRITICAL_HIT]!!.getValue()
-                        mob.hp -= criticalDamage
-                        Anime.killboardMessage(
-                            player,
-                            "Башня нанесла §c§l${Formatter.toFormat(criticalDamage)} §fкритического $damageFormat"
-                        )
-                    } else {
-                        mob.hp -= damage
-                        Anime.killboardMessage(
-                            player,
-                            "Башня нанесла §c§l${Formatter.toFormat(damage)} §f$damageFormat"
-                        )
-                    }
+                    val swordDamage = SwordType.valueOf(stat.sword).damage
+                    val criticalDamage =
+                        damage + tower!!.upgrades[ImprovementType.CRITICAL_HIT_RATIO]!!.getValue() + stat.researchType[ResearchType.CRITICAL_HIT]!!.getValue()
+                    val isCriticalDamage =
+                        Math.random() > tower!!.upgrades[ImprovementType.CRITICAL_STRIKE_CHANCE]!!.getValue()
 
-                    if (mob.hp <= 0) {
-                        val token =
-                            stat.userImprovementType[ImprovementType.CASH_BONUS_KILL]!!.getValue() + stat.researchType[ResearchType.CASH_BONUS_KILL]!!.getValue()
-
-                        giveTokenWithBooster(token)
-
-                        ModTransfer(
-                            mob.uuid.toString(), "§b+${Formatter.toFormat(token)} §f${
-                                token.plural(
-                                    "Жетон",
-                                    "Жетона",
-                                    "Жетонов"
-                                )
-                            }"
-                        ).send("mob:kill", player)
-
-                        wave!!.aliveMobs.remove(mob)
-                    }
+                    mob.hitMob(
+                        this,
+                        if (pair[1].toBoolean()) swordDamage else if (isCriticalDamage) criticalDamage else damage,
+                        if (pair[1].toBoolean()) "Вы нанесли §c§l${Formatter.toFormat(swordDamage)} §f$damageFormat" else if (isCriticalDamage) "Башня нанесла §c§l${
+                            Formatter.toFormat(
+                                criticalDamage
+                            )
+                        } §fкритического $damageFormat" else "Башня нанесла §c§l${Formatter.toFormat(damage)} §f$damageFormat"
+                    )
                 }
             }
         }
@@ -195,10 +169,12 @@ class App : JavaPlugin() {
                             1.0,
                             mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
                         )
+
                     tower.health -= damage
                     Glow.animate(player, .5, GlowColor.RED)
                     Anime.killboardMessage(player, "Вам нанесли §c§l${toFormat(damage)} урона")
                     tower.updateHealth()
+
                     val wave = wave ?: return@createReader
                     val waveLevel = wave.level
                     val reward =
@@ -240,9 +216,6 @@ class App : JavaPlugin() {
 
                         this.session = null
                         this.wave = null
-
-                        if (reward == 0.0)
-                            return@createReader
 
                         giveMoneyWithBooster(reward)
                     }

@@ -57,8 +57,7 @@ object MobManager {
             val moveSpeed = readDouble()
             val attackRange = readDouble()
             val isShooter = readBoolean()
-            val mob = Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat(), speedAttack, attackRange, isShooter)
-            mobs[mob.create()] = mob
+            Mob(uuid, id, x, y, z, hp, moveSpeed.toFloat(), speedAttack, attackRange, isShooter).apply { mobs[create()] = this }
         }
 
         mod.registerChannel("mob:kill") {

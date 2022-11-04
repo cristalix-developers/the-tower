@@ -48,14 +48,13 @@ class TopManager : ClockInject {
     private fun updateData() {
         CoroutineScope(Dispatchers.IO).launch {
             for (field in boards.keys) {
-                val topPackageResponse = clientSocket.writeAndAwaitResponse<TopPackage>(
+                tops[field] = clientSocket.writeAndAwaitResponse<TopPackage>(
                     TopPackage(
                         field,
                         DATA_COUNT,
                         false
                     )
-                ).await()
-                tops[field] = topPackageResponse.entries.map {
+                ).await().entries.map {
                     TopEntry(
                         if (it.displayName == null) "ERROR" else it.displayName!!,
                         TOP_DATA_FORMAT.format(it.value)

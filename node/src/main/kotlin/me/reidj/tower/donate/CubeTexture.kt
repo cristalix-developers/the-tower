@@ -32,9 +32,7 @@ enum class CubeTexture(
 
     override fun getPrice() = price
 
-    override fun isSave() = true
-
     override fun give(user: User) {
-
+        user.stat.donates.add(name)
     }
 }

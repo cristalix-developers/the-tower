@@ -174,8 +174,6 @@ class DonateMenu {
                     Anime.close(player)
                     Glow.animate(player, 0.4, GlowColor.GREEN)
                     donate.give(user)
-                    if (donate.isSave())
-                        stat.donates.add(donate.getObjectName())
                     player.sendMessage(Formatting.fine("Спасибо за поддержку разработчика!"))
                     clientSocket.write(SaveUserPackage(player.uniqueId, stat))
                 }

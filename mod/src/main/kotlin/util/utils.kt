@@ -33,5 +33,5 @@ fun MutableList<TowerManager.Bullet>.removeAll() {
 
 fun screenCheck(): Boolean {
     val currentScreen = UIEngine.clientApi.minecraft().currentScreen()
-    return currentScreen == null || currentScreen::class.java.simpleName != "aV"
+    return currentScreen == null || currentScreen::class.java.simpleName == "aV"
 }
