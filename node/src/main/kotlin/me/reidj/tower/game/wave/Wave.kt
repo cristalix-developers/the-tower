@@ -76,33 +76,22 @@ data class Wave(
         val damageFormula = level * if (has) 0.5 else 0.05
         MobType.values()
             .filter { it.wave.any { wave -> level % wave == 0 } }
-            .forEach {
-                if (level % 5 == 0 && mobs.none { mob -> mob.isBoss } && it.isBoss) {
-                    Mob {
-                        hp = it.hp + hpFormula
-                        damage = it.damage + damageFormula
-                        type = EntityType.valueOf(it.name)
-                        isBoss = true
-                        speedAttack = it.speedAttack
-                        moveSpeed = it.moveSpeed
-                        attackRange = it.attackRange
-                        isShooter = it.isShooter
-                    }.location(location).create(player).run {
-                        aliveMobs.add(this)
-                        mobs.add(this)
-                    }
-                } else if (!it.isBoss) {
-                    Mob {
-                        hp = it.hp + hpFormula
-                        damage = it.damage + damageFormula
-                        type = EntityType.valueOf(it.name)
-                        speedAttack = it.speedAttack
-                        attackRange = it.attackRange
-                        isShooter = it.isShooter
-                    }.location(location).create(player).run {
-                        aliveMobs.add(this)
-                        mobs.add(this)
-                    }
+            .forEach { mobType ->
+                val hasBoss = level % 5 == 0 && mobType.isBoss
+                if (hasBoss && mobs.any { it.isBoss })
+                    return@forEach
+                Mob {
+                    hp = mobType.hp + hpFormula
+                    damage = mobType.damage + damageFormula
+                    type = EntityType.valueOf(mobType.name)
+                    speedAttack = mobType.speedAttack
+                    moveSpeed = mobType.moveSpeed
+                    attackRange = mobType.attackRange
+                    isShooter = mobType.isShooter
+                    isBoss = hasBoss
+                }.location(location).create(player).run {
+                    aliveMobs.add(this)
+                    mobs.add(this)
                 }
             }
     }

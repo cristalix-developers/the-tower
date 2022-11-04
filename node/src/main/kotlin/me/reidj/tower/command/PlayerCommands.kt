@@ -42,12 +42,13 @@ class PlayerCommands {
             )
         }
         command("thx") { player, _ ->
-            if (app.playerDataManager.globalBoosters.isEmpty()) {
+            val globalBoosters = app.playerDataManager.globalBoosters
+            if (globalBoosters.isEmpty()) {
                 player.error("Сейчас нету активных бустеров!")
                 return@command
             }
             val user = app.getUser(player) ?: return@command
-            app.playerDataManager.globalBoosters.forEach {
+            globalBoosters.forEach {
                 val owner = app.getUser(it.owner) ?: return@command
                 val uuids = app.playerDataManager.thanksMap[it.uuid] ?: return@command
                 if (uuids.contains(player.uniqueId))
@@ -58,7 +59,7 @@ class PlayerCommands {
             }
             Anime.killboardMessage(
                 player,
-                "Вы поблагодарили за ${app.playerDataManager.globalBoosters.size} бустер(ов)!"
+                "Вы поблагодарили за ${globalBoosters.size} бустер(ов)!"
             )
         }
     }

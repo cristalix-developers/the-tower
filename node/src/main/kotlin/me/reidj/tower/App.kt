@@ -47,6 +47,7 @@ import me.reidj.tower.user.PlayerDataManager
 import me.reidj.tower.user.User
 import me.reidj.tower.util.*
 import me.reidj.tower.util.Formatter
+import net.minecraft.server.v1_12_R1.WorldServer
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -197,6 +198,7 @@ class App : JavaPlugin() {
 
                         player.giveDefaultItems()
                         player.flying(false)
+                        
                         showToAll()
                         Anime.close(player)
 
@@ -229,7 +231,7 @@ class App : JavaPlugin() {
         Thread.sleep(1000)
     }
 
-    fun getNMSWorld() = worldMeta.world.handle
+    fun getNMSWorld(): WorldServer = worldMeta.world.handle
 
     fun getUser(uuid: UUID) = playerDataManager.userMap[uuid]
 
