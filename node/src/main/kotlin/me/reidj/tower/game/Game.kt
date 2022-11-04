@@ -7,14 +7,20 @@ import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.choicer
 import me.func.mod.ui.scoreboard.ScoreBoard
 import me.func.mod.util.after
+import me.func.protocol.data.status.EndStatus
+import me.func.protocol.math.Position
 import me.reidj.tower.app
 import me.reidj.tower.data.ImprovementType
+import me.reidj.tower.data.ResearchType
 import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.user.Session
+import me.reidj.tower.user.User
 import me.reidj.tower.util.PATH
+import me.reidj.tower.util.clear
 import me.reidj.tower.util.flying
+import me.reidj.tower.util.giveDefaultItems
 import org.bukkit.Material
 import org.bukkit.entity.Player
 
@@ -132,6 +138,51 @@ interface Game {
                     CONST_TICKS_BEFORE_STRIKE
                 ).send("tower:update-state", player)
             }
+        }
+    }
+
+    fun end(user: User) {
+        val tower = user.tower ?: return
+        val stat = user.stat
+        val wave = user.wave ?: return
+        val waveLevel = wave.level
+        val reward =
+            (waveLevel * waveLevel - waveLevel) / 4 + stat.researchType[ResearchType.MONEY_BONUS_WAVE_PASS]!!.getValue()
+
+        if (tower.health <= 0) {
+            if (stat.maximumWavePassed > waveLevel) {
+                stat.maximumWavePassed = waveLevel
+            }
+
+            after {
+                ScoreBoard.hide(user.player)
+                ScoreBoard.subscribe("lobby-scoreboard", user.player)
+            }
+
+            user.player.giveDefaultItems()
+            user.player.flying(false)
+
+            user.showToAll()
+            Anime.close(user.player)
+
+            // Игра закончилась
+            ModTransfer(false).send("tower:update-state", user.player)
+
+            Anime.showEnding(user.player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
+            Anime.overlayText(user.player, Position.BOTTOM_RIGHT, "")
+
+            wave.aliveMobs.clear(user.player)
+            Gem.bulkRemove(user.connection, user.session!!.gems)
+
+            user.inGame = false
+
+            user.giveToken(-user.tokens)
+            user.giveExperienceWithBooster(waveLevel * 3 * 0.3)
+
+            user.session = null
+            user.wave = null
+
+            user.giveMoneyWithBooster(reward)
         }
     }
 }

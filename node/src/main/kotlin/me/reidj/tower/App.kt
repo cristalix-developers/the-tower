@@ -10,14 +10,7 @@ import kotlinx.coroutines.runBlocking
 import me.func.mod.Anime
 import me.func.mod.Kit
 import me.func.mod.conversation.ModLoader
-import me.func.mod.conversation.ModTransfer
-import me.func.mod.ui.Glow
-import me.func.mod.ui.scoreboard.ScoreBoard
-import me.func.mod.util.after
 import me.func.mod.util.listener
-import me.func.protocol.data.color.GlowColor
-import me.func.protocol.data.status.EndStatus
-import me.func.protocol.math.Position
 import me.func.sound.Category
 import me.func.sound.Music
 import me.reidj.tower.arena.ArenaManager
@@ -30,9 +23,6 @@ import me.reidj.tower.content.MainGui
 import me.reidj.tower.data.ImprovementType
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.donate.DonateMenu
-import me.reidj.tower.game.Default
-import me.reidj.tower.game.Gem
-import me.reidj.tower.game.Rating
 import me.reidj.tower.game.wave.WaveManager
 import me.reidj.tower.game.wave.mob.Mob
 import me.reidj.tower.laboratory.LaboratoryManager
@@ -45,8 +35,9 @@ import me.reidj.tower.tournament.TournamentManager
 import me.reidj.tower.upgrade.UpgradeMenu
 import me.reidj.tower.user.PlayerDataManager
 import me.reidj.tower.user.User
-import me.reidj.tower.util.*
 import me.reidj.tower.util.Formatter
+import me.reidj.tower.util.MapLoader
+import me.reidj.tower.util.plural
 import net.minecraft.server.v1_12_R1.WorldServer
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -102,8 +93,6 @@ class App : JavaPlugin() {
 
         worldMeta = MapLoader().load("tower")!!
 
-        Default()
-        Rating()
         ArenaManager()
 
         MainGui()
@@ -164,64 +153,12 @@ class App : JavaPlugin() {
             // Если моб есть в списке, то отнимаем хп у башни
             val pair = buffer.toString(Charsets.UTF_8).split(":")
             app.findMob(user, pair[0].encodeToByteArray())?.let { mob ->
-                user.run {
-                    val damage =
-                        max(
-                            1.0,
-                            mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - stat.researchType[ResearchType.PROTECTION]!!.getValue()
-                        )
-
-                    tower.health -= damage
-                    Glow.animate(player, .5, GlowColor.RED)
-                    Anime.killboardMessage(player, "Вам нанесли §c§l${toFormat(damage)} урона")
-                    tower.updateHealth()
-
-                    val wave = wave ?: return@createReader
-                    val waveLevel = wave.level
-                    val reward =
-                        (waveLevel * waveLevel - waveLevel) / 4 + stat.researchType[ResearchType.MONEY_BONUS_WAVE_PASS]!!.getValue()
-
-                    // Провожу действия с игроком если он проигрывает
-                    if (tower.health <= 0) {
-                        if (stat.maximumWavePassed > waveLevel)
-                            stat.maximumWavePassed = waveLevel
-
-                        if (isTournament) {
-                            TournamentManager.end(this)
-                            isTournament = false
-                        }
-
-                        after {
-                            ScoreBoard.hide(player)
-                            ScoreBoard.subscribe("lobby-scoreboard", player)
-                        }
-
-                        player.giveDefaultItems()
-                        player.flying(false)
-                        
-                        showToAll()
-                        Anime.close(player)
-
-                        // Игра закончилась
-                        ModTransfer(false).send("tower:update-state", player)
-
-                        Anime.showEnding(player, EndStatus.LOSE, "Волн пройдено:", "$waveLevel")
-                        Anime.overlayText(player, Position.BOTTOM_RIGHT, "")
-
-                        wave.aliveMobs.clear(player)
-                        Gem.bulkRemove(user.connection, session.gems)
-
-                        inGame = false
-
-                        giveToken(-tokens)
-                        giveExperienceWithBooster(waveLevel * 3 * 0.3)
-
-                        this.session = null
-                        this.wave = null
-
-                        giveMoneyWithBooster(reward)
-                    }
-                }
+                val damage =
+                    max(
+                        1.0,
+                        mob.damage - session.towerImprovement[ImprovementType.PROTECTION]!!.getValue() - user.stat.researchType[ResearchType.PROTECTION]!!.getValue()
+                    )
+                tower.hit(user, damage)
             }
         }
     }

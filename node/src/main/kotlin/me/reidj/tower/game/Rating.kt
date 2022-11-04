@@ -3,9 +3,9 @@ package me.reidj.tower.game
 import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.util.after
-import me.func.mod.util.command
 import me.reidj.tower.app
 import me.reidj.tower.tournament.TournamentManager
+import me.reidj.tower.user.User
 import me.reidj.tower.util.error
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -41,13 +41,16 @@ class Rating : Game {
                 queue.add(player.uniqueId)
                 ModTransfer(queue.size).send("queue:online", player)
                 ModTransfer("tournament.png", queueSlots).send("queue:show", player)
+                Anime.close(player)
                 if (queue.size == queueSlots) {
                     ModTransfer().send("queue:hide", player)
                     Anime.killboardMessage(player, "Игра начнётся через 2 секунды...")
                     after(2 * 20) {
                         Anime.title(player, "§dНачинаем!")
                         queue.forEach { uuid ->
-                            (app.getUser(player) ?: return@forEach).isTournament = true
+                            val user = app.getUser(player) ?: return@forEach
+                            user.isTournament = true
+                            user.game = Rating()
                             super.start(Bukkit.getPlayer(uuid))
                             queue.clear()
                         }
@@ -59,16 +62,15 @@ class Rating : Game {
         }
     }
 
-    init {
-        command("tournament") { player, _ ->
-            (app.getUser(player) ?: return@command).run {
-                if (stat.tournament.passedWaves.size != 3) {
-                    start(player)
-                } else {
-                    player.error("У вас закончились попытки!")
-                }
-            }
+    override fun end(user: User) {
+        super.end(user)
+        if (user.isTournament) {
+            TournamentManager.end(user)
+            user.isTournament = false
         }
+    }
+
+    init {
         Anime.createReader("queue:leave") { player, _ -> queueLeave(player) }
     }
 }

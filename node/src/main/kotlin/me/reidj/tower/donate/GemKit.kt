@@ -1,5 +1,6 @@
 package me.reidj.tower.donate
 
+import me.reidj.tower.data.Stat
 import me.reidj.tower.user.User
 import me.reidj.tower.util.PATH
 
@@ -32,4 +33,8 @@ enum class GemKit(
     override fun give(user: User) {
         user.giveGem(reward)
     }
+
+    override fun getCurrent(stat: Stat) = false
+
+    override fun setCurrent(stat: Stat) = Unit
 }

@@ -4,6 +4,7 @@ import me.func.mod.Anime
 import me.reidj.tower.app
 import me.reidj.tower.booster.BoosterInfo
 import me.reidj.tower.clientSocket
+import me.reidj.tower.data.Stat
 import me.reidj.tower.protocol.SaveGlobalBoosterPackage
 import me.reidj.tower.user.User
 import me.reidj.tower.util.PATH
@@ -102,4 +103,8 @@ enum class BoosterType(
         }
         clientSocket.write(SaveGlobalBoosterPackage(booster))
     }
+
+    override fun getCurrent(stat: Stat) = false
+
+    override fun setCurrent(stat: Stat) = Unit
 }

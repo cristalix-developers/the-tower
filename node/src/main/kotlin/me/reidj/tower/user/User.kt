@@ -15,6 +15,7 @@ import me.reidj.tower.clientSocket
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.data.Stat
 import me.reidj.tower.donate.StartingKit
+import me.reidj.tower.game.Game
 import me.reidj.tower.game.wave.Wave
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.util.LevelSystem
@@ -33,6 +34,7 @@ class User(stat: Stat) {
 
     lateinit var player: Player
     lateinit var connection: PlayerConnection
+    lateinit var game: Game
 
     var session: Session? = null
     var tower: Tower? = null

@@ -1,8 +1,12 @@
 package me.reidj.tower.user
 
+import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
+import me.func.mod.ui.Glow
+import me.func.protocol.data.color.GlowColor
 import me.reidj.tower.data.*
 import me.reidj.tower.upgrade.Upgradable
+import me.reidj.tower.util.toFormat
 import org.bukkit.entity.Player
 
 /**
@@ -59,5 +63,13 @@ data class Tower(
                     user.player
                 )
             }
+    }
+
+    fun hit(user: User, damage: Double) {
+        health -= damage
+        Glow.animate(user.player, .5, GlowColor.RED)
+        Anime.killboardMessage(user.player, "Вам нанесли §c§l${toFormat(damage)} урона")
+        updateHealth()
+        user.game.end(user)
     }
 }

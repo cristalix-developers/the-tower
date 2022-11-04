@@ -56,24 +56,18 @@ class DonateMenu {
             storage = donate.map { pos ->
                 converter(button {
                     val has = pos.getObjectName() in stat.donates
-                    val current = has && when (pos) {
-                        is CubeTexture -> stat.currentCubeTexture == pos.name
-                        is SwordSkin -> stat.currentSwordSkin == pos.name
-                        else -> false
-                    }
+                    val current = has && pos.getCurrent(stat)
                     description(pos.getDescription())
                     price(pos.getPrice())
                     texture(pos.getTexture())
                     hint(if (current) "Выбрано" else if (has) "Выбрать" else "Купить")
                     onClick { player, _, _ ->
-                        if (current)
+                        if (current) {
                             return@onClick
-                        Anime.close(player)
+                        }
                         if (has) {
-                            when (pos) {
-                                is CubeTexture -> stat.currentCubeTexture = pos.name
-                                is SwordSkin -> stat.currentSwordSkin = pos.name
-                            }
+                            pos.setCurrent(stat)
+                            Anime.close(player)
                             Anime.title(player, "§dВыбрано!")
                             clientSocket.write(SaveUserPackage(player.uniqueId, user.stat))
                             return@onClick

@@ -5,7 +5,9 @@ import me.func.mod.conversation.ModTransfer
 import me.func.mod.ui.dialog.Dialog
 import me.func.mod.util.command
 import me.reidj.tower.app
+import me.reidj.tower.game.Default
 import me.reidj.tower.game.Game
+import me.reidj.tower.game.Rating
 import me.reidj.tower.util.DialogUtil
 import me.reidj.tower.util.error
 import me.reidj.tower.util.transfer
@@ -61,6 +63,17 @@ class PlayerCommands {
                 player,
                 "Вы поблагодарили за ${globalBoosters.size} бустер(ов)!"
             )
+        }
+        command("default") { player, _ -> (app.getUser(player) ?: return@command).game = Default().apply { start(player) } }
+        command("tournament") { player, _ ->
+            (app.getUser(player) ?: return@command).run {
+                game = Rating()
+                if (stat.tournament.passedWaves.size != 3) {
+                    game.start(player)
+                } else {
+                    player.error("У вас закончились попытки!")
+                }
+            }
         }
     }
 }

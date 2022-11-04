@@ -1,5 +1,6 @@
 package me.reidj.tower.donate
 
+import me.reidj.tower.data.Stat
 import me.reidj.tower.user.User
 import me.reidj.tower.util.PATH
 
@@ -34,5 +35,11 @@ enum class CubeTexture(
 
     override fun give(user: User) {
         user.stat.donates.add(name)
+    }
+
+    override fun getCurrent(stat: Stat) = stat.currentCubeTexture == name
+
+    override fun setCurrent(stat: Stat) {
+        stat.currentCubeTexture = name
     }
 }
