@@ -39,8 +39,7 @@ class UpgradeMenu {
     private fun open(user: User, type: MutableMap<ImprovementType, Improvement>, category: Category) {
         val notInGame = !user.inGame
         val stat = user.stat
-        val money = if (notInGame) "Монет ${Formatter.toFormat(stat.money)}" else "Токенов ${Formatter.toFormat(user.tokens)}"
-        menu.money = money
+        menu.money = if (notInGame) "Монет ${Formatter.toFormat(stat.money)}" else "Токенов ${Formatter.toFormat(user.tokens)}"
         menu.rows = 3
         menu.columns = 2
         menu.vault = if (notInGame) "${PATH}coin.png" else "${PATH}token.png"

@@ -18,7 +18,7 @@ import java.util.*
  **/
 object RankManager {
 
-    private val ranks = mutableSetOf<UUID>()
+    private val ranks = hashSetOf<UUID>()
 
     fun createRank(user: User) {
         val location = user.player.location
@@ -71,5 +71,8 @@ object RankManager {
         }
     }
 
-    fun remove(uuid: UUID) = ModTransfer(uuid.toString()).send("tower:rank-remove", Bukkit.getOnlinePlayers())
+    fun remove(uuid: UUID) {
+        ranks.remove(uuid)
+        ModTransfer(uuid.toString()).send("tower:rank-remove", Bukkit.getOnlinePlayers())
+    }
 }

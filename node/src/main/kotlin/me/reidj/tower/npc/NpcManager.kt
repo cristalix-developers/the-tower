@@ -27,7 +27,7 @@ import kotlin.math.pow
 class NpcManager : ClockInject {
 
     companion object {
-        val npcs = mutableMapOf<NpcType, NpcSmart>()
+        val npcs = hashMapOf<NpcType, NpcSmart>()
     }
 
     init {
