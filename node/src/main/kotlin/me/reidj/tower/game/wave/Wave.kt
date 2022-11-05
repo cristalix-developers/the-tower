@@ -27,7 +27,7 @@ data class Wave(
 
     fun start() {
         startTime = System.currentTimeMillis()
-        ModTransfer(40).send("tower:bar", player)
+        ModTransfer("$level волна. До следующей волны", 40).send("tower:bar", player)
         repeat(1 + level * 2) {
             Bukkit.getScheduler().runTaskLater(app, {
                 val session = (app.getUser(player) ?: return@runTaskLater).session ?: return@runTaskLater

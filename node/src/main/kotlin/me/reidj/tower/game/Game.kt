@@ -5,7 +5,6 @@ import me.func.mod.Anime
 import me.func.mod.conversation.ModTransfer
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.choicer
-import me.func.mod.ui.scoreboard.ScoreBoard
 import me.func.mod.util.after
 import me.func.protocol.data.status.EndStatus
 import me.func.protocol.math.Position
@@ -123,9 +122,6 @@ interface Game {
             wave!!.start()
 
             after(3 * 20) {
-                ScoreBoard.hide(player)
-                ScoreBoard.subscribe("game-scoreboard", player)
-
                 // Игра началась
                 ModTransfer(
                     true,
@@ -152,11 +148,6 @@ interface Game {
         if (tower.health <= 0) {
             if (stat.maximumWavePassed > waveLevel) {
                 stat.maximumWavePassed = waveLevel
-            }
-
-            after {
-                ScoreBoard.hide(user.player)
-                ScoreBoard.subscribe("lobby-scoreboard", user.player)
             }
 
             user.player.giveDefaultItems()

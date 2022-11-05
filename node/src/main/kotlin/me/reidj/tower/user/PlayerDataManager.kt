@@ -11,7 +11,6 @@ import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.dailyReward
-import me.func.mod.ui.scoreboard.ScoreBoard
 import me.func.mod.util.after
 import me.func.protocol.ui.indicator.Indicators
 import me.reidj.tower.app
@@ -41,7 +40,6 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 import ru.cristalix.core.formatting.Formatting
-import ru.cristalix.core.realm.IRealmService
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -57,25 +55,6 @@ class PlayerDataManager : Listener {
     val spawn: Label = app.worldMeta.getLabel("spawn").apply { yaw = 0f }
 
     var globalBoosters = mutableListOf<BoosterInfo>()
-
-    init {
-        ScoreBoard.builder()
-            .key("lobby-scoreboard")
-            .header("TowerSimulator")
-            .dynamic("Уровень") { "§b${app.getUser(it)?.getLevel()}" }
-            .dynamic("Ранг") { "§a${app.getUser(it)?.stat?.rank?.title}" }
-            .empty()
-            .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }
-            .build()
-
-        ScoreBoard.builder()
-            .key("game-scoreboard")
-            .header("TowerSimulator")
-            .dynamic("Волна") { app.getUser(it)?.wave?.level }
-            .empty()
-            .dynamic("Онлайн") { IRealmService.get().getOnlineOnRealms("TOW") }
-            .build()
-    }
 
     @EventHandler
     fun AsyncPlayerPreLoginEvent.handle() = registerIntent(app).apply {
@@ -121,8 +100,6 @@ class PlayerDataManager : Listener {
                 Indicators.AIR_BAR
             )
             Anime.loadTextures(player, *Images.values().map { it.path() }.toTypedArray())
-
-            ScoreBoard.subscribe("lobby-scoreboard", player)
 
             ModLoader.send("mod-bundle-1.0-SNAPSHOT.jar", player)
 
