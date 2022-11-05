@@ -8,6 +8,7 @@ import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
 import me.func.mod.util.after
 import me.func.protocol.data.color.GlowColor
+import me.func.protocol.data.emoji.Emoji
 import me.func.protocol.math.Position
 import me.reidj.tower.app
 import me.reidj.tower.booster.BoosterType
@@ -129,9 +130,11 @@ class User(stat: Stat) {
         val prevLevel = getLevel()
         stat.experience += exp
         ModTransfer(
+            Emoji.EXP,
             requiredExperience(),
             LevelSystem.getRequiredExperience(getLevel()) - LevelSystem.getRequiredExperience(getLevel() - 1)
         ).send("tower:exp", player)
+        ModTransfer("㗨 ${getLevel()}").send("tower:level", player)
         if (getLevel() > prevLevel) {
             Anime.alert(
                 player,

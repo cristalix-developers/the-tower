@@ -116,8 +116,6 @@ class App : JavaPlugin() {
 
         listener(playerDataManager, InteractEvent(), UnusedEvent(), PlayerMoveEvent())
 
-
-
         Anime.createReader("mob:hit") { player, buffer ->
             // Нужно для проверки кто нанёс урон, башня или игрок
             val pair = buffer.toString(Charsets.UTF_8).split(":")

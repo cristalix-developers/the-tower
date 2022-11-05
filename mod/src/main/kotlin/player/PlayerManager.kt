@@ -1,10 +1,10 @@
 package player
 
 import dev.xdark.clientapi.event.lifecycle.GameLoop
-import dev.xdark.clientapi.resource.ResourceLocation
 import mod
+import ru.cristalix.clientapi.readUtf8
 import ru.cristalix.uiengine.UIEngine
-import ru.cristalix.uiengine.element.RectangleElement
+import ru.cristalix.uiengine.element.CarvedRectangle
 import ru.cristalix.uiengine.element.TextElement
 import ru.cristalix.uiengine.eventloop.animate
 import ru.cristalix.uiengine.utility.*
@@ -17,27 +17,44 @@ import util.Formatter
  */
 class PlayerManager {
 
-    private val gemBox = createBox(true, "gem")
-    private val moneyBox = createBox(false, "coin")
-    private val levelBox = carved {
+    private lateinit var progress: CarvedRectangle
+    private lateinit var experienceContent: TextElement
+    private val experiencePanel = carved {
         origin = BOTTOM
         align = BOTTOM
-        offset.y -= 24.0
-        size = V3(58.0, 13.0)
+        size = V3(90.0, 13.0)
         color = Color(0, 0, 0, 0.62)
-        +carved {
+        offset = V3(-46.0, -24.0)
+        progress = carved {
             origin = CENTER
             align = CENTER
-            size = V3(0.0, 12.0, 0.0)
+            size = V3(0.0, 13.0, 0.0)
             color = Color(34, 184, 77, 1.0)
         }
-        +text {
+        experienceContent = text {
             origin = CENTER
             align = CENTER
             shadow = true
-            scale = V3(0.9, 0.9)
             content = "Загрузка..."
         }
+        +progress
+        +experienceContent
+    }
+
+    private lateinit var levelContent: TextElement
+    private val levelPanel = carved {
+        origin = BOTTOM
+        align = BOTTOM
+        size = V3(90.0, 13.0)
+        color = Color(0, 0, 0, 0.62)
+        offset = V3(46.0, -24.0)
+        levelContent = text {
+            origin = CENTER
+            align = CENTER
+            shadow = true
+            content = "Загрузка..."
+        }
+        +levelContent
     }
 
     companion object {
@@ -45,24 +62,20 @@ class PlayerManager {
     }
 
     init {
-        UIEngine.overlayContext.addChild(gemBox, moneyBox, levelBox)
+        UIEngine.overlayContext.addChild(experiencePanel, levelPanel)
 
-        mod.registerChannel("tower:money") {
-            val money = readDouble()
-            (moneyBox.children[4] as TextElement).content = Formatter.toMoneyFormat(money)
-        }
-
-        mod.registerChannel("tower:gem") {
-            val gem = readInt()
-            (gemBox.children[4] as TextElement).content = Formatter.toMoneyFormat(gem.toDouble())
+        mod.registerChannel("tower:level") {
+            val level = readUtf8()
+            levelContent.content = level
         }
 
         mod.registerChannel("tower:exp") {
+            val emoji = readUtf8()
             val experience = readDouble()
             val requiredExperience = readInt()
 
-            (levelBox.children[3] as RectangleElement).animate(1) { size.x = 58.0 / requiredExperience * experience }
-            (levelBox.children[4] as TextElement).content = "${Formatter.toFormat(experience)} из $requiredExperience"
+            progress.animate(1) { size.x = 58.0 / requiredExperience * experience }
+            experienceContent.content = "$emoji ${Formatter.toFormat(experience)} из $requiredExperience"
         }
 
         mod.registerChannel("user:sword") {
@@ -71,33 +84,8 @@ class PlayerManager {
 
         mod.registerHandler<GameLoop> {
             val has = !mod.gameActive && screenCheck()
-            moneyBox.enabled = has
-            gemBox.enabled = has
-            levelBox.enabled = has
-        }
-    }
-
-    private fun createBox(isLeft: Boolean, texture: String) = carved {
-        origin = BOTTOM
-        align = BOTTOM
-        offset = V3(if (isLeft) -60.9 else 60.9, -24.0)
-        size = V3(60.0, 13.0)
-        color = Color(0, 0, 0, 0.62)
-        +rectangle {
-            origin = CENTER
-            align = if (isLeft) LEFT else RIGHT
-            size = V3(9.5, 9.5, 9.5)
-            color = WHITE
-            if (isLeft) offset.x += 8.0 else offset.x -= 8.0
-            textureLocation = ResourceLocation.of("minecraft", "mcpatcher/cit/tower/$texture.png")
-        }
-        +text {
-            origin = CENTER
-            align = CENTER
-            shadow = true
-            if (isLeft) offset.x += 5.0 else offset.x -= 5.0
-            scale = V3(0.9, 0.9)
-            content = "Загрузка..."
+            experiencePanel.enabled = has
+            levelPanel.enabled = has
         }
     }
 }

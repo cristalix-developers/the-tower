@@ -30,9 +30,9 @@ class Gem(location: Location) {
     }
 
     companion object {
-        fun bulkRemove(connection: PlayerConnection, coins: Set<Gem>) {
-            val idsToRemove = IntArray(coins.size)
-            with(coins.iterator()) {
+        fun bulkRemove(connection: PlayerConnection, gems: Set<Gem>) {
+            val idsToRemove = IntArray(gems.size)
+            with(gems.iterator()) {
                 for (i in idsToRemove.indices) {
                     idsToRemove[i] = this.next().entityItem.getId()
                 }

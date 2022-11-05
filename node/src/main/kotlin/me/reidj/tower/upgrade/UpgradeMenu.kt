@@ -3,6 +3,7 @@ package me.reidj.tower.upgrade
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
+import me.func.protocol.data.emoji.Emoji
 import me.reidj.tower.app
 import me.reidj.tower.data.Category
 import me.reidj.tower.data.Improvement
@@ -11,7 +12,6 @@ import me.reidj.tower.sound.SoundType
 import me.reidj.tower.sword.SwordType
 import me.reidj.tower.user.User
 import me.reidj.tower.util.Formatter
-import me.reidj.tower.util.PATH
 import me.reidj.tower.util.error
 
 /**
@@ -42,7 +42,7 @@ class UpgradeMenu {
         menu.money = if (notInGame) "Монет ${Formatter.toFormat(stat.money)}" else "Токенов ${Formatter.toFormat(user.tokens)}"
         menu.rows = 3
         menu.columns = 2
-        menu.vault = if (notInGame) "${PATH}coin.png" else "${PATH}token.png"
+        menu.vault = if (notInGame) Emoji.COIN else Emoji.RUBY
         menu.storage = type.filter { it.key.category == category }.map { (key, value) ->
             val level = value.level
             val cost = key.price * level * 0.5

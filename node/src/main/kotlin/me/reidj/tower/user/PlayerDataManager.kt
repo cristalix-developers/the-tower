@@ -11,7 +11,10 @@ import me.func.mod.ui.booster.Booster
 import me.func.mod.ui.booster.Boosters
 import me.func.mod.ui.menu.button
 import me.func.mod.ui.menu.dailyReward
+import me.func.mod.ui.token.Token
+import me.func.mod.ui.token.TokenGroup
 import me.func.mod.util.after
+import me.func.protocol.data.emoji.Emoji
 import me.func.protocol.ui.indicator.Indicators
 import me.reidj.tower.app
 import me.reidj.tower.booster.BoosterInfo
@@ -26,10 +29,8 @@ import me.reidj.tower.protocol.BulkSaveUserPackage
 import me.reidj.tower.protocol.LoadUserPackage
 import me.reidj.tower.protocol.SaveUserPackage
 import me.reidj.tower.rank.RankManager
-import me.reidj.tower.util.Images
-import me.reidj.tower.util.giveDefaultItems
-import me.reidj.tower.util.godSet
-import me.reidj.tower.util.transfer
+import me.reidj.tower.util.*
+import me.reidj.tower.util.Formatter
 import org.bukkit.Bukkit
 import org.bukkit.GameMode
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer
@@ -55,6 +56,17 @@ class PlayerDataManager : Listener {
     val spawn: Label = app.worldMeta.getLabel("spawn").apply { yaw = 0f }
 
     var globalBoosters = mutableListOf<BoosterInfo>()
+
+    private val group = TokenGroup(
+        Token.builder()
+            .title("Самоцветы")
+            .content { player -> Emoji.RUBY + "§c " + app.getUser(player)!!.stat.gem }
+            .build(),
+        Token.builder()
+            .title("Монеты")
+            .content { player -> Emoji.COIN + "§6 " + Formatter.toFormat(app.getUser(player)!!.stat.money) }
+            .build()
+    )
 
     @EventHandler
     fun AsyncPlayerPreLoginEvent.handle() = registerIntent(app).apply {
@@ -89,6 +101,8 @@ class PlayerDataManager : Listener {
             player.performCommand("resourcepack")
             player.giveDefaultItems()
             player.isOp = player.uniqueId.toString() in godSet
+
+            group.subscribe(player)
 
             Anime.hideIndicator(
                 player,

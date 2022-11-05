@@ -8,13 +8,13 @@ import me.func.mod.ui.menu.confirmation.Confirmation
 import me.func.mod.ui.menu.selection
 import me.func.mod.util.command
 import me.func.protocol.data.color.GlowColor
+import me.func.protocol.data.emoji.Emoji
 import me.reidj.tower.app
 import me.reidj.tower.clock.ClockInject
 import me.reidj.tower.data.Category
 import me.reidj.tower.data.ResearchType
 import me.reidj.tower.sound.SoundType
 import me.reidj.tower.util.Formatter.toFormat
-import me.reidj.tower.util.PATH
 import me.reidj.tower.util.error
 import me.reidj.tower.util.formatSecond
 import me.reidj.tower.util.plural
@@ -43,7 +43,7 @@ class LaboratoryManager : ClockInject {
                         val gem = 5 * value.level
                         button {
                             title = "${key.title} §3${value.level} LVL"
-                            menu.vault = "${PATH}coin.png"
+                            menu.vault = Emoji.COIN
                             texture = key.texture
                             description =
                                 if (value.whenBought != 0L) "Нажмите ПКМ, чтобы закончить изучение" else "${toFormat(value.getValue())
