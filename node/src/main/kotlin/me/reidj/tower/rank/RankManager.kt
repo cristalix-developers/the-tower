@@ -18,37 +18,24 @@ import java.util.*
  **/
 object RankManager {
 
-    private val ranks = hashSetOf<UUID>()
-
     fun createRank(user: User) {
-        val location = user.player.location
         user.stat.run {
-            if (rank == RankType.NONE)
-                return@run
-            ranks.add(uuid)
-            ModTransfer(
-                uuid.toString(),
-                "${rank.name.lowercase()}.png",
-                location.x,
-                location.y,
-                location.z
-            ).send("tower:rank", Bukkit.getOnlinePlayers())
+            if (rank == RankType.NONE) return@run
+            ModTransfer(uuid.toString(), "${rank.name.lowercase()}.png").send("tower:rank", Bukkit.getOnlinePlayers())
         }
     }
 
     fun showAll(user: User) {
-        ranks.mapNotNull { app.getUser(it) }.forEach {
-            if (user.stat.rank == RankType.NONE)
+        Bukkit.getOnlinePlayers().mapNotNull { app.getUser(it) }.forEach {
+            if (user.stat.rank == RankType.NONE) {
                 return@forEach
-            val location = it.player.location
-            it.stat.run {
-                ModTransfer(
-                    uuid.toString(),
-                    "${rank.name.lowercase()}.png",
-                    location.x,
-                    location.y,
-                    location.z
-                ).send("tower:rank", user.player)
+            }
+            val stat = it.stat
+            after(5) {
+                ModTransfer(stat.uuid.toString(), "${stat.rank.name.lowercase()}.png").send(
+                    "tower:rank",
+                    user.player
+                )
             }
         }
     }
@@ -72,7 +59,6 @@ object RankManager {
     }
 
     fun remove(uuid: UUID) {
-        ranks.remove(uuid)
         ModTransfer(uuid.toString()).send("tower:rank-remove", Bukkit.getOnlinePlayers())
     }
 }

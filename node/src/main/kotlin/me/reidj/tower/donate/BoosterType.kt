@@ -22,49 +22,49 @@ enum class BoosterType(
 ) : Donate {
     GLOBAL_EXP_BOOST(
         "Глобальный бустер Опыта §bх2",
-        "Глобальный бустер на §b1 час§f, Вы получаете в два раза больше Опыта!",
+        "Глобальный бустер на §b1 час§f, Вы \nполучаете в два раза больше Опыта!",
         99,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.EXP, true) }
     ),
     LOCAL_EXP_BOOST(
         "Локальный бустер Опыта §bх2",
-        "Локальный бустер на §b1 час§f, Вы получаете в два раза больше Опыта!",
+        "Локальный бустер на §b1 час§f, Вы \nполучаете в два раза больше Опыта!",
         59,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.EXP, false) }
     ),
     GLOBAL_GEM_BOOST(
         "Глобальный бустер Самоцветов §bх2",
-        "Глобальный бустер на §b1 час§f, Вы получаете в два раза больше Самоцветов!",
+        "Глобальный бустер на §b1 час§f, Вы \nполучаете в два раза больше\nСамоцветов!",
         109,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.GEM, true) }
     ),
     LOCAL_GEM_BOOST(
         "Локальный бустер Самоцветов §bх2",
-        "Локальный бустер на §b1 час§f, Вы получаете в два раза больше Самоцветов!",
+        "Локальный бустер на §b1 час§f, Вы \nполучаете в два раза больше\nСамоцветов!",
         69,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.GEM, false) }
     ),
     GLOBAL_TOKEN_BOOST(
         "Глобальный бустер Токенов §bх2",
-        "Глобальный бустер на §b1 час§f, Вы получаете в два раза больше Токенов!",
+        "Глобальный бустер на §b1 час§f, Вы \nполучаете в два раза больше\nТокенов!",
         99,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.TOKEN, true) }
     ),
     LOCAL_TOKEN_BOOST(
         "Локальный бустер Токенов §bх2",
-        "Локальный бустер на §b1 час§f, Вы получаете в два раза больше Токенов!",
+        "Локальный бустер на §b1 час§f, Вы \nполучаете в два раза больше\nТокенов!",
         59,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.TOKEN, false) }
     ),
     GLOBAL_MONEY_BOOST(
         "Глобальный бустер Монет §bх2",
-        "Глобальный бустер на §b1 час§f, Вы получаете в два раза больше Монет!",
+        "Глобальный бустер на §b1 час§f, Вы \nполучаете в два раза больше Монет!",
         109,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.MONEY, true) }
     ),
     LOCAL_MONEY_BOOST(
         "Локальный бустер Монет §bх2",
-        "Локальный бустер на §b1 час§f, Вы получаете в два раза больше Монет!",
+        "Локальный бустер на §b1 час§f, Вы \nполучаете в два раза больше Монет!",
         69,
         { BoosterInfo.defaultInstance(it.stat.uuid, it.player.displayName, me.reidj.tower.booster.BoosterType.MONEY, false) }
     ),

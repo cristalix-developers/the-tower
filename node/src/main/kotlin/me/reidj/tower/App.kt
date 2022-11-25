@@ -1,7 +1,6 @@
 package me.reidj.tower
 
 import clepto.bukkit.B
-import clepto.cristalix.Cristalix
 import clepto.cristalix.WorldMeta
 import dev.implario.bukkit.platform.Platforms
 import dev.implario.platform.impl.darkpaper.PlatformDarkPaper
@@ -71,8 +70,6 @@ class App : JavaPlugin() {
         B.plugin = this
 
         Platforms.set(PlatformDarkPaper())
-
-        Cristalix.client()
 
         CoreApi.get().run {
             registerService(ITransferService::class.java, TransferService(socketClient))

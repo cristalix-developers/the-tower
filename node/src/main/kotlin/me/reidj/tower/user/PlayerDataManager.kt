@@ -125,8 +125,10 @@ class PlayerDataManager : Listener {
                .filter { type -> type.value.whenBought != 0L }
                .forEach { addProgress(user, it.key) }
 
-            RankManager.createRank(user)
-            RankManager.showAll(user)
+            RankManager.run {
+                createRank(user)
+                showAll(user)
+            }
 
             if (app.playerDataManager.globalBoosters.isNotEmpty()) {
                 sendBoosters(player, *app.playerDataManager.globalBoosters.toTypedArray())
